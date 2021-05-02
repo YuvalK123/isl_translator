@@ -35,7 +35,7 @@ class _HomeState extends State<Home> {
           SizedBox(height: 20.0,),
           TextFormField(
               decoration: textInputDecoration.copyWith(hintText: 'title'),
-              validator: (val) => val.isEmpty ? '' : null,
+              // validator: (val) => val.isEmpty ? '' : null,
             onChanged: (val) { // key
                 setState(() {
                   key = val;
@@ -60,29 +60,57 @@ class _HomeState extends State<Home> {
             },
           ),
           SizedBox(height: 20.0,),
-          RaisedButton(
-            color: Colors.pink[400],
-            child: Text("Add video",
-                style: TextStyle(color: Colors.white)
-            ),
-            onPressed: () async {
-              if (_formKey.currentState.validate()){
-                print("$key, $url, $desc");
-                DatabaseService().updateVideo(key, url, desc);
-              }
-            },
+
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget> [
+              RaisedButton(
+                color: Colors.pink[400],
+                child: Text("Add video",
+                    style: TextStyle(color: Colors.white)
+                ),
+                onPressed: () async {
+                  if (_formKey.currentState.validate()){
+                    await DatabaseService().updateVideo(key, url, desc);
+                  }
+                },
+              ),
+              SizedBox(width: 10.0,),
+              RaisedButton(
+                color: Colors.pink[400],
+                child: Text("Delete video",
+                    style: TextStyle(color: Colors.white)
+                ),
+                onPressed: () async {
+                  if (_formKey.currentState.validate()){
+                   await DatabaseService().deleteVideo(key);
+                  }
+                },
+              ),
+              SizedBox(height: 10.0,),
+            ],
           ),
-          SizedBox(height: 10.0,),
+
           RaisedButton(
             color: Colors.pink[400],
-            child: Text("Delete video",
+            child: Text("Print Data",
                 style: TextStyle(color: Colors.white)
             ),
             onPressed: () async {
-              if (_formKey.currentState.validate()){
-                print("$key, $url, $desc");
-                DatabaseService().deleteVideo(key);
+              if (_formKey.currentState.validate()) {
+                print("not working yet");
+                // print("______");
+                // dynamic vids = DatabaseService().vids;
+                // // vids.toString();
+                // print(vids.foreach((element) => element));
+                // print("______");
               }
+              // if (_formKey.currentState.validate()){
+              //   print("validated");
+              //   print(DatabaseService().videos.forEach((element) {print(element);}));
+              // }
+              // print("after if");
             },
           ),
           SizedBox(height: 12.0,),
