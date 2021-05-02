@@ -72,6 +72,19 @@ class _HomeState extends State<Home> {
               }
             },
           ),
+          SizedBox(height: 10.0,),
+          RaisedButton(
+            color: Colors.pink[400],
+            child: Text("Delete video",
+                style: TextStyle(color: Colors.white)
+            ),
+            onPressed: () async {
+              if (_formKey.currentState.validate()){
+                print("$key, $url, $desc");
+                DatabaseService().deleteVideo(key);
+              }
+            },
+          ),
           SizedBox(height: 12.0,),
           Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),)
         ],

@@ -2,18 +2,25 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 class DatabaseService {
 
-  // DatabaseService( { this.uid } );
+  final String uid;
+
+  DatabaseService( { this.uid } );
 
   // collection reference
   final CollectionReference videosCollection =
     Firestore.instance.collection('videosUrls');
 
   Future updateVideo(String key, String url, String desc) async {
-    return await videosCollection.document('K5PJZ8WUsbNqi7tqfxzmbljgPW73').setData({
+    print("$key, $url, $desc");
+    return await videosCollection.document(key).setData({
       "title" : key,
       "url" : url,
       "description" : desc
     });
   }
 
+  Future deleteVideo(String key) async{
+    print("deleting $key");
+    return await videosCollection.document(key).delete();
+  }
 }
