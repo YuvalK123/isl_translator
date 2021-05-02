@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "685169809464",
+    "project_id": "islcsproject",
+    "storage_bucket": "islcsproject.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:685169809464:android:ac075ac45e48267e3eeecd",
+        "android_client_info": {
+          "package_name": "com.csproject.isl_translator"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "685169809464-iet64f6hqb8s4molsip8q1bkj3nji945.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgiEU4oHoFBrS_sEdFpVzYifpotLcAFys"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "685169809464-iet64f6hqb8s4molsip8q1bkj3nji945.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
