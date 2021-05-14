@@ -99,12 +99,18 @@ class _HomeState extends State<Home> {
             ),
             onPressed: () async {
               if (_formKey.currentState.validate()) {
-                print("not working yet");
-                // print("______");
-                // dynamic vids = DatabaseService().vids;
-                // // vids.toString();
-                // print(vids.foreach((element) => element));
-                // print("______");
+                print("______");
+                dynamic vids = DatabaseService().vids;
+                print("vids is $vids");
+                if (vids != null){
+                  vids.forEach((e) => print("e = $e;"));
+                  // print(vids.forEach((element) => element));
+                  print("______");
+                }else{
+                  print("vids == null");
+                }
+                // vids.toString();
+
               }
               // if (_formKey.currentState.validate()){
               //   print("validated");

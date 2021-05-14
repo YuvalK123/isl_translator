@@ -28,18 +28,19 @@ class DatabaseService {
     return await videosCollection.document(key).delete();
   }
 
-  // List<Vid> _videoFromSnapshot(QuerySnapshot snapshot) {
-  //   return snapshot.documents.map((doc) =>
-  //       Vid(title: doc.data['title'] ?? 'no title available',
-  //           url: doc.data['url'] ?? 'no url available',
-  //           desc: doc.data['description'] ?? 'no desc available')
-  //   ).toList();
-  // }
-  //
-  // Stream<List<Vid>> get vids {
-  //   Stream<List<Vid>> x = videosCollection.snapshots().map(_videoFromSnapshot);
-  //   // print(x.forEach((element) => element.toString()));
-  //   return x;
-  // }
+  List<Vid> _videoFromSnapshot(QuerySnapshot snapshot) {
+    return snapshot.documents.map((doc) =>
+        Vid(title: doc.data['title'] ?? 'no title available',
+            url: doc.data['url'] ?? 'no url available',
+            desc: doc.data['description'] ?? 'no desc available')
+    ).toList();
+  }
+
+  Stream<List<Vid>> get vids {
+    Stream<List<Vid>> x = videosCollection.snapshots().map(_videoFromSnapshot);
+    print("x is $x");
+    // print(x.forEach((element) => element.toString()));
+    return x;
+  }
 
 }
