@@ -12,43 +12,43 @@ class RecordPage extends StatefulWidget {
 }
 
 class _RecordPage extends State<RecordPage> {
-  final Map<String, HighlightedWord> _highlights = {
-    'flutter': HighlightedWord(
-      onTap: () => print('flutter'),
-      textStyle: const TextStyle(
-        color: Colors.blue,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'voice': HighlightedWord(
-      onTap: () => print('voice'),
-      textStyle: const TextStyle(
-        color: Colors.green,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'subscribe': HighlightedWord(
-      onTap: () => print('subscribe'),
-      textStyle: const TextStyle(
-        color: Colors.red,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'like': HighlightedWord(
-      onTap: () => print('like'),
-      textStyle: const TextStyle(
-        color: Colors.blueAccent,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-    'comment': HighlightedWord(
-      onTap: () => print('comment'),
-      textStyle: const TextStyle(
-        color: Colors.green,
-        fontWeight: FontWeight.bold,
-      ),
-    ),
-  };
+  // final Map<String, HighlightedWord> _highlights = {
+  //   'flutter': HighlightedWord(
+  //     onTap: () => print('flutter'),
+  //     textStyle: const TextStyle(
+  //       color: Colors.blue,
+  //       fontWeight: FontWeight.bold,
+  //     ),
+  //   ),
+  //   'voice': HighlightedWord(
+  //     onTap: () => print('voice'),
+  //     textStyle: const TextStyle(
+  //       color: Colors.green,
+  //       fontWeight: FontWeight.bold,
+  //     ),
+  //   ),
+  //   'subscribe': HighlightedWord(
+  //     onTap: () => print('subscribe'),
+  //     textStyle: const TextStyle(
+  //       color: Colors.red,
+  //       fontWeight: FontWeight.bold,
+  //     ),
+  //   ),
+  //   'like': HighlightedWord(
+  //     onTap: () => print('like'),
+  //     textStyle: const TextStyle(
+  //       color: Colors.blueAccent,
+  //       fontWeight: FontWeight.bold,
+  //     ),
+  //   ),
+  //   'comment': HighlightedWord(
+  //     onTap: () => print('comment'),
+  //     textStyle: const TextStyle(
+  //       color: Colors.green,
+  //       fontWeight: FontWeight.bold,
+  //     ),
+  //   ),
+  // };
 
   stt.SpeechToText _speech;
   bool _isListening = false;
@@ -88,19 +88,12 @@ class _RecordPage extends State<RecordPage> {
         reverse: true,
         child: Container(
           padding: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 150.0),
-          child: TextHighlight(
-            text: _text,
-            words: _highlights,
-            textStyle: const TextStyle(
-              fontSize: 25.0,
-              color: Colors.black,
-              fontWeight: FontWeight.w400,
-            ),
+          child: Text(_text),
           ),
         ),
-      ),
+      );
 
-    );
+    // );
   }
 
   void _listen() async {
@@ -116,9 +109,11 @@ class _RecordPage extends State<RecordPage> {
           onResult: (val) =>
               setState(() {
                 _text = val.recognizedWords;
+                print("recg is $_text");
                 if (val.hasConfidenceRating && val.confidence > 0) {
                   _confidence = val.confidence;
                 }
+                print("confd ${val.confidence}");
               }),
         );
       }

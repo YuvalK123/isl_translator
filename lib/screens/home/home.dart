@@ -72,7 +72,7 @@ class _HomeState extends State<Home> {
                 ),
                 onPressed: () async {
                   if (_formKey.currentState.validate()){
-                    await DatabaseService().updateVideo(key, url, desc);
+                    await DatabaseVidService().updateVideo(key, url, desc);
                   }
                 },
               ),
@@ -84,7 +84,7 @@ class _HomeState extends State<Home> {
                 ),
                 onPressed: () async {
                   if (_formKey.currentState.validate()){
-                   await DatabaseService().deleteVideo(key);
+                   await DatabaseVidService().deleteVideo(key);
                   }
                 },
               ),
@@ -100,7 +100,7 @@ class _HomeState extends State<Home> {
             onPressed: () async {
               if (_formKey.currentState.validate()) {
                 print("______");
-                dynamic vids = DatabaseService().vids;
+                dynamic vids = DatabaseVidService().vids;
                 print("vids is $vids");
                 if (vids != null){
                   vids.forEach((e) => print("e = $e;"));
