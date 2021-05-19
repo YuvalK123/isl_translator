@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
+import 'package:isl_translator/screens/home/home.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'voice_translation.dart';
 import 'text_translation.dart';
@@ -94,6 +95,14 @@ class _TranslationScreenState extends State<TranslationScreen> {
               Tab(text: 'Write', icon: Icon(Icons.text_fields))
             ],
           ),
+          actions: <Widget>[
+            FlatButton.icon(onPressed: (){
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home()));
+            },
+                icon: Icon(Icons.home),
+                label: Text("Home")
+            ),
+          ],
         ),
         body: SafeArea(
           bottom: false,
