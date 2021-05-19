@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:isl_translator/screens/translation_page/text_translation.dart';
+import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
+import 'package:isl_translator/screens/wrapper.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/constant.dart';
 import 'package:isl_translator/shared/loading.dart';
@@ -26,6 +29,19 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text("Isl translator - home"),
         backgroundColor: Colors.lightBlue[100],
+        actions: <Widget>[
+      FlatButton.icon(
+      icon: Icon(Icons.translate),
+        label: Text("Translation page",
+          style: TextStyle(fontSize: 15.0),
+        ),
+        onPressed: (){
+          Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => TranslationWrapper(),
+              ));
+        }),
+        ],
       ),
       backgroundColor: Colors.brown[200],
       body: Form(
