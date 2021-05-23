@@ -92,7 +92,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
             isScrollable: true,
             tabs: [
               Tab(text: 'Speak',icon: Icon(Icons.speaker_phone)),
-              Tab(text: 'Write', icon: Icon(Icons.text_fields))
+              Tab(text: 'Write', icon: Icon(Icons.text_fields)),
             ],
           ),
           actions: <Widget>[
@@ -109,7 +109,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
           child: TabBarView(
               children: [
                 RecordPage(),
-                TranslatePage()
+                TranslatePage(),
               ]
           ),
         ),
