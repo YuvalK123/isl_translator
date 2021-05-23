@@ -4,6 +4,7 @@ import 'package:isl_translator/screens/home/home.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'voice_translation.dart';
 import 'text_translation.dart';
+import 'add_expression_page.dart';
 
 void main() {
   runApp(TranslationWrapper());
@@ -83,7 +84,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 3,
       child: Scaffold(
         appBar: AppBar(
           title: Text("Sign Language Translator"),
@@ -91,8 +92,9 @@ class _TranslationScreenState extends State<TranslationScreen> {
           bottom: const TabBar(
             isScrollable: true,
             tabs: [
-              Tab(text: 'Speak',icon: Icon(Icons.speaker_phone)),
-              Tab(text: 'Write', icon: Icon(Icons.text_fields))
+              Tab(text: 'Speak',icon: Icon(Icons.mic)),
+              Tab(text: 'Write', icon: Icon(Icons.text_fields)),
+              Tab(text: 'Add Expression', icon: Icon(Icons.video_call))
             ],
           ),
           actions: <Widget>[
@@ -109,7 +111,8 @@ class _TranslationScreenState extends State<TranslationScreen> {
           child: TabBarView(
               children: [
                 RecordPage(),
-                TranslatePage()
+                TranslatePage(),
+                AddExpression(),
               ]
           ),
         ),
