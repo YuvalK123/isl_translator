@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/services//show_video.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
+//import 'package:flick_video_player/flick_video_player.dart';
+
 
 class TranslatePage extends StatefulWidget {
   TranslatePage({Key key, this.title}) : super(key: key);
@@ -48,6 +50,16 @@ class _TranslatePage extends State<TranslatePage>
     super.dispose();
   }
 
+
+  /* Split the word to letters */
+  void split_to_letters(String word) {
+    var num = 0;
+    for( var i = num ; i <= word.length; i++) {
+      print(word[i]);
+      // need to display each word on a video
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -69,23 +81,36 @@ class _TranslatePage extends State<TranslatePage>
               // ignore: deprecated_member_use
               FlatButton(
                 onPressed: () async{
-                  //show the video in other page
-                  //child: Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen()));
-                  print(myController.text);
-                  //show the video in the same page
-                  StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/" + myController.text + ".mp4");
-                  var url = await (ref.getDownloadURL());
+                  var url;
+                  StorageReference ref  = FirebaseStorage.instance.ref().child("animation_openpose/" + myController.text + ".mp4");
+                  try {
+                    // gets the video's url
+                    url = await ref.getDownloadURL();
+                  } catch(err) {
+                    // Video doesn't exist - so split the work to letters
+                    split_to_letters(myController.text);
+                  }
+
+                  // Display the video
                   _controller = VideoPlayerController.network(
                     '$url'
-                    // 'https://drive.google.com/uc?export=download&id=18tX2pBLGIGCIhbhKBfV1Tvu-KsbWWLmT',
                   );
                   // Initialize the controller and store the Future for later use.
                   _initializeVideoPlayerFuture = _controller.initialize();
                   // Use the controller to loop the video.
                   _controller.setLooping(false);
-
-                  // start the video
                   setState(() {
+                    if (!_controller.value.isPlaying) {
+                      _controller.play();
+                      /*return Container(
+                        child: FlickVideoPlayer(
+                            flickManager: flickManager
+                        ),
+                      );*/
+                    }
+                  });
+                  // start the video
+                  /*setState(() {
                     // If the video is playing, pause it.
                     if (_controller.value.isPlaying) {
                       _controller.pause();
@@ -93,7 +118,7 @@ class _TranslatePage extends State<TranslatePage>
                       // If the video is paused, play it.
                       _controller.play();
                     }
-                  });
+                  });*/
 
                 },
                 child: Text("Translate"),
@@ -120,7 +145,7 @@ class _TranslatePage extends State<TranslatePage>
             ]
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      /*floatingActionButton: FloatingActionButton(
         onPressed: () {
           // Wrap the play or pause in a call to `setState`. This ensures the
           // correct icon is shown.
@@ -135,10 +160,10 @@ class _TranslatePage extends State<TranslatePage>
           });
         },
         // Display the correct icon depending on the state of the player.
-        /*child: Icon(
+        child: Icon(
           _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-        ),*/
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+        ),
+      ),*/ // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
 
