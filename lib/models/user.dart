@@ -1,11 +1,11 @@
 
-class User {
+class UserModel {
 
   final String uid;
   final String name;
   final int age;
   final String gender;
 
-  User({ this.uid, this.name, this.age, this.gender });
+  UserModel({ this.uid, this.name, this.age, this.gender });
 
 }

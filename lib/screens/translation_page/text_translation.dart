@@ -1,3 +1,4 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services//show_video.dart';
 import 'package:video_player/video_player.dart';
@@ -25,6 +26,9 @@ class _TranslatePage extends State<TranslatePage>
     // Create and store the VideoPlayerController. The VideoPlayerController
     // offers several different constructors to play videos from assets, files,
     // or the internet.
+    StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/אותם.mp4");
+    String url = (ref.getDownloadURL().toString());
+    print("url is $url");
     _controller = VideoPlayerController.network(
         'NULL'
     );
@@ -64,13 +68,18 @@ class _TranslatePage extends State<TranslatePage>
               ),
               // ignore: deprecated_member_use
               FlatButton(
-                onPressed: () {
+                onPressed: () async{
                   //show the video in other page
                   //child: Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen()));
 
                   //show the video in the same page
+                  StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/אותם.mp4");
+                  Future<dynamic> url = await (ref.getDownloadURL());
+
+                  print("url is $url");
                   _controller = VideoPlayerController.network(
-                    'https://drive.google.com/uc?export=download&id=18tX2pBLGIGCIhbhKBfV1Tvu-KsbWWLmT',
+                    url.toString()
+                    // 'https://drive.google.com/uc?export=download&id=18tX2pBLGIGCIhbhKBfV1Tvu-KsbWWLmT',
                   );
                   // Initialize the controller and store the Future for later use.
                   _initializeVideoPlayerFuture = _controller.initialize();
