@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/models/video.dart';
 
@@ -10,7 +11,7 @@ class DatabaseVidService {
 
   // collection reference
   final CollectionReference videosCollection =
-  Firestore.instance.collection('videosUrls');
+  FirebaseFirestore.instance.collection('videosUrls');
 
 
 
@@ -30,10 +31,10 @@ class DatabaseVidService {
   }
 
   List<Vid> _videoFromSnapshot(QuerySnapshot snapshot) {
-    return snapshot.documents.map((doc) =>
-        Vid(title: doc.data['title'] ?? 'no title available',
-            url: doc.data['url'] ?? 'no url available',
-            desc: doc.data['description'] ?? 'no desc available')
+    return snapshot.docs.map((doc) =>
+        Vid(title: doc.data()['title'] ?? 'no title available',
+            url: doc.data()['url'] ?? 'no url available',
+            desc: doc.data()['description'] ?? 'no desc available')
     ).toList();
   }
 
@@ -62,16 +63,16 @@ class DatabaseUserService{
     });
   }
 
-  List<User> _brewListFromSnapshot(QuerySnapshot snapshot){
-    return snapshot.documents.map((doc) =>
-        User(name: doc.data['name'] ?? '',
-            age: doc.data['age'] ?? 0,
-            gender: doc.data['gender'] ?? "f")
+  List<UserModel> _brewListFromSnapshot(QuerySnapshot snapshot){
+    return snapshot.docs.map((doc) =>
+        UserModel(name: doc.data()['name'] ?? '',
+            age: doc.data()['age'] ?? 0,
+            gender: doc.data()['gender'] ?? "f")
     ).toList();
   }
 
   // get brews stream
-  Stream<List<User>> get users {
+  Stream<List<UserModel>> get users {
     return usersCollection.snapshots().map(_brewListFromSnapshot);
   }
 }

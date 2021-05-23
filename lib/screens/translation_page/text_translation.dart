@@ -1,8 +1,8 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'file:///C:/Users/israe/AndroidStudioProjects/isl_translator/lib/services/show_video.dart';
+import 'package:isl_translator/services//show_video.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 
 class TranslatePage extends StatefulWidget {
   TranslatePage({Key key, this.title}) : super(key: key);
@@ -26,8 +26,11 @@ class _TranslatePage extends State<TranslatePage>
     // Create and store the VideoPlayerController. The VideoPlayerController
     // offers several different constructors to play videos from assets, files,
     // or the internet.
+    StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/אותם.mp4");
+    String url = (ref.getDownloadURL().toString());
+    print("url is $url");
     _controller = VideoPlayerController.network(
-      'NULL'
+        'NULL'
     );
     // Initialize the controller and store the Future for later use.
     _initializeVideoPlayerFuture = _controller.initialize();
@@ -53,70 +56,71 @@ class _TranslatePage extends State<TranslatePage>
         backgroundColor: Colors.deepPurple[300],
       ),
       body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-              children: [
-                TextField(
-                  controller: myController,
-                  decoration: InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: 'Enter your text'
-                  ),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+            children: [
+              TextField(
+                controller: myController,
+                decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Enter your text'
                 ),
-                // ignore: deprecated_member_use
-                FlatButton(
-                  onPressed: () {
-                    //show the video in other page
-                    //child: Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen()));
+              ),
+              // ignore: deprecated_member_use
+              FlatButton(
+                onPressed: () async{
+                  //show the video in other page
+                  //child: Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen()));
 
-                    StorageReference ref = FirebaseStorage.instance.ref().child("images/sky.jpg");
-                    String url = (ref.getDownloadURL()).toString();
-                    print(url);
+                  //show the video in the same page
+                  StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/אותם.mp4");
+                  Future<dynamic> url = await (ref.getDownloadURL());
 
-                    //show the video in the same page
-                    _controller = VideoPlayerController.network(
-                      'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%99%D7%9E%D7%99%D7%99%D7%9C.mp4?alt=media&token=f2a5ab23-834e-4a80-a7d2-36cd5cedfbf4',
-                    );
-                    // Initialize the controller and store the Future for later use.
-                    _initializeVideoPlayerFuture = _controller.initialize();
-                    // Use the controller to loop the video.
-                    _controller.setLooping(false);
+                  print("url is $url");
+                  _controller = VideoPlayerController.network(
+                    url.toString()
+                    // 'https://drive.google.com/uc?export=download&id=18tX2pBLGIGCIhbhKBfV1Tvu-KsbWWLmT',
+                  );
+                  // Initialize the controller and store the Future for later use.
+                  _initializeVideoPlayerFuture = _controller.initialize();
+                  // Use the controller to loop the video.
+                  _controller.setLooping(false);
 
-                    // start the video
-                    setState(() {
-                      // If the video is playing, pause it.
-                      if (_controller.value.isPlaying) {
-                        _controller.pause();
-                      } else {
-                        // If the video is paused, play it.
-                        _controller.play();
-                      }
-                    });
-
-                  },
-                  child: Text("Translate"),
-                  color: Colors.black12,
-                ),
-                FutureBuilder(
-                  future: _initializeVideoPlayerFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.done) {
-                      // If the VideoPlayerController has finished initialization, use
-                      // the data it provides to limit the aspect ratio of the video.
-                      return AspectRatio(
-                        aspectRatio: _controller.value.aspectRatio,
-                        // Use the VideoPlayer widget to display the video.
-                        child: VideoPlayer(_controller),
-                      );
+                  // start the video
+                  setState(() {
+                    // If the video is playing, pause it.
+                    if (_controller.value.isPlaying) {
+                      _controller.pause();
                     } else {
-                      // If the VideoPlayerController is still initializing, show a
-                      // loading spinner.
-                      return Center(child: CircularProgressIndicator());
+                      // If the video is paused, play it.
+                      _controller.play();
                     }
-                  },
-                ),
-              ]
-          ),
+                  });
+
+                },
+                child: Text("Translate"),
+                color: Colors.black12,
+              ),
+              FutureBuilder(
+                future: _initializeVideoPlayerFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    // If the VideoPlayerController has finished initialization, use
+                    // the data it provides to limit the aspect ratio of the video.
+                    return AspectRatio(
+                      aspectRatio: _controller.value.aspectRatio,
+                      // Use the VideoPlayer widget to display the video.
+                      child: VideoPlayer(_controller),
+                    );
+                  } else {
+                    // If the VideoPlayerController is still initializing, show a
+                    // loading spinner.
+                    return Center(child: CircularProgressIndicator());
+                  }
+                },
+              ),
+            ]
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {

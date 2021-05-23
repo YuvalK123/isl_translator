@@ -6,13 +6,13 @@ class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // create user based on firebase user
-  User _userFromFirebase(FirebaseUser user){
-    return user != null ? User(uid: user.uid) : null ;
+  UserModel _userFromFirebase(User user){
+    return user != null ? UserModel(uid: user.uid) : null ;
   }
 
   // auth change user stream
-  Stream<User> get user{
-    return _auth.onAuthStateChanged.map(_userFromFirebase);
+  Stream<UserModel> get user{
+    return _auth.authStateChanges().map(_userFromFirebase);
     // .map((FirebaseUser user) => _userFromFirebase(user));
   }
 
@@ -20,8 +20,8 @@ class AuthService {
   Future signInAnon() async {
     try{
       // user object
-      AuthResult result = await _auth.signInAnonymously();
-      FirebaseUser user = result.user;
+      UserCredential result = await _auth.signInAnonymously();
+      User user = result.user;
       return _userFromFirebase(user);
     }
     catch(e){
@@ -33,10 +33,10 @@ class AuthService {
   // sign in with email and password
   Future signInUserWithEmailAndPassword(String email, String password) async{
     try{
-      AuthResult result = await _auth.signInWithEmailAndPassword(
+      UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password
       );
-      FirebaseUser user = result.user;
+      User user = result.user;
       return _userFromFirebase(user);
     }catch(e){
       print(e.toString());
@@ -47,10 +47,10 @@ class AuthService {
   // register with email & password
   Future registerUserWithEmailAndPassword(String email, String password) async{
     try{
-      AuthResult result = await _auth.createUserWithEmailAndPassword(
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password
       );
-      FirebaseUser user = result.user;
+      User user = result.user;
       // create a new document for the user with the uid
       await DatabaseUserService(uid: user.uid).updateUserData(
           '0', 'new user', 100
