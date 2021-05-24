@@ -39,7 +39,6 @@ class MainDrawer extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 22,
                           color: Colors.white,
-                          fontFamily: 'david',
                         ),
                       ),
                       SizedBox(height: 10.0,),
@@ -47,7 +46,6 @@ class MainDrawer extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 11,
                           color: Colors.white,
-                          fontFamily: 'david',
                         ),
                       ),
                     ],
@@ -60,10 +58,21 @@ class MainDrawer extends StatelessWidget {
               title: "Home",
               onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
+                    // to be a new Home page
                     builder: (context) => Home(),
                   )
               ),
-              icon: Icon(Icons.home)),
+              icon: Icon(Icons.home)
+          ),
+          DrawerButton(
+              title: "Add video",
+              onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => Home(),
+                  )
+              ),
+              icon: Icon(Icons.video_library)
+          ),
           DrawerButton(
               title: "Translation",
               onTap: () => Navigator.of(context).push(
@@ -71,7 +80,8 @@ class MainDrawer extends StatelessWidget {
                     builder: (context) => TranslationWrapper(),
                   )
               ),
-              icon: Icon(Icons.translate)),
+              icon: Icon(Icons.translate)
+          ),
           DrawerButton(
               title: "Dictionary",
               onTap: null,
@@ -79,11 +89,13 @@ class MainDrawer extends StatelessWidget {
           DrawerButton(
               title: "Profile",
               onTap: null,
-              icon: Icon(Icons.person)),
+              icon: Icon(Icons.person)
+          ),
           DrawerButton(
               title: "Log out",
               onTap: null,
-              icon: Icon(Icons.logout)),
+              icon: Icon(Icons.logout)
+          ),
         ],
       ),
     );
