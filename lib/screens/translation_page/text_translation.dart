@@ -73,14 +73,15 @@ class _TranslatePage extends State<TranslatePage>
                   //child: Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen()));
 
                   //show the video in the same page
-                  StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/אותם.mp4");
-                  Future<dynamic> url = await (ref.getDownloadURL());
-
-                  print("url is $url");
+                  print(myController.text);
+                  //show the video in the same page
+                  StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/" + myController.text + ".mp4");
+                  var url = await (ref.getDownloadURL());
                   _controller = VideoPlayerController.network(
-                    url.toString()
+                      '$url'
                     // 'https://drive.google.com/uc?export=download&id=18tX2pBLGIGCIhbhKBfV1Tvu-KsbWWLmT',
                   );
+
                   // Initialize the controller and store the Future for later use.
                   _initializeVideoPlayerFuture = _controller.initialize();
                   // Use the controller to loop the video.
