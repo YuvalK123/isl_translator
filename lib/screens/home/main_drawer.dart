@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
+import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'home.dart';
 
@@ -68,7 +69,7 @@ class MainDrawer extends StatelessWidget {
               title: "Add video",
               onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (context) => Home(),
+                    builder: (context) => AddVideoPage(),
                   )
               ),
               icon: Icon(Icons.video_library)
