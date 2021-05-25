@@ -9,14 +9,22 @@ class DrawerButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      leading: this.icon,
+      // leading: this.icon,
       title: Text(
         this.title,
         style: TextStyle(
           fontSize: 18,
         ),
+        textAlign: TextAlign.right,
+      ),
+      trailing: Wrap(
+        spacing: 12,
+        children: <Widget>[
+          this.icon,
+        ],
       ),
       onTap: this.onTap,
+      hoverColor: Colors.grey[300],
     );
   }
 }
