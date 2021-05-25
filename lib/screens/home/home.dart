@@ -6,6 +6,8 @@ import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/constant.dart';
 import 'package:isl_translator/shared/loading.dart';
 
+import 'main_drawer.dart';
+
 class Home extends StatefulWidget {
   @override
   _HomeState createState() => _HomeState();
@@ -29,20 +31,21 @@ class _HomeState extends State<Home> {
       appBar: AppBar(
         title: Text("Isl translator - home"),
         backgroundColor: Colors.lightBlue[100],
-        actions: <Widget>[
-      FlatButton.icon(
-      icon: Icon(Icons.translate),
-        label: Text("Translation page",
-          style: TextStyle(fontSize: 15.0),
-        ),
-        onPressed: (){
-          Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => TranslationWrapper(),
-              ));
-        }),
-        ],
+      //   actions: <Widget>[
+      // FlatButton.icon(
+      // icon: Icon(Icons.translate),
+      //   label: Text("Translation page",
+      //     style: TextStyle(fontSize: 15.0),
+      //   ),
+      //   onPressed: (){
+      //     Navigator.of(context).push(
+      //         MaterialPageRoute(
+      //           builder: (context) => TranslationWrapper(),
+      //         ));
+      //   }),
+      //   ],
       ),
+      endDrawer: MainDrawer(),
       backgroundColor: Colors.brown[200],
       body: Form(
       key: _formKey,

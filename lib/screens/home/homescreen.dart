@@ -10,7 +10,8 @@ class HomeScreen extends StatelessWidget {
           style: TextStyle(),
         ),
       ),
-      drawer: MainDrawer(),
+      // drawer: MainDrawer(),
+      endDrawer: MainDrawer(),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

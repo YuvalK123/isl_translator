@@ -22,10 +22,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Add video"),
-        backgroundColor: Colors.lightBlue[100],
-      ),
       backgroundColor: Colors.brown[200],
       body: Form(
         key: _formKey,

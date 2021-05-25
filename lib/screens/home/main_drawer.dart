@@ -20,23 +20,13 @@ class MainDrawer extends StatelessWidget {
             color: Theme.of(context).primaryColor,
             child: Center(
               child:Row(
+
                 children: [
-                  Container(
-                    width: 100.0,
-                    height: 70.0,
-                    margin: EdgeInsets.only(top: 30.0, bottom: 10.0, right: 10.0),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      image: DecorationImage(
-                          image: NetworkImage(imgUrl),
-                          fit: BoxFit.fitHeight
-                      ),
-                    ),
-                  ),
+                  Spacer(),
                   Column(
                     children: <Widget> [
                       SizedBox(height: 15.0,),
-                      Text('Username',
+                      Text('שם משתמש',
                         style: TextStyle(
                           fontSize: 22,
                           color: Colors.white,
@@ -51,12 +41,25 @@ class MainDrawer extends StatelessWidget {
                       ),
                     ],
                   ),
+                  Spacer(),
+                  Container(
+                    width: 100.0,
+                    height: 70.0,
+                    margin: EdgeInsets.only(top: 30.0, bottom: 10.0, left: 0.0),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      image: DecorationImage(
+                          image: NetworkImage(imgUrl),
+                          fit: BoxFit.fitHeight
+                      ),
+                    ),
+                  ),
                 ],
             ),
             ),
           ),
           DrawerButton(
-              title: "Home",
+              title: "דף הבית",
               onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     // to be a new Home page
@@ -66,7 +69,7 @@ class MainDrawer extends StatelessWidget {
               icon: Icon(Icons.home)
           ),
           DrawerButton(
-              title: "Add video",
+              title: "הוסף וידיאו",
               onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => AddVideoPage(),
@@ -75,7 +78,7 @@ class MainDrawer extends StatelessWidget {
               icon: Icon(Icons.video_library)
           ),
           DrawerButton(
-              title: "Translation",
+              title: "תרגום",
               onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => TranslationWrapper(),
@@ -84,16 +87,16 @@ class MainDrawer extends StatelessWidget {
               icon: Icon(Icons.translate)
           ),
           DrawerButton(
-              title: "Dictionary",
+              title: "מילון",
               onTap: null,
               icon: Icon(Icons.book)),
           DrawerButton(
-              title: "Profile",
+              title: "איזור אישי",
               onTap: null,
               icon: Icon(Icons.person)
           ),
           DrawerButton(
-              title: "Log out",
+              title: "התנתק/י",
               onTap: null,
               icon: Icon(Icons.logout)
           ),
