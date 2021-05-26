@@ -52,7 +52,7 @@ class _RecordPage extends State<RecordPage> {
 
   stt.SpeechToText _speech;
   bool _isListening = false;
-  String _text = 'Press the button and start speaking';
+  String _text = 'לחצ/י על הכפתור על מנת לדבר';
   double _confidence = 1.0;
 
   @override
@@ -65,7 +65,7 @@ class _RecordPage extends State<RecordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Voice to Sign Language'),
+        title: Text('תרגום מקול לשפת הסימנים'),
         backgroundColor: Colors.deepPurple[300],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,

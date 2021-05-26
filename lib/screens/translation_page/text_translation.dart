@@ -117,7 +117,7 @@ class _TranslatePage extends State<TranslatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Text to Sign Language'),
+        title: Text('תרגום מטקסט לשפת הסימנים',textDirection: TextDirection.rtl),
         backgroundColor: Colors.deepPurple[300],
       ),
       body: Padding(
@@ -125,9 +125,10 @@ class _TranslatePage extends State<TranslatePage> {
         child: Column(
             children: [
               TextField(
+                textDirection: TextDirection.rtl,
                 controller: myController,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'Enter your text'),
+                    border: OutlineInputBorder(), hintText: 'הכנס/י טקסט'),
               ),
               // ignore: deprecated_member_use
               FlatButton(
@@ -163,7 +164,7 @@ class _TranslatePage extends State<TranslatePage> {
                     }
                   });
                 },
-                child: Text("Translate"),
+                child: Text("תרגם"),
                 color: Colors.black12,
               ),
               FutureBuilder(
