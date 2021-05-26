@@ -2,14 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
+import 'package:isl_translator/services/auth.dart';
 import 'home.dart';
 
 class MainDrawer extends StatelessWidget {
+
+  final AuthService _auth = AuthService();
+
   @override
   Widget build(BuildContext context) {
     // future user image
     String imgUrl = 'https://static.toiimg.com/photo/msid-67586673/67586673.jpg';
-
     return Drawer(
 
       child: Column(
@@ -63,7 +66,7 @@ class MainDrawer extends StatelessWidget {
               onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
                     // to be a new Home page
-                    builder: (context) => Home(),
+                    builder: (context) => TranslationWrapper(),
                   )
               ),
               icon: Icon(Icons.home)
@@ -97,7 +100,9 @@ class MainDrawer extends StatelessWidget {
           ),
           DrawerButton(
               title: "התנתק/י",
-              onTap: null,
+              onTap: () async {
+                await _auth.signOut();
+              },
               icon: Icon(Icons.logout)
           ),
         ],
