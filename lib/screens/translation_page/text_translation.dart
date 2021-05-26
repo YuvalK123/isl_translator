@@ -1,9 +1,8 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:isl_translator/services//show_video.dart';
+import 'package:isl_translator/services/show_video.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
-//import 'package:flick_video_player/flick_video_player.dart';
 
 class TranslatePage extends StatefulWidget {
   TranslatePage({Key key, this.title}) : super(key: key);
@@ -44,75 +43,6 @@ class _TranslatePage extends State<TranslatePage> {
     super.dispose();
   }
 
-  /* Split the word to letters */
-  List<String> split_to_letters(String word) {
-    List<String> lettersList = List<String>(word.length);
-    var num = 0;
-    for (var i = num; i < word.length; i++) {
-      print(word[i]);
-      lettersList[i] = word[i];
-    }
-    return lettersList;
-  }
-
-  /* Search for terms in the sentence and return a list ot terms */
-  List<String> search_term(String sentence, List<String> saveTerms) {
-    List<String> terms = [];
-    for (var i = 0; i < saveTerms.length; i++) {
-      var searchName = saveTerms[i].replaceAll(new RegExp(r'[\u200f]'), "");
-      if (sentence.contains(new RegExp(searchName, caseSensitive: false))) {
-        terms.add(saveTerms[i]);
-      }
-    }
-    print(terms);
-    return terms;
-  }
-
-  /* Split the sentence to word/term and return a list of the split sentence*/
-  List<String> split_sentence(String sentence) {
-    var new_sentence = sentence.replaceAll(
-        new RegExp(r'[\u200f]'), ""); // replace to regular space
-    List sentence_list = new_sentence.split(" "); //split the sentence to words
-
-    List<String> saveTerms = [
-      'יום הזיכרון',
-      'ארבעת המינים',
-      'כרטיס ברכה'
-    ]; // list of terms(need to create one)
-    List<String> terms =
-    search_term(new_sentence, saveTerms); // terms in the sentence
-
-    //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
-    List<String> splitSentence = [];
-
-    // save the index and the length of the terms
-    List indexTerms = [];
-    for (int i = 0; i < terms.length; i++) {
-      indexTerms.add(Pair(new_sentence.indexOf(terms[i]), terms[i].length));
-    }
-    //indexTerms.sort((a, b) => getIndex(a).compareTo(getIndex(b)));
-    indexTerms.sort((x,y) => x.a.compareTo(y.a));
-
-    // split the sentence to word and terms
-    int terms_count = 0;
-    int sentence_list_count = 0;
-    for (int i = 0; i < new_sentence.length;) {
-      if (terms_count < indexTerms.length && i == indexTerms[terms_count].a) {
-        splitSentence.add(new_sentence.substring(i, i + indexTerms[terms_count].b));
-        List termSplit = new_sentence.substring(i, i + indexTerms[terms_count].b).split(" ");
-        i += indexTerms[terms_count].b + 1;
-        sentence_list_count += termSplit.length;
-        terms_count++;
-      } else {
-        splitSentence.add(sentence_list[sentence_list_count]);
-        i += sentence_list[sentence_list_count].length + 1;
-        sentence_list_count += 1;
-      }
-    }
-
-    return splitSentence;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -135,12 +65,12 @@ class _TranslatePage extends State<TranslatePage> {
                 onPressed: () async {
                   String sentence =
                       myController.text; // got the sentence from the user
-                  List<String> splitSentence =
-                  split_sentence(sentence); // split the sentence
+                  List<String> splitSentenceList =
+                  splitSentence(sentence); // split the sentence
                   var url;
                   List<String> letters;
-                  print(splitSentence);
-                  String videoName = splitSentence[0]; // take the first word
+                  print(splitSentenceList);
+                  String videoName = splitSentenceList[0]; // take the first word
                   StorageReference ref = FirebaseStorage.instance
                       .ref()
                       .child("animation_openpose/" + videoName + ".mp4");
@@ -149,7 +79,7 @@ class _TranslatePage extends State<TranslatePage> {
                     url = await ref.getDownloadURL();
                   } catch (err) {
                     // Video doesn't exist - so split the work to letters
-                    letters = split_to_letters(myController.text);
+                    letters = splitToLetters(myController.text);
                   }
 
                   // Display the video
@@ -200,10 +130,3 @@ class _TranslatePage extends State<TranslatePage> {
   }
 }
 
-/* Create Tuple */
-class Pair<T1, T2> {
-  final T1 a;
-  final T2 b;
-
-  Pair(this.a, this.b);
-}
