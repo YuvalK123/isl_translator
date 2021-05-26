@@ -71,7 +71,7 @@ class _TranslatePage extends State<TranslatePage> {
                   List<String> letters;
                   print(splitSentenceList);
                   String videoName = splitSentenceList[0]; // take the first word
-                  StorageReference ref = FirebaseStorage.instance
+                  Reference ref = FirebaseStorage.instance
                       .ref()
                       .child("animation_openpose/" + videoName + ".mp4");
                   try {

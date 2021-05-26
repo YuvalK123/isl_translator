@@ -27,19 +27,39 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
   return terms;
 }
 
+/* Find all the terms in DB - maybe to do it only once and save it? */
+Future<List<String>> findTermsDB() async {
+  List<String> terms = [];
+  final result = await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
+    for (int i=0; i< result.items.length; i++){
+      String videoName = (result.items)[i].toString().substring(55,(result.items)[i].toString().length -5);
+      if(videoName.split(" ").length > 1){
+        terms.add(videoName);
+      }
+    }
+  });
+  print(terms);
+  return terms;
+}
+
 /* Split the sentence to word/term and return a list of the split sentence*/
 List<String> splitSentence(String sentence) {
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
   List sentenceList = newSentence.split(" "); //split the sentence to words
-
   List<String> saveTerms = [
     'יום הזיכרון',
     'ארבעת המינים',
     'כרטיס ברכה'
   ]; // list of terms(need to create one)
-  List<String> terms =
-  searchTerm(newSentence, saveTerms); // terms in the sentence
+
+  // get all terms
+  /*Future<List<String>> futureTerms = findTermsDB();
+  print('futureTerms');
+  futureTerms.then((result) => print("bla" + result.toString()))
+      .catchError((e) => print('error'));*/
+
+  List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
 
   //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
   List<String> splitSentence = [];
