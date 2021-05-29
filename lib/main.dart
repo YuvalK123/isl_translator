@@ -18,10 +18,8 @@ class MyApp extends StatelessWidget {
     return StreamProvider<UserModel>.value(
       value: AuthService().user,
       child: MaterialApp(
-        home:Directionality( // add this
-              textDirection: TextDirection.rtl, // set this property
-              child: Wrapper()),
-         // home: Home()
+        home: Wrapper(),
+        // home: Home()
       ),
     );
   }
