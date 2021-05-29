@@ -88,13 +88,13 @@ class _TranslationScreenState extends State<TranslationScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Sign Language Translator"),
+          title: Text("תרגום שפת הסימנים", textDirection: TextDirection.rtl,),
           backgroundColor: Colors.deepPurple[200],
           bottom: const TabBar(
             isScrollable: true,
             tabs: [
-              Tab(text: 'Speak',icon: Icon(Icons.speaker_phone)),
-              Tab(text: 'Write', icon: Icon(Icons.text_fields)),
+              Tab(text: 'שמע',icon: Icon(Icons.speaker_phone)),
+              Tab(text: 'טקסט', icon: Icon(Icons.text_fields)),
             ],
           ),
           // actions: <Widget>[

@@ -1,6 +1,6 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:isl_translator/services//show_video.dart';
+import 'package:isl_translator/services/show_video.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 
@@ -11,8 +11,8 @@ class TranslatePage extends StatefulWidget {
   @override
   _TranslatePage createState() => _TranslatePage();
 }
-class _TranslatePage extends State<TranslatePage>
-{
+
+class _TranslatePage extends State<TranslatePage> {
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
   final myController = TextEditingController();
@@ -26,12 +26,7 @@ class _TranslatePage extends State<TranslatePage>
     // Create and store the VideoPlayerController. The VideoPlayerController
     // offers several different constructors to play videos from assets, files,
     // or the internet.
-    StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/אותם.mp4");
-    String url = (ref.getDownloadURL().toString());
-    print("url is $url");
-    _controller = VideoPlayerController.network(
-        'NULL'
-    );
+    _controller = VideoPlayerController.network('NULL');
     // Initialize the controller and store the Future for later use.
     _initializeVideoPlayerFuture = _controller.initialize();
     // Use the controller to loop the video.
@@ -52,7 +47,7 @@ class _TranslatePage extends State<TranslatePage>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Text to Sign Language'),
+        title: Text('תרגום מטקסט לשפת הסימנים',textDirection: TextDirection.rtl),
         backgroundColor: Colors.deepPurple[300],
       ),
       body: Padding(
@@ -60,46 +55,46 @@ class _TranslatePage extends State<TranslatePage>
         child: Column(
             children: [
               TextField(
+                textDirection: TextDirection.rtl,
                 controller: myController,
                 decoration: InputDecoration(
-                    border: OutlineInputBorder(),
-                    hintText: 'Enter your text'
-                ),
+                    border: OutlineInputBorder(), hintText: 'הכנס/י טקסט'),
               ),
               // ignore: deprecated_member_use
               FlatButton(
-                onPressed: () async{
-                  //show the video in other page
-                  //child: Navigator.of(context).push(MaterialPageRoute(builder: (context) => VideoPlayerScreen()));
+                onPressed: () async {
+                  String sentence =
+                      myController.text; // got the sentence from the user
+                  List<String> splitSentenceList =
+                  splitSentence(sentence); // split the sentence
+                  var url;
+                  List<String> letters;
+                  print(splitSentenceList);
+                  String videoName = splitSentenceList[0]; // take the first word
+                  Reference ref = FirebaseStorage.instance
+                      .ref()
+                      .child("animation_openpose/" + videoName + ".mp4");
+                  try {
+                    // gets the video's url
+                    url = await ref.getDownloadURL();
+                  } catch (err) {
+                    // Video doesn't exist - so split the work to letters
+                    letters = splitToLetters(myController.text);
+                  }
 
-                  //show the video in the same page
-                  print(myController.text);
-                  //show the video in the same page
-                  StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/" + myController.text + ".mp4");
-                  var url = await (ref.getDownloadURL());
-                  _controller = VideoPlayerController.network(
-                      '$url'
-                    // 'https://drive.google.com/uc?export=download&id=18tX2pBLGIGCIhbhKBfV1Tvu-KsbWWLmT',
-                  );
-
+                  // Display the video
+                  _controller = VideoPlayerController.network('$url');
                   // Initialize the controller and store the Future for later use.
                   _initializeVideoPlayerFuture = _controller.initialize();
                   // Use the controller to loop the video.
                   _controller.setLooping(false);
-
-                  // start the video
                   setState(() {
-                    // If the video is playing, pause it.
-                    if (_controller.value.isPlaying) {
-                      _controller.pause();
-                    } else {
-                      // If the video is paused, play it.
+                    if (!_controller.value.isPlaying) {
                       _controller.play();
                     }
                   });
-
                 },
-                child: Text("Translate"),
+                child: Text("תרגם"),
                 color: Colors.black12,
               ),
               FutureBuilder(
@@ -108,10 +103,18 @@ class _TranslatePage extends State<TranslatePage>
                   if (snapshot.connectionState == ConnectionState.done) {
                     // If the VideoPlayerController has finished initialization, use
                     // the data it provides to limit the aspect ratio of the video.
-                    return AspectRatio(
+                    return AspectRatio( // replay (need to add a replay button/ maybe change this code)
                       aspectRatio: _controller.value.aspectRatio,
-                      // Use the VideoPlayer widget to display the video.
-                      child: VideoPlayer(_controller),
+                      child: GestureDetector(
+                        onTap: () {
+                          if (!_controller.value.isPlaying) {
+                            setState(() {});
+                            _controller.initialize();
+                            _controller.play();
+                          }
+                        },
+                        child: VideoPlayer(_controller),
+                      ),
                     );
                   } else {
                     // If the VideoPlayerController is still initializing, show a
@@ -123,26 +126,7 @@ class _TranslatePage extends State<TranslatePage>
             ]
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Wrap the play or pause in a call to `setState`. This ensures the
-          // correct icon is shown.
-          setState(() {
-            // If the video is playing, pause it.
-            if (_controller.value.isPlaying) {
-              _controller.pause();
-            } else {
-              // If the video is paused, play it.
-              _controller.play();
-            }
-          });
-        },
-        // Display the correct icon depending on the state of the player.
-        /*child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-        ),*/
-      ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
-
 }
+
