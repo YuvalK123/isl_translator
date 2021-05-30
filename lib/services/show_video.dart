@@ -1,87 +1,101 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
-class VideoPlayerScreen extends StatefulWidget {
-  VideoPlayerScreen({Key key}) : super(key: key);
-
-  @override
-  _VideoPlayerScreenState createState() => _VideoPlayerScreenState();
+/* Split the word to letters */
+List<String> splitToLetters(String word) {
+  List<String> lettersList = List<String>(word.length);
+  var num = 0;
+  for (var i = num; i < word.length; i++) {
+    print(word[i]);
+    lettersList[i] = word[i];
+  }
+  return lettersList;
 }
 
-class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  VideoPlayerController _controller;
-  Future<void> _initializeVideoPlayerFuture;
+/* Search for terms in the sentence and return a list ot terms */
+List<String> searchTerm(String sentence, List<String> saveTerms) {
+  List<String> terms = [];
+  for (var i = 0; i < saveTerms.length; i++) {
+    var searchName = saveTerms[i].replaceAll(new RegExp(r'[\u200f]'), "");
+    if (sentence.contains(new RegExp(searchName, caseSensitive: false))) {
+      terms.add(saveTerms[i]);
+    }
+  }
+  print(terms);
+  return terms;
+}
 
-  @override
-  void initState() {
-    // Create and store the VideoPlayerController. The VideoPlayerController
-    // offers several different constructors to play videos from assets, files,
-    // or the internet.
-    _controller = VideoPlayerController.network(
-      'https://drive.google.com/uc?export=download&id=18tX2pBLGIGCIhbhKBfV1Tvu-KsbWWLmT',
-    );
-    // Initialize the controller and store the Future for later use.
-    _initializeVideoPlayerFuture = _controller.initialize();
+/* Find all the terms in DB - maybe to do it only once and save it? */
+Future<List<String>> findTermsDB() async {
+  List<String> terms = [];
+  final result = await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
+    for (int i=0; i< result.items.length; i++){
+      String videoName = (result.items)[i].toString().substring(55,(result.items)[i].toString().length -5);
+      if(videoName.split(" ").length > 1){
+        terms.add(videoName);
+      }
+    }
+  });
+  print(terms);
+  return terms;
+}
 
-    // Use the controller to loop the video.
-    _controller.setLooping(false);
+/* Split the sentence to word/term and return a list of the split sentence*/
+List<String> splitSentence(String sentence) {
+  var newSentence = sentence.replaceAll(
+      new RegExp(r'[\u200f]'), ""); // replace to regular space
+  List sentenceList = newSentence.split(" "); //split the sentence to words
+  List<String> saveTerms = [
+    'יום הזיכרון',
+    'ארבעת המינים',
+    'כרטיס ברכה'
+  ]; // list of terms(need to create one)
 
-    super.initState();
+  // get all terms
+  /*Future<List<String>> futureTerms = findTermsDB();
+  print('futureTerms');
+  futureTerms.then((result) => print("bla" + result.toString()))
+      .catchError((e) => print('error'));*/
+
+  List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
+
+  //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
+  List<String> splitSentence = [];
+
+  // save the index and the length of the terms
+  List indexTerms = [];
+  for (int i = 0; i < terms.length; i++) {
+    indexTerms.add(Pair(newSentence.indexOf(terms[i]), terms[i].length));
+  }
+  //indexTerms.sort((a, b) => getIndex(a).compareTo(getIndex(b)));
+  indexTerms.sort((x,y) => x.a.compareTo(y.a));
+
+  // split the sentence to word and terms
+  int termsCount = 0;
+  int sentenceListCount = 0;
+  for (int i = 0; i < newSentence.length;) {
+    if (termsCount < indexTerms.length && i == indexTerms[termsCount].a) {
+      splitSentence.add(newSentence.substring(i, i + indexTerms[termsCount].b));
+      List termSplit = newSentence.substring(i, i + indexTerms[termsCount].b).split(" ");
+      i += indexTerms[termsCount].b + 1;
+      sentenceListCount += termSplit.length;
+      termsCount++;
+    } else {
+      splitSentence.add(sentenceList[sentenceListCount]);
+      i += sentenceList[sentenceListCount].length + 1;
+      sentenceListCount += 1;
+    }
   }
 
-  @override
-  void dispose() {
-    // Ensure disposing of the VideoPlayerController to free up resources.
-    _controller.dispose();
-    super.dispose();
-  }
+  return splitSentence;
+}
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Butterfly Video'),
-      ),
-      // Use a FutureBuilder to display a loading spinner while waiting for the
-      // VideoPlayerController to finish initializing.
-      body: FutureBuilder(
-        future: _initializeVideoPlayerFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            // If the VideoPlayerController has finished initialization, use
-            // the data it provides to limit the aspect ratio of the video.
-            return AspectRatio(
-              aspectRatio: _controller.value.aspectRatio,
-              // Use the VideoPlayer widget to display the video.
-              child: VideoPlayer(_controller),
-            );
-          } else {
-            // If the VideoPlayerController is still initializing, show a
-            // loading spinner.
-            return Center(child: CircularProgressIndicator());
-          }
-        },
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Wrap the play or pause in a call to `setState`. This ensures the
-          // correct icon is shown.
-          setState(() {
-            // If the video is playing, pause it.
-            if (_controller.value.isPlaying) {
-              _controller.pause();
-            } else {
-              // If the video is paused, play it.
-              _controller.play();
-            }
-          });
-        },
-        // Display the correct icon depending on the state of the player.
-        child: Icon(
-          _controller.value.isPlaying ? Icons.pause : Icons.play_arrow,
-        ),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
-    );
-  }
+/* Create Tuple */
+class Pair<T1, T2> {
+  final T1 a;
+  final T2 b;
+
+  Pair(this.a, this.b);
 }

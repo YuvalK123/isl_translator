@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:isl_translator/screens/home/home.dart';
+import 'package:isl_translator/screens/home/main_drawer.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'voice_translation.dart';
 import 'text_translation.dart';
-import 'add_expression_page.dart';
 
 void main() {
   runApp(TranslationWrapper());
@@ -21,6 +21,7 @@ class TranslationWrapper extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: TranslationScreen(),
+
     );
   }
 }
@@ -84,35 +85,34 @@ class _TranslationScreenState extends State<TranslationScreen> {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 3,
+      length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text("Sign Language Translator"),
+          title: Text("תרגום שפת הסימנים", textDirection: TextDirection.rtl,),
           backgroundColor: Colors.deepPurple[200],
           bottom: const TabBar(
             isScrollable: true,
             tabs: [
-              Tab(text: 'Speak',icon: Icon(Icons.mic)),
-              Tab(text: 'Write', icon: Icon(Icons.text_fields)),
-              Tab(text: 'Add Expression', icon: Icon(Icons.video_call))
+              Tab(text: 'שמע',icon: Icon(Icons.speaker_phone)),
+              Tab(text: 'טקסט', icon: Icon(Icons.text_fields)),
             ],
           ),
-          actions: <Widget>[
-            FlatButton.icon(onPressed: (){
-              Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home()));
-            },
-                icon: Icon(Icons.home),
-                label: Text("Home")
-            ),
-          ],
+          // actions: <Widget>[
+          //   FlatButton.icon(onPressed: (){
+          //     Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home()));
+          //   },
+          //       icon: Icon(Icons.home),
+          //       label: Text("Home")
+          //   ),
+          // ],
         ),
+        endDrawer: MainDrawer(),
         body: SafeArea(
           bottom: false,
           child: TabBarView(
               children: [
                 RecordPage(),
                 TranslatePage(),
-                AddExpression(),
               ]
           ),
         ),
