@@ -87,9 +87,18 @@ class _TranslationScreenState extends State<TranslationScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+
         appBar: AppBar(
-          title: Text("תרגום שפת הסימנים", textDirection: TextDirection.rtl,),
-          backgroundColor: Colors.deepPurple[200],
+          title: Container(
+            alignment: Alignment.centerRight,
+              child: Text(
+                "תרגום שפת הסימנים",
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )
+          ),
+          backgroundColor: Colors.cyan[900],
           bottom: const TabBar(
             isScrollable: true,
             tabs: [
