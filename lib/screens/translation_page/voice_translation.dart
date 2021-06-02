@@ -79,8 +79,15 @@ class _RecordPage extends State<RecordPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('תרגום מקול לשפת הסימנים', textDirection: TextDirection.rtl),
-        backgroundColor: Colors.deepPurple[300],
+        title: Container(
+          alignment: Alignment.topRight,
+          child: Text('תרגום מקול לשפת הסימנים',
+              textDirection: TextDirection.rtl,
+            textAlign: TextAlign.right,
+
+          ),
+        ),
+        backgroundColor: Colors.cyan[800],
 
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -96,14 +103,18 @@ class _RecordPage extends State<RecordPage> {
         child: FloatingActionButton(
           onPressed: _listen,
           child: Icon(_isListening ? Icons.mic : Icons.mic_none),
-          backgroundColor: Colors.indigo[400],
+          backgroundColor: Colors.grey,
         ),
       ),
       body: SingleChildScrollView(
         reverse: true,
         child: Container(
+          alignment: Alignment.topRight,
           padding: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 150.0),
-          child: Text(_text),
+          child: Text(
+              _text,
+              textAlign: TextAlign.right,
+          ),
         ),
       ),
     );
