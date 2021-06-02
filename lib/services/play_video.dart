@@ -146,14 +146,14 @@ class PlayVideoService{
 
 main() {
   runApp(MaterialApp(
-    home: VideoPlayerDemo(["bla"]),
+    home: VideoPlayerDemo(myUrls: ["bla"],),
   ));
 }
 
 class VideoPlayerDemo extends StatefulWidget {
   final List<String> myUrls;
 
-  VideoPlayerDemo(this.myUrls);
+  VideoPlayerDemo({this.myUrls});
 
   final Set<String> words = {
     'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%AA%D7%94.mp4?alt=media&token=40efd0bf-e7a5-4c05-b6fc-312107e6c8ab',
@@ -294,6 +294,9 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
   void _nextVideo() async {
     if (_lock || index == widget.myUrls.length - 1) {
+      setState(() {
+        // this._urls = widget.myUrls;
+      });
       return;
     }
     _lock = true;
@@ -331,7 +334,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
               ),
             ),
           ),
-          Positioned(
+          /*Positioned(
             child: Container(
               height: 10,
               width: MediaQuery.of(context).size.width * _buffer,
@@ -344,17 +347,17 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
               width: MediaQuery.of(context).size.width * _position,
               color: Colors.greenAccent,
             ),
-          ),
+          ),*/
         ],
       ),
-      floatingActionButton: Row(
+      /*floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           FloatingActionButton(onPressed: _previousVideo, child: Icon(Icons.arrow_back)),
           SizedBox(width: 24),
           FloatingActionButton(onPressed: _nextVideo, child: Icon(Icons.arrow_forward)),
         ],
-      ),
+      ),*/
     );
   }
 }
