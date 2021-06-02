@@ -127,11 +127,12 @@ class _TranslatePage extends State<TranslatePage> {
                 color: Colors.black12,
               ),
               Container(
+
                 child: AspectRatio(
                   aspectRatio: 1.0,
                     child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
+                    )
                 ),
-              ),
             ]
         ),
       ),

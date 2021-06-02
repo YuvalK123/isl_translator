@@ -144,31 +144,17 @@ class PlayVideoService{
 }
 
 
-main() {
-  runApp(MaterialApp(
-    home: VideoPlayerDemo(myUrls: ["bla"],),
-  ));
-}
-
-
 class VideoPlayerDemo extends StatefulWidget {
-  List<String> myUrls;
+  final List<String> myUrls;
 
   VideoPlayerDemo({Key key, this.myUrls}): super(key: key);
 
-  final Set<String> words = {
-    'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%AA%D7%94.mp4?alt=media&token=40efd0bf-e7a5-4c05-b6fc-312107e6c8ab',
-    'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%A9.mp4?alt=media&token=ad9871c6-187a-4431-9baf-26197ec14709',
-  };
 
   // VideoPlayerDemo({this.words});
 
   @override
-  _VideoPlayerDemoState createState() {
-    var v = _VideoPlayerDemoState();
-    // v.initState();
-    return v;
-  }
+  _VideoPlayerDemoState createState() => _VideoPlayerDemoState();
+
 }
 
 class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
@@ -180,18 +166,22 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   Map<int, VoidCallback> _listeners = {};
   Set<String> _urls;
   bool state;
+  Color borderColor = Colors.transparent;
 
   @override
   void initState() {
     this.state = true;
     print("new page");
     super.initState();
-    _urls = widget.words;
     print("my urls!!");
     print(widget.myUrls);
     print("urls are at page $_urls");
     if (widget.myUrls.length > 0) {
       _initController(0).then((_) {
+        setState(() {
+          this.borderColor = Colors.black;
+          // this.borderColor = Theme.of(context)
+        });
         _playController(0);
       });
     }
@@ -199,13 +189,6 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
     if (widget.myUrls.length > 1) {
       _initController(1).whenComplete(() => _lock = false);
     }
-  }
-
-  void dispose() {
-    // Clean up the controller when the widget is disposed.
-    _controller(index).dispose();
-    //_controller.dispose();
-    super.dispose();
   }
 
   VoidCallback _listenerSpawner() {
@@ -351,7 +334,18 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
             child: Center(
               child: AspectRatio(
                 aspectRatio: _controller(index).value.aspectRatio,
-                child: Center(child: VideoPlayer(_controller(index)),),
+                child: Center(child: Container(
+                    decoration: BoxDecoration(
+                        border: Border.all(
+                          color: this.borderColor,
+                          width: 4.0,
+
+                        ),
+                      borderRadius: BorderRadius.all(
+                        Radius.circular(5.0),
+                      )
+                    ),
+                    child: VideoPlayer(_controller(index))),),
 
               ),
             ),
