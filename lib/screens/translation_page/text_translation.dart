@@ -137,13 +137,14 @@ class _TranslatePage extends State<TranslatePage> {
                   /* new Column(
                       children: <Widget>[VideoPlayerDemo(urls)]);*/
 
-                   Navigator.push(
-                     context,
-                     MaterialPageRoute(builder: (context) => VideoPlayerDemo(myUrls: myUrls,)),
-                   );
-                  /*setState(() {
+                   // Navigator.push(
+                   //   context,
+                   //   MaterialPageRoute(builder: (context) => VideoPlayerDemo(myUrls: myUrls,)),
+                   // );
+                  // this.videoPlayerDemo.myUrls.clear();
+                  setState(() {
                     this.videoPlayerDemo = VideoPlayerDemo(myUrls: urls,);
-                  });*/
+                  });
 
 
                   /*Navigator.of(context).pushReplacement(
@@ -154,11 +155,12 @@ class _TranslatePage extends State<TranslatePage> {
                 child: Text("תרגם"),
                 color: Colors.black12,
               ),
-              /*Container(
+              Container(
                 child: AspectRatio(
+                  aspectRatio: 100/100,
                     child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
                 ),
-              ),*/
+              ),
               /*Visibility(
                 child: GestureDetector(
                 onLongPressStart: (_) => _controller(index).pause(),

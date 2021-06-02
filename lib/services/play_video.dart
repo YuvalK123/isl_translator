@@ -319,14 +319,11 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Playing ${index + 1} of ${widget.myUrls.length}"),
-      ),
       body: Stack(
         children: <Widget>[
           GestureDetector(
-            onLongPressStart: (_) => _controller(index).pause(),
-            onLongPressEnd: (_) => _controller(index).play(),
+            // onLongPressStart: (_) => _controller(index).pause(),
+            // onLongPressEnd: (_) => _controller(index).play(),
             child: Center(
               child: AspectRatio(
                 aspectRatio: _controller(index).value.aspectRatio,
