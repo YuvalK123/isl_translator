@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 /* Split the word to letters */
 List<String> splitToLetters(String word) {
-  List<String> lettersList = [];
+  List<String> lettersList = List<String>(word.length);
   var num = 0;
   for (var i = num; i < word.length; i++) {
     print(word[i]);
@@ -52,6 +52,12 @@ List<String> splitSentence(String sentence) {
     'ארבעת המינים',
     'כרטיס ברכה'
   ]; // list of terms(need to create one)
+
+  // get all terms
+  /*Future<List<String>> futureTerms = findTermsDB();
+  print('futureTerms');
+  futureTerms.then((result) => print("bla" + result.toString()))
+      .catchError((e) => print('error'));*/
 
   List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
 

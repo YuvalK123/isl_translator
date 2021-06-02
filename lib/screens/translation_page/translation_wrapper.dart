@@ -17,7 +17,7 @@ class TranslationWrapper extends StatelessWidget {
       title: 'Flutter Voice',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        primaryColor: Colors.blueGrey,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: TranslationScreen(),
@@ -87,14 +87,23 @@ class _TranslationScreenState extends State<TranslationScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
+
         appBar: AppBar(
-          title: Text("Sign Language Translator"),
-          backgroundColor: Colors.deepPurple[200],
+          title: Container(
+            alignment: Alignment.centerRight,
+              child: Text(
+                "תרגום שפת הסימנים",
+                textAlign: TextAlign.right,
+                textDirection: TextDirection.rtl,
+                style: TextStyle(fontWeight: FontWeight.bold),
+              )
+          ),
+          backgroundColor: Colors.cyan[900],
           bottom: const TabBar(
             isScrollable: true,
             tabs: [
-              Tab(text: 'Speak',icon: Icon(Icons.speaker_phone)),
-              Tab(text: 'Write', icon: Icon(Icons.text_fields)),
+              Tab(text: 'שמע',icon: Icon(Icons.speaker_phone)),
+              Tab(text: 'טקסט', icon: Icon(Icons.text_fields)),
             ],
           ),
         ),

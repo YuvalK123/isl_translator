@@ -146,12 +146,19 @@ class PlayVideoService{
 
 main() {
   runApp(MaterialApp(
-    home: VideoPlayerDemo(),
+    home: VideoPlayerDemo(myUrls: ["bla"],),
   ));
 }
 
 class VideoPlayerDemo extends StatefulWidget {
-  final Set<String> words = {};
+  final List<String> myUrls;
+
+  VideoPlayerDemo({this.myUrls});
+
+  final Set<String> words = {
+    'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%AA%D7%94.mp4?alt=media&token=40efd0bf-e7a5-4c05-b6fc-312107e6c8ab',
+    'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%A9.mp4?alt=media&token=ad9871c6-187a-4431-9baf-26197ec14709',
+  };
 
   // VideoPlayerDemo({this.words});
 
@@ -166,30 +173,29 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   bool _lock = true;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
-  // Set<String> _urls;
-  Set<String> _urls; // = {
-    // 'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%AA%D7%94.mp4?alt=media&token=40efd0bf-e7a5-4c05-b6fc-312107e6c8ab',
-    // 'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%A9.mp4?alt=media&token=ad9871c6-187a-4431-9baf-26197ec14709',
-  // };
+  Set<String> _urls;
 
   @override
   void initState() {
     super.initState();
     _urls = widget.words;
+    print("my urls!!");
+    print(widget.myUrls);
     print("urls are at page $_urls");
-    if (_urls.length > 0) {
+    if (widget.myUrls.length > 0) {
       _initController(0).then((_) {
         _playController(0);
       });
     }
 
-    if (_urls.length > 1) {
+    if (widget.myUrls.length > 1) {
       _initController(1).whenComplete(() => _lock = false);
     }
   }
 
   VoidCallback _listenerSpawner(index) {
     return () {
+      print("index is ==> " + index);
       int dur = _controller(index).value.duration.inMilliseconds;
       int pos = _controller(index).value.position.inMilliseconds;
       int buf = _controller(index).value.buffered.last.end.inMilliseconds;
@@ -203,7 +209,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
         _buffer = buf / dur;
       });
       if (dur - pos < 1) {
-        if (index < _urls.length - 1) {
+        if (index < widget.myUrls.length - 1) {
           _nextVideo();
         }
       }
@@ -211,18 +217,18 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   }
 
   VideoPlayerController _controller(int index) {
-    return _controllers[_urls.elementAt(index)];
+    return _controllers[widget.myUrls[index]];
   }
 
   Future<void> _initController(int index) async {
-    var controller = VideoPlayerController.network(_urls.elementAt(index));
-    _controllers[_urls.elementAt(index)] = controller;
+    var controller = VideoPlayerController.network(widget.myUrls[index]);
+    _controllers[widget.myUrls[index]] = controller;
     await controller.initialize();
   }
 
   void _removeController(int index) {
     _controller(index).dispose();
-    _controllers.remove(_urls.elementAt(index));
+    _controllers.remove(widget.myUrls[index]);
     _listeners.remove(index);
   }
 
@@ -237,8 +243,29 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
       _listeners[index] = _listenerSpawner(index);
     }
     _controller(index).addListener(_listeners[index]);
+    if(index <widget.myUrls.length)
+      {
+        _controller(index).addListener(checkIfVideoFinished);
+
+      }
+    //_controller(index).addListener(checkIfVideoFinished);
     await _controller(index).play();
     setState(() {});
+  }
+
+  void checkIfVideoFinished() {
+    if (_controller == null ||
+        _controller(index).value == null ||
+        _controller(index).value.position == null) return;
+    if (_controller(index).value.position.inSeconds ==
+        _controller(index).value.duration.inSeconds)
+    {
+      _controller(index).removeListener(() => checkIfVideoFinished());
+      //_controller.dispose();
+      //_controller(index) = null;
+      _nextVideo();
+      //playHi(sentence, index+1);
+    }
   }
 
   void _previousVideo() {
@@ -249,7 +276,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
     _stopController(index);
 
-    if (index + 1 < _urls.length) {
+    if (index + 1 < widget.myUrls.length) {
       _removeController(index + 1);
     }
 
@@ -261,13 +288,15 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
       _initController(index - 1).whenComplete(() => _lock = false);
     }
     setState(() {
-      print("urls, set state at page");
       _urls = widget.words;
     });
   }
 
   void _nextVideo() async {
-    if (_lock || index == _urls.length - 1) {
+    if (_lock || index == widget.myUrls.length - 1) {
+      setState(() {
+        // this._urls = widget.myUrls;
+      });
       return;
     }
     _lock = true;
@@ -280,7 +309,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
     _playController(++index);
 
-    if (index == _urls.length - 1) {
+    if (index == widget.myUrls.length - 1) {
       _lock = false;
     } else {
       _initController(index + 1).whenComplete(() => _lock = false);
@@ -291,7 +320,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Playing ${index + 1} of ${_urls.length}"),
+        title: Text("Playing ${index + 1} of ${widget.myUrls.length}"),
       ),
       body: Stack(
         children: <Widget>[
@@ -305,7 +334,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
               ),
             ),
           ),
-          Positioned(
+          /*Positioned(
             child: Container(
               height: 10,
               width: MediaQuery.of(context).size.width * _buffer,
@@ -318,17 +347,17 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
               width: MediaQuery.of(context).size.width * _position,
               color: Colors.greenAccent,
             ),
-          ),
+          ),*/
         ],
       ),
-      floatingActionButton: Row(
+      /*floatingActionButton: Row(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
           FloatingActionButton(onPressed: _previousVideo, child: Icon(Icons.arrow_back)),
           SizedBox(width: 24),
           FloatingActionButton(onPressed: _nextVideo, child: Icon(Icons.arrow_forward)),
         ],
-      ),
+      ),*/
     );
   }
 }
