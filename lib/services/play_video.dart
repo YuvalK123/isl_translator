@@ -150,10 +150,11 @@ main() {
   ));
 }
 
-class VideoPlayerDemo extends StatefulWidget {
-  final List<String> myUrls;
 
-  VideoPlayerDemo({this.myUrls});
+class VideoPlayerDemo extends StatefulWidget {
+  List<String> myUrls;
+
+  VideoPlayerDemo({Key key, this.myUrls}): super(key: key);
 
   final Set<String> words = {
     'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%AA%D7%94.mp4?alt=media&token=40efd0bf-e7a5-4c05-b6fc-312107e6c8ab',
@@ -163,7 +164,11 @@ class VideoPlayerDemo extends StatefulWidget {
   // VideoPlayerDemo({this.words});
 
   @override
-  _VideoPlayerDemoState createState() => _VideoPlayerDemoState();
+  _VideoPlayerDemoState createState() {
+    var v = _VideoPlayerDemoState();
+    // v.initState();
+    return v;
+  }
 }
 
 class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
@@ -174,9 +179,12 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
   Set<String> _urls;
+  bool state;
 
   @override
   void initState() {
+    this.state = true;
+    print("new page");
     super.initState();
     _urls = widget.words;
     print("my urls!!");
@@ -193,12 +201,25 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
     }
   }
 
-  VoidCallback _listenerSpawner(index) {
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    _controller(index).dispose();
+    //_controller.dispose();
+    super.dispose();
+  }
+
+  VoidCallback _listenerSpawner() {
+
     return () {
-      print("index is ==> " + index);
-      int dur = _controller(index).value.duration.inMilliseconds;
-      int pos = _controller(index).value.position.inMilliseconds;
-      int buf = _controller(index).value.buffered.last.end.inMilliseconds;
+      var index = this.index;
+      var controller = _controller(index);
+      if( controller.value.buffered.length <= 0 ) return;
+      print("index is ==> " + index.toString());
+      int dur = controller.value.duration.inMilliseconds;
+      int pos = controller.value.position.inMilliseconds;
+
+      int buf = controller.value.buffered[controller.value.buffered.length-1].end.inMilliseconds;
+      // int buf = controller.value.buffered.last.end.inMilliseconds;
 
       setState(() {
         if (dur <= pos) {
@@ -240,7 +261,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
   void _playController(int index) async {
     if (!_listeners.keys.contains(index)) {
-      _listeners[index] = _listenerSpawner(index);
+      _listeners[index] = _listenerSpawner();
     }
     _controller(index).addListener(_listeners[index]);
     if(index <widget.myUrls.length)
@@ -264,6 +285,9 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
       //_controller.dispose();
       //_controller(index) = null;
       _nextVideo();
+      if(index ==widget.myUrls.length -1){
+        //add replay button
+      }
       //playHi(sentence, index+1);
     }
   }
@@ -284,17 +308,17 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
     if (index == 0) {
       _lock = false;
+
     } else {
       _initController(index - 1).whenComplete(() => _lock = false);
     }
-    setState(() {
-      _urls = widget.words;
-    });
   }
 
   void _nextVideo() async {
     if (_lock || index == widget.myUrls.length - 1) {
       setState(() {
+        this.state = false;
+        // this.index = 0;
         // this._urls = widget.myUrls;
       });
       return;
@@ -322,12 +346,13 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
       body: Stack(
         children: <Widget>[
           GestureDetector(
-            // onLongPressStart: (_) => _controller(index).pause(),
-            // onLongPressEnd: (_) => _controller(index).play(),
+            onLongPressStart: (_) => _controller(index).pause(),
+            onLongPressEnd: (_) => _controller(index).play(),
             child: Center(
               child: AspectRatio(
                 aspectRatio: _controller(index).value.aspectRatio,
-                child: Center(child: VideoPlayer(_controller(index))),
+                child: Center(child: VideoPlayer(_controller(index)),),
+
               ),
             ),
           ),

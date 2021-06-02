@@ -39,6 +39,7 @@ dependencies:
   youtube_player_flutter: ^7.0.0+7
   cupertino_icons: ^1.0.2
   camera: ^0.7.0
+  shared_preferences: ^2.0.6
 #dependency_overrides:
 #  firebase_core: ^0.7.0
 
