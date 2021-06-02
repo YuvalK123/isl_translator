@@ -141,10 +141,16 @@ class _TranslatePage extends State<TranslatePage> {
                    //   context,
                    //   MaterialPageRoute(builder: (context) => VideoPlayerDemo(myUrls: myUrls,)),
                    // );
+                  // this.videoPlayerDemo.myUrls.clear();
                   setState(() {
                     this.videoPlayerDemo = VideoPlayerDemo(myUrls: urls,);
                   });
 
+
+                  /*Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => VideoPlayerDemo(urls),
+                    ));*/
                 },
                 child: Text("תרגם"),
                 color: Colors.black12,
@@ -152,10 +158,22 @@ class _TranslatePage extends State<TranslatePage> {
               Container(
                 child: AspectRatio(
                   aspectRatio: 100/100,
-                  child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo,
+                    child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
                 ),
               ),
-
+              /*Visibility(
+                child: GestureDetector(
+                onLongPressStart: (_) => _controller(index).pause(),
+                onLongPressEnd: (_) => _controller(index).play(),
+                child: Center(
+                  child: AspectRatio(
+                    aspectRatio: _controller(index).value.aspectRatio,
+                    child: Center(child: VideoPlayer(_controller(index))),
+                  ),
+                ),
+              ),
+                visible: _showContainer,
+              ),*/
             ]
         ),
       ),
