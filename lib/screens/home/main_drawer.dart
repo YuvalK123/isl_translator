@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
+import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
+import 'package:isl_translator/services/database.dart';
+import 'package:provider/provider.dart';
 import 'home.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -13,6 +16,10 @@ class MainDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     // future user image
     String imgUrl = 'https://static.toiimg.com/photo/msid-67586673/67586673.jpg';
+    final user = Provider.of<UserModel>(context);
+    print("user: ${user.toString()}");
+    final DatabaseUserService userService = DatabaseUserService(uid: user.uid);
+
     return Drawer(
 
       child: Column(
@@ -29,7 +36,7 @@ class MainDrawer extends StatelessWidget {
                   Column(
                     children: <Widget> [
                       SizedBox(height: 15.0,),
-                      Text('שם משתמש',
+                      Text("שם משתמש",
                         style: TextStyle(
                           fontSize: 22,
                           color: Colors.white,

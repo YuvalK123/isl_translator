@@ -18,7 +18,7 @@ class DatabaseVidService {
 
   Future updateVideo(String key, String url, String desc) async {
     print("inserting $key, $url, $desc");
-    return await videosCollection.document(key).setData({
+    return await videosCollection.doc(key).set({
       "title": key,
       "url": url,
       "description": desc
@@ -53,19 +53,26 @@ class DatabaseUserService{
 
   // collection reference
   final CollectionReference usersCollection =
-  Firestore.instance.collection('users');
+  FirebaseFirestore.instance.collection('users');
 
   Future updateUserData(String name, String age, int gender) async {
-    return await usersCollection.document(uid).setData({
+    return await usersCollection.doc(uid).set({
       'name' : name,
       'age' : age,
       'gender' : gender
     });
   }
 
-  List<UserModel> _brewListFromSnapshot(QuerySnapshot snapshot){
+  Future getUserData() async{
+    if (this.uid == null){
+      return null;
+    }
+    return await usersCollection.doc(this.uid).get();
+  }
+
+  List<UserModel> _userListFromSnapshot(QuerySnapshot snapshot){
     return snapshot.docs.map((doc) =>
-        UserModel(name: doc.data()['name'] ?? '',
+        UserModel(userName: doc.data()['name'] ?? '',
             age: doc.data()['age'] ?? 0,
             gender: doc.data()['gender'] ?? "f")
     ).toList();
@@ -73,6 +80,6 @@ class DatabaseUserService{
 
   // get brews stream
   Stream<List<UserModel>> get users {
-    return usersCollection.snapshots().map(_brewListFromSnapshot);
+    return usersCollection.snapshots().map(_userListFromSnapshot);
   }
 }

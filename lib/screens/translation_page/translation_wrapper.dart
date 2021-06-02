@@ -97,14 +97,6 @@ class _TranslationScreenState extends State<TranslationScreen> {
               Tab(text: 'Write', icon: Icon(Icons.text_fields)),
             ],
           ),
-          // actions: <Widget>[
-          //   FlatButton.icon(onPressed: (){
-          //     Navigator.of(context).push(MaterialPageRoute(builder: (context) => Home()));
-          //   },
-          //       icon: Icon(Icons.home),
-          //       label: Text("Home")
-          //   ),
-          // ],
         ),
         endDrawer: MainDrawer(),
         body: SafeArea(
