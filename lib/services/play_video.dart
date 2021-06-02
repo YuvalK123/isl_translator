@@ -342,7 +342,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
                         ),
                       borderRadius: BorderRadius.all(
-                        Radius.circular(5.0),
+                        Radius.circular(7.0),
                       )
                     ),
                     child: VideoPlayer(_controller(index))),),
