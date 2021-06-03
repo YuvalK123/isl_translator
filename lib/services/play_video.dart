@@ -153,7 +153,7 @@ main() {
 class VideoPlayerDemo extends StatefulWidget {
   final List<String> myUrls;
 
-  VideoPlayerDemo({this.myUrls});
+  VideoPlayerDemo({Key key, this.myUrls}) : super(key: key);
 
   final Set<String> words = {
     'https://firebasestorage.googleapis.com/v0/b/islcsproject.appspot.com/o/animation_openpose%2F%D7%90%D7%AA%D7%94.mp4?alt=media&token=40efd0bf-e7a5-4c05-b6fc-312107e6c8ab',
@@ -164,12 +164,13 @@ class VideoPlayerDemo extends StatefulWidget {
 
   @override
   _VideoPlayerDemoState createState() => _VideoPlayerDemoState();
+
 }
 
 class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   int index = 0;
-  double _position = 0;
-  double _buffer = 0;
+  double _position;
+  double _buffer;
   bool _lock = true;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
@@ -177,11 +178,10 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
   @override
   void initState() {
+    print("new page");
     super.initState();
-    _urls = widget.words;
     print("my urls!!");
     print(widget.myUrls);
-    print("urls are at page $_urls");
     if (widget.myUrls.length > 0) {
       _initController(0).then((_) {
         _playController(0);
@@ -193,12 +193,20 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
     }
   }
 
-  VoidCallback _listenerSpawner(index) {
+  VoidCallback _listenerSpawner() {
+
     return () {
-      print("index is ==> " + index);
-      int dur = _controller(index).value.duration.inMilliseconds;
-      int pos = _controller(index).value.position.inMilliseconds;
-      int buf = _controller(index).value.buffered.last.end.inMilliseconds;
+      var index = this.index;
+      var controller = _controller(index);
+      if(controller == null) return;
+      if(controller.value == null) return;
+      if( controller.value.buffered.length <= 0) return;
+      print("index is ==> " + index.toString());
+      int dur = controller.value.duration.inMilliseconds;
+      int pos = controller.value.position.inMilliseconds;
+
+      int buf = controller.value.buffered[controller.value.buffered.length-1].end.inMilliseconds;
+      // int buf = controller.value.buffered.last.end.inMilliseconds;
 
       setState(() {
         if (dur <= pos) {
@@ -240,7 +248,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
   void _playController(int index) async {
     if (!_listeners.keys.contains(index)) {
-      _listeners[index] = _listenerSpawner(index);
+      _listeners[index] = _listenerSpawner();
     }
     _controller(index).addListener(_listeners[index]);
     if(index <widget.myUrls.length)
@@ -256,6 +264,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   void checkIfVideoFinished() {
     if (_controller == null ||
         _controller(index).value == null ||
+        _controller(index).value.duration == null ||
         _controller(index).value.position == null) return;
     if (_controller(index).value.position.inSeconds ==
         _controller(index).value.duration.inSeconds)

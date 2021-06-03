@@ -1,6 +1,8 @@
+
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
+import 'package:isl_translator/services/play_video.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:isl_translator/services/show_video.dart';
 import 'package:video_player/video_player.dart';
@@ -16,48 +18,13 @@ class RecordPage extends StatefulWidget {
 }
 
 class _RecordPage extends State<RecordPage> {
-  // final Map<String, HighlightedWord> _highlights = {
-  //   'flutter': HighlightedWord(
-  //     onTap: () => print('flutter'),
-  //     textStyle: const TextStyle(
-  //       color: Colors.blue,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //   ),
-  //   'voice': HighlightedWord(
-  //     onTap: () => print('voice'),
-  //     textStyle: const TextStyle(
-  //       color: Colors.green,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //   ),
-  //   'subscribe': HighlightedWord(
-  //     onTap: () => print('subscribe'),
-  //     textStyle: const TextStyle(
-  //       color: Colors.red,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //   ),
-  //   'like': HighlightedWord(
-  //     onTap: () => print('like'),
-  //     textStyle: const TextStyle(
-  //       color: Colors.blueAccent,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //   ),
-  //   'comment': HighlightedWord(
-  //     onTap: () => print('comment'),
-  //     textStyle: const TextStyle(
-  //       color: Colors.green,
-  //       fontWeight: FontWeight.bold,
-  //     ),
-  //   ),
-  // };
-
   stt.SpeechToText _speech;
   bool _isListening = false;
   String _text = 'לחצ/י על הכפתור על מנת לדבר';
   double _confidence = 1.0;
+  int keys = 0;
+  List<String> myUrls = [];
+  VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("-1"), myUrls: [],);
 
   //video controller
   VideoPlayerController _controller;
@@ -73,7 +40,9 @@ class _RecordPage extends State<RecordPage> {
 
     super.initState();
     _speech = stt.SpeechToText();
+
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +70,7 @@ class _RecordPage extends State<RecordPage> {
         repeatPauseDuration: const Duration(milliseconds: 100),
         repeat: true,
         child: FloatingActionButton(
-          onPressed: _listen,
+          onPressed:  !_isListening ? _listen : stop,
           child: Icon(_isListening ? Icons.mic : Icons.mic_none),
           backgroundColor: Colors.grey,
         ),
@@ -111,9 +80,21 @@ class _RecordPage extends State<RecordPage> {
         child: Container(
           alignment: Alignment.topRight,
           padding: const EdgeInsets.fromLTRB(30.0, 30.0, 30.0, 150.0),
-          child: Text(
-              _text,
-              textAlign: TextAlign.right,
+          child: Column(
+            children: [
+              SizedBox(height: 10.0,),
+              Text(
+                  _text,
+                  textAlign: TextAlign.right,
+              ),
+              SizedBox(height: 5.0,),
+              Container(
+                child: AspectRatio(
+                    aspectRatio: 100/100,
+                    child: _videoPlayerDemo.myUrls.length < 1 ? null : _videoPlayerDemo
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -121,18 +102,42 @@ class _RecordPage extends State<RecordPage> {
 
     // );
   }
+  Future<void> stop() async {
+    await _speech.stop();
+    await Future.delayed(const Duration(seconds: 1));
+    setState(() async{
+
+      print("stop");
+      // this.isPressed = false;
+      this._isListening = false;
+      var result = await meow();
+    });
+
+
+  }
 
   void _listen() async {
+    // setState(() {
+    //   this.isPressed = true;
+    // });
+
     if (!_isListening) {
       bool available = await _speech.initialize(
-        onStatus: (val) => print('onStatus: $val'),
+        onStatus: (val) async{
+          print('onStatus: $val');
+          if (val.toLowerCase().contains("not")) {
+            await stop();
+            return;
+          }
+        },
         onError: (val) => print('onError: $val'),
         debugLogging: false,
       );
+
       if (available) {
         setState(() => _isListening = true);
         _speech.listen(
-          onResult: (val)  =>
+          onResult: (val) =>
               setState(() {
                 _text = val.recognizedWords;
                 print("recg is $_text");
@@ -144,9 +149,10 @@ class _RecordPage extends State<RecordPage> {
               }),
         );
       }
-    } else {
-      setState(() => _isListening = false);
-      _speech.stop();
+    }
+
+    Future<void> meoww1(String val) async{
+
     }
 
     /* Display video */
@@ -177,5 +183,48 @@ class _RecordPage extends State<RecordPage> {
         _controller.play();
       }
     });*/
+  }
+
+  Future<void> meow() async{
+    String sentence = _text; // got the sentence from the user
+    print("sentence is $sentence");
+    List<String> splitSentenceList =
+    splitSentence(sentence); // split the sentence
+    String url;
+    List<String> letters;
+    print("split is $splitSentenceList");
+    List<String> urls = [];
+    for(int i=0; i < splitSentenceList.length; i++)
+    {
+      Reference ref = FirebaseStorage.instance
+          .ref()
+          .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
+      try {
+        // gets the video's url
+        url = await ref.getDownloadURL();
+        urls.add(url);
+      } catch (err) {
+        // Video doesn't exist - so split the work to letters
+        letters = splitToLetters(sentence);
+        for(int j=0; j < letters.length; j++){
+          Reference ref = FirebaseStorage.instance
+              .ref()
+              .child("animation_openpose/" + letters[j] + ".mp4");
+          url = await ref.getDownloadURL();
+          urls.add(url);
+        }
+      }
+
+      //_initController(url).whenComplete(() => _lock = false);
+    }
+    myUrls = urls;
+    print("hello this is the urls ==> " + urls.toString());
+    print("and this is the text: $_text from sentence $sentence");
+    setState(() {
+      this._videoPlayerDemo = VideoPlayerDemo(myUrls: urls, key: Key(this.keys.toString()),);
+      print("video demo ind in voice translation: ${this.keys}");
+      this.keys++;
+    });
+
   }
 }

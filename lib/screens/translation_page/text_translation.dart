@@ -18,9 +18,10 @@ class _TranslatePage extends State<TranslatePage> {
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
   final myController = TextEditingController();
-  VideoPlayerDemo videoPlayerDemo = VideoPlayerDemo(myUrls: [],);
+  VideoPlayerDemo videoPlayerDemo = VideoPlayerDemo(key: Key("-1"), myUrls: [],);
   List<String> myUrls;
   int index = 0;
+  int ind = 0;
   double _position = 0;
   double _buffer = 0;
   bool _lock = true;
@@ -118,32 +119,10 @@ class _TranslatePage extends State<TranslatePage> {
                   }
                   myUrls = urls;
                   print("hello this is the urls ==> " + urls.toString());
-                  /*show();
-                  if (myUrls.length > 0) {
-                    _initController(0).then((_) {
-                      _playController(0);
-                    });
-                  }
-
-                  if (myUrls.length > 1) {
-                    _initController(1).whenComplete(() => _lock = false);
-                  }*/
-                  /*var playerDemo = VideoPlayerDemo(myUrls);
                   setState(() {
-                    _videoPlayerDemo = playerDemo;
-
-                  });*/
-
-                  /* new Column(
-                      children: <Widget>[VideoPlayerDemo(urls)]);*/
-
-                   // Navigator.push(
-                   //   context,
-                   //   MaterialPageRoute(builder: (context) => VideoPlayerDemo(myUrls: myUrls,)),
-                   // );
-                  // this.videoPlayerDemo.myUrls.clear();
-                  setState(() {
-                    this.videoPlayerDemo = VideoPlayerDemo(myUrls: urls,);
+                    this.videoPlayerDemo = VideoPlayerDemo(myUrls: urls, key: Key(this.ind.toString()),);
+                    print("ind: ${this.ind}");
+                    this.ind++;
                   });
 
 
