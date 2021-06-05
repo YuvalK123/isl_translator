@@ -41,7 +41,7 @@ dependencies:
   camera: ^0.7.0
   shared_preferences: ^2.0.6
   disk_lru_cache: ^0.0.2
-
+  path_provider: ^2.0.2
 #dependency_overrides:
 #  firebase_core: ^0.7.0
 

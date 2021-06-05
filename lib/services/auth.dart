@@ -7,7 +7,10 @@ class AuthService {
 
   // create user based on firebase user
   UserModel _userFromFirebase(User user){
-    return user != null ? UserModel(uid: user.uid) : null ;
+    var dbs = DatabaseUserService(uid: user.uid);
+    return user != null ? UserModel(
+      uid: user.uid,
+    ) : null ;
   }
 
   // auth change user stream
@@ -53,7 +56,9 @@ class AuthService {
       User user = result.user;
       // create a new document for the user with the uid
       await DatabaseUserService(uid: user.uid).updateUserData(
-          '0', 'new user', 100
+        username: "new user",
+        age: 100,
+        gender: 'f',
       );
       return _userFromFirebase(user);
     }catch(e){

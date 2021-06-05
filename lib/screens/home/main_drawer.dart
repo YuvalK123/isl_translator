@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
+import 'package:isl_translator/screens/dictonary/dict.dart';
 import 'package:isl_translator/screens/profile/profile.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
@@ -18,6 +19,7 @@ class MainDrawer extends StatelessWidget {
   final pageButton currPage;
   final AuthService _auth = AuthService();
 
+
   MainDrawer({this.currPage = pageButton.TRANSLATION});
 
   @override
@@ -27,7 +29,6 @@ class MainDrawer extends StatelessWidget {
     final user = Provider.of<UserModel>(context);
     print("user: ${user.toString()}");
     final DatabaseUserService userService = DatabaseUserService(uid: user.uid);
-    print("curr page = ${this.currPage}");
     return Drawer(
 
       child: Column(
@@ -78,37 +79,25 @@ class MainDrawer extends StatelessWidget {
           ),
           DrawerButton(
             title: "תרגום",
-            onTap: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => TranslationWrapper(),
-                )
-            ),
+            onTap: () => pushPage(context, TranslationWrapper()),
             icon: Icon(Icons.translate),
             isCurrPage: this.currPage == pageButton.TRANSLATION,
           ),
           DrawerButton(
               title: "הוסף וידיאו",
-              onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => AddVideoPage(),
-                  )
-              ),
+              onTap: () => pushPage(context, AddVideoPage()),
               icon: Icon(Icons.video_library),
             isCurrPage: this.currPage == pageButton.ADDVID,
           ),
           DrawerButton(
               title: "מילון",
-              onTap: null,
+              onTap: () => pushPage(context, Dictionary()),
               icon: Icon(Icons.book),
             isCurrPage: this.currPage == pageButton.DICT,
           ),
           DrawerButton(
               title: "איזור אישי",
-              onTap:  () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => Profile(),
-                  )
-              ),
+              onTap:  () => pushPage(context, Profile()),
               icon: Icon(Icons.person),
             isCurrPage: this.currPage == pageButton.PROFILE,
           ),
@@ -122,6 +111,14 @@ class MainDrawer extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+  
+  void pushPage(BuildContext context, Widget page){
+    Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => page,
+        )
     );
   }
 }

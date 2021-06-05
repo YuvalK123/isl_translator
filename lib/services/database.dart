@@ -27,7 +27,7 @@ class DatabaseVidService {
 
   Future deleteVideo(String key) async {
     print("deleting $key");
-    return await videosCollection.document(key).delete();
+    return await videosCollection.doc(key).delete();
   }
 
   List<Vid> _videoFromSnapshot(QuerySnapshot snapshot) {
@@ -55,9 +55,9 @@ class DatabaseUserService{
   final CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('users');
 
-  Future updateUserData(String name, String age, int gender) async {
+  Future updateUserData({String username, int age, String gender}) async {
     return await usersCollection.doc(uid).set({
-      'name' : name,
+      'name' : username,
       'age' : age,
       'gender' : gender
     });
@@ -72,14 +72,25 @@ class DatabaseUserService{
 
   List<UserModel> _userListFromSnapshot(QuerySnapshot snapshot){
     return snapshot.docs.map((doc) =>
-        UserModel(userName: doc.data()['name'] ?? '',
+        UserModel(username: doc.data()['username'] ?? 'Anon user',
             age: doc.data()['age'] ?? 0,
-            gender: doc.data()['gender'] ?? "f")
+            gender: doc.data()['gender'] ?? "")
     ).toList();
   }
 
+  UserModel _userModelFromSnapshot(DocumentSnapshot documentSnapshot){
+    return UserModel(
+      uid: this.uid,
+      username: documentSnapshot.data()["username"] ?? "anon user",
+      gender: documentSnapshot.data()["gender"],
+      age: documentSnapshot.data()["age"],
+    );
+  }
+
   // get brews stream
-  Stream<List<UserModel>> get users {
-    return usersCollection.snapshots().map(_userListFromSnapshot);
+  Stream<UserModel> get users {
+    print("uid is $uid");
+    return usersCollection.doc(this.uid).snapshots()
+        .map(_userModelFromSnapshot);
   }
 }

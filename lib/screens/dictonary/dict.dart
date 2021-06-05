@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:isl_translator/screens/home/main_drawer.dart';
 
 class Dictionary extends StatefulWidget {
   @override
@@ -8,8 +9,10 @@ class Dictionary extends StatefulWidget {
 class _DictionaryState extends State<Dictionary> {
   @override
   Widget build(BuildContext context) {
-    return Container(
-
+      return Scaffold(
+        appBar: AppBar(title: Text("מילון"),),
+        endDrawer: MainDrawer(currPage: pageButton.DICT,),
+        body: Text("body"),
     );
   }
 }
