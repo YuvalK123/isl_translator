@@ -1,9 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:imagebutton/imagebutton.dart';
 import 'package:isl_translator/screens/dictonary/animals.dart';
+import 'package:isl_translator/screens/home/main_drawer.dart';
 import 'package:random_color/random_color.dart';
-// import 'package:isl_translator/models/button_image.dart';
 
 class Dictionary extends StatefulWidget {
   @override
@@ -15,7 +14,9 @@ class _DictionaryState extends State<Dictionary> {
   void initState() {
     super.initState();
   }
+
   RandomColor _randomColor = RandomColor();
+
   List<Card> _buildGridCards(BuildContext context) {
     ButtonImage holidays = new ButtonImage();
     holidays.name = "hanukkah.jfif";
@@ -50,7 +51,6 @@ class _DictionaryState extends State<Dictionary> {
 
     return products.map((product) {
       return Card(
-        //color: Colors.cyan[800],
         shape: RoundedRectangleBorder(side: BorderSide(color: Colors.black, width: 2),
             borderRadius: const BorderRadius.all(
                 Radius.circular(8.0)
@@ -68,14 +68,8 @@ class _DictionaryState extends State<Dictionary> {
                     aspectRatio: 18 / 12,
                     child: Container(
                       alignment: Alignment.bottomCenter,
-                      //width: 100.0,
-                      //height: 50.0,
-                      //color: Colors.green[100],
-                      /*child: FittedBox(
-                        child: Image.asset("assets/images/" + product.name),
-                        fit: BoxFit.fill,
-                      )*/child:Image.asset(
-                          "assets/images/" + product.name
+                      child:Image.asset(
+                          "assets/images/" + product.name,
                       ),
                     ),
                   ),
@@ -139,6 +133,7 @@ class _DictionaryState extends State<Dictionary> {
             )),
         backgroundColor: Colors.cyan[900],
       ),
+      endDrawer: MainDrawer(currPage: pageButton.DICT,),
       body: GridView.count(
           crossAxisCount: 2,
           padding: EdgeInsets.all(16.0),
