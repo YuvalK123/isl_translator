@@ -57,6 +57,7 @@ class _DictionaryState extends State<Dictionary> {
             )),
         // TODO: Adjust card heights (103)
         child: Stack(
+          clipBehavior: Clip.none,
           children: <Widget>[
             Column(
               // TODO: Center items on the card (103)
@@ -77,20 +78,23 @@ class _DictionaryState extends State<Dictionary> {
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(25.0, 35.0, 20.0,10.0),
-                    child: Column(
-                      // TODO: Align labels to the bottom and center (103)
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      // TODO: Change innermost Column (103)
-                      children: <Widget>[
-                        // TODO: Handle overflowing labels (103)
-                        Container(alignment: Alignment.center,
-                          child: Text(
-                            product.text,
-                            style: theme.textTheme.title,
-                            maxLines: 1,
+                    child: SingleChildScrollView  (
+                      child: Column(
+                        
+                        // TODO: Align labels to the bottom and center (103)
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        // TODO: Change innermost Column (103)
+                        children: <Widget>[
+                          // TODO: Handle overflowing labels (103)
+                          Container(alignment: Alignment.center,
+                            child: Text(
+                              product.text,
+                              style: theme.textTheme.title,
+                              maxLines: 1,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -122,6 +126,7 @@ class _DictionaryState extends State<Dictionary> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Container(
             alignment: Alignment.centerRight,
