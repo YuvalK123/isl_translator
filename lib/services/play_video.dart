@@ -165,6 +165,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   double _buffer = 0;
   bool _isReady = false;
   bool _lock = true;
+  bool _isReady = false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
   Set<String> _urls;
@@ -335,6 +336,12 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     } else {
       _initController(index + 1).whenComplete(() => _lock = false);
     }
+  }
+
+  @override
+  void dispose(){
+    _controller(index).dispose();
+    super.dispose();
   }
 
   @override
