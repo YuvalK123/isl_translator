@@ -105,7 +105,7 @@ class _TranslatePage extends State<TranslatePage> {
                         urls.add(url);
                       } catch (err) {
                         // Video doesn't exist - so split the work to letters
-                        letters = splitToLetters(myController.text);
+                        letters = splitToLetters(splitSentenceList[i]);
                         for(int j=0; j < letters.length; j++){
                           Reference ref = FirebaseStorage.instance
                               .ref()

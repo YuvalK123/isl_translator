@@ -3,6 +3,8 @@ import 'package:isl_translator/models/drawer_button.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
+import 'package:isl_translator/screens/dictonary//dict.dart';
+
 import 'home.dart';
 
 class MainDrawer extends StatelessWidget {
@@ -23,7 +25,6 @@ class MainDrawer extends StatelessWidget {
             color: Colors.cyan[900],
             child: Center(
               child:Row(
-
                 children: [
                   Spacer(),
                   Column(
@@ -91,7 +92,11 @@ class MainDrawer extends StatelessWidget {
           ),
           DrawerButton(
               title: "מילון",
-              onTap: null,
+              onTap:() => Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => Dictionary(),
+                )
+              ),
               icon: Icon(Icons.book)),
           DrawerButton(
               title: "איזור אישי",
