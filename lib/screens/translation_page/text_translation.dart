@@ -67,73 +67,76 @@ class _TranslatePage extends State<TranslatePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: Container(alignment: Alignment.topRight,child: Text('תרגום מטקסט לשפת הסימנים',textDirection: TextDirection.rtl)),
         backgroundColor: Colors.cyan[800],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-            children: <Widget>[
-              TextField(
-                textDirection: TextDirection.rtl,
-                controller: myController,
-                decoration: InputDecoration(
-                    border: OutlineInputBorder(), hintText: 'הכנס/י טקסט'),
-                    textAlign: TextAlign.right,
-              ),
+        child: SingleChildScrollView(
+          child: Column(
+              children: <Widget>[
+                TextField(
+                  textDirection: TextDirection.rtl,
+                  controller: myController,
+                  decoration: InputDecoration(
+                      border: OutlineInputBorder(), hintText: 'הכנס/י טקסט'),
+                      textAlign: TextAlign.right,
+                ),
 
-              // ignore: deprecated_member_use
-              FlatButton(
-                onPressed: () async {
-                  String sentence =
-                  myController.text; // got the sentence from the user
-                  List<String> splitSentenceList =
-                  splitSentence(sentence); // split the sentence
-                  String url;
-                  List<String> letters;
-                  print(splitSentenceList);
-                  List<String> urls = [];
-                  for(int i=0; i < splitSentenceList.length; i++)
-                  {
-                      Reference ref = FirebaseStorage.instance
-                          .ref()
-                          .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
-                      try {
-                        // gets the video's url
-                        url = await ref.getDownloadURL();
-                        urls.add(url);
-                      } catch (err) {
-                        // Video doesn't exist - so split the work to letters
-                        letters = splitToLetters(splitSentenceList[i]);
-                        for(int j=0; j < letters.length; j++){
-                          Reference ref = FirebaseStorage.instance
-                              .ref()
-                              .child("animation_openpose/" + letters[j] + ".mp4");
+                // ignore: deprecated_member_use
+                FlatButton(
+                  onPressed: () async {
+                    String sentence =
+                    myController.text; // got the sentence from the user
+                    List<String> splitSentenceList =
+                    splitSentence(sentence); // split the sentence
+                    String url;
+                    List<String> letters;
+                    print(splitSentenceList);
+                    List<String> urls = [];
+                    for(int i=0; i < splitSentenceList.length; i++)
+                    {
+                        Reference ref = FirebaseStorage.instance
+                            .ref()
+                            .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
+                        try {
+                          // gets the video's url
                           url = await ref.getDownloadURL();
                           urls.add(url);
+                        } catch (err) {
+                          // Video doesn't exist - so split the work to letters
+                          letters = splitToLetters(splitSentenceList[i]);
+                          for(int j=0; j < letters.length; j++){
+                            Reference ref = FirebaseStorage.instance
+                                .ref()
+                                .child("animation_openpose/" + letters[j] + ".mp4");
+                            url = await ref.getDownloadURL();
+                            urls.add(url);
+                          }
                         }
-                      }
-                  }
-                  myUrls = urls;
-                  print("hello this is the urls ==> " + urls.toString());
-                  setState(() {
-                    this.videoPlayerDemo = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
-                    this.ind++;
-                  });
+                    }
+                    myUrls = urls;
+                    print("hello this is the urls ==> " + urls.toString());
+                    setState(() {
+                      this.videoPlayerDemo = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
+                      this.ind++;
+                    });
 
-                },
-                child: Text("תרגם"),
-                color: Colors.black12,
-              ),
-              Container(
-
-                child: AspectRatio(
-                  aspectRatio: 1.0,
-                    child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
-                    )
+                  },
+                  child: Text("תרגם"),
+                  color: Colors.black12,
                 ),
-            ]
+                Container(
+
+                  child: AspectRatio(
+                    aspectRatio: 1.0,
+                      child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
+                      )
+                  ),
+              ]
+          ),
         ),
       ),
 

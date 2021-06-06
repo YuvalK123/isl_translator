@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/services/show_video.dart';
+import 'package:isl_translator/shared/loading.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-
+import 'package:isl_translator/main.dart';
 import 'package:flutter/material.dart';
 // import 'package:video_player/video_player.dart';
 
@@ -147,6 +148,7 @@ class PlayVideoService{
 class VideoPlayerDemo extends StatefulWidget {
   final List<String> myUrls;
 
+
   VideoPlayerDemo({Key key, this.myUrls}): super(key: key);
 
 
@@ -157,10 +159,11 @@ class VideoPlayerDemo extends StatefulWidget {
 
 }
 
-class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
+class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   int index = 0;
   double _position = 0;
   double _buffer = 0;
+  bool _isReady = false;
   bool _lock = true;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
@@ -170,18 +173,21 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
   @override
   void initState() {
-    this.state = true;
+
     print("new page");
     super.initState();
+    this.state = true;
     print("my urls!!");
     print(widget.myUrls);
     print("urls are at page $_urls");
     if (widget.myUrls.length > 0) {
       _initController(0).then((_) {
         setState(() {
+          this._isReady = true;
           this.borderColor = Colors.black;
           // this.borderColor = Theme.of(context)
         });
+
         _playController(0);
       });
     }
@@ -190,6 +196,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
       _initController(1).whenComplete(() => _lock = false);
     }
   }
+
 
   VoidCallback _listenerSpawner() {
 
@@ -236,6 +243,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
     _listeners.remove(index);
   }
 
+
   void _stopController(int index) {
     _controller(index).removeListener(_listeners[index]);
     _controller(index).pause();
@@ -255,6 +263,12 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
     //_controller(index).addListener(checkIfVideoFinished);
     await _controller(index).play();
     setState(() {});
+  }
+
+  @override
+  void dispose(){
+    _controller(index).dispose();
+    super.dispose();
   }
 
   void checkIfVideoFinished() {
@@ -325,7 +339,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return !this._isReady ? Loading() : Scaffold(
       body: Stack(
         children: <Widget>[
           GestureDetector(
@@ -350,30 +364,8 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
               ),
             ),
           ),
-          /*Positioned(
-            child: Container(
-              height: 10,
-              width: MediaQuery.of(context).size.width * _buffer,
-              color: Colors.grey,
-            ),
-          ),
-          Positioned(
-            child: Container(
-              height: 10,
-              width: MediaQuery.of(context).size.width * _position,
-              color: Colors.greenAccent,
-            ),
-          ),*/
         ],
       ),
-      /*floatingActionButton: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: <Widget>[
-          FloatingActionButton(onPressed: _previousVideo, child: Icon(Icons.arrow_back)),
-          SizedBox(width: 24),
-          FloatingActionButton(onPressed: _nextVideo, child: Icon(Icons.arrow_forward)),
-        ],
-      ),*/
     );
   }
 }

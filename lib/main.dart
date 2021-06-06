@@ -11,6 +11,8 @@ void main() async {
   runApp(MyApp());
 }
 
+// RouteObserver<PageRoute> routeObserver = RouteObserver<PageRoute>();
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
@@ -18,6 +20,7 @@ class MyApp extends StatelessWidget {
     return StreamProvider<UserModel>.value(
       value: AuthService().user,
       child: MaterialApp(
+        // navigatorObservers: [routeObserver],
         home: Wrapper(),
         // home: Home()
       ),

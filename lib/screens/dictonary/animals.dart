@@ -47,6 +47,7 @@ class _AnimalsState extends State<Animals> {
               )),
           // TODO: Adjust card heights (103)
           child: Stack(
+            clipBehavior: Clip.none,
             children: <Widget>[
               Column(
                 // TODO: Center items on the card (103)
@@ -73,20 +74,22 @@ class _AnimalsState extends State<Animals> {
                   Expanded(
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(25.0, 35.0, 20.0, 10.0),
-                      child: Column(
-                        // TODO: Align labels to the bottom and center (103)
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        // TODO: Change innermost Column (103)
-                        children: <Widget>[
-                          // TODO: Handle overflowing labels (103)
-                          Container(alignment: Alignment.center,
-                            child: Text(
-                              product.text,
-                              style: theme.textTheme.title,
-                              maxLines: 1,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          // TODO: Align labels to the bottom and center (103)
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          // TODO: Change innermost Column (103)
+                          children: <Widget>[
+                            // TODO: Handle overflowing labels (103)
+                            Container(alignment: Alignment.center,
+                              child: Text(
+                                product.text,
+                                style: theme.textTheme.title,
+                                maxLines: 1,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -175,21 +178,23 @@ class _AnimalsState extends State<Animals> {
       child: Container(       // use container to change width and height
         height: 400,
         width: 1000,
-        child: Column(
-          children: <Widget>[
-            Container(
-            child: AspectRatio(
-                aspectRatio: 1.0,
-                child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
-            ),
-            ),
-            FlatButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: new Text("סגור"),
-            ),
-          ],
+        child: SingleChildScrollView(
+          child: Column(
+            children: <Widget>[
+              Container(
+              child: AspectRatio(
+                  aspectRatio: 1.0,
+                  child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
+              ),
+              ),
+              FlatButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: new Text("סגור"),
+              ),
+            ],
+          ),
         ),
       ),
     );
