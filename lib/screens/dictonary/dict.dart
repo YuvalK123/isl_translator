@@ -120,6 +120,7 @@ class _DictionaryState extends State<Dictionary> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      endDrawer: MainDrawer(currPage: pageButton.DICT,),
       appBar: AppBar(
         title: Container(
             alignment: Alignment.centerRight,
