@@ -5,29 +5,86 @@ import 'package:isl_translator/services/show_video.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 import 'package:video_player/video_player.dart';
-class Animals extends StatefulWidget {
+class Subject extends StatefulWidget {
+  final String name;
+  Subject(this.name);
+
   @override
-  _AnimalsState createState() => _AnimalsState();
+  _SubjectState createState() => _SubjectState();
 }
 
-class _AnimalsState extends State<Animals> {
+class _SubjectState extends State<Subject> {
   VideoPlayerDemo videoPlayerDemo = VideoPlayerDemo(key: Key("0"), myUrls: [],);
   List<String> myUrls;
   int ind = 1;
+  String subjectName;
   @override
   void initState() {
     super.initState();
+    subjectName = widget.name;
   }
 
   List<Card> _buildGridCards(BuildContext context) {
-      ButtonImage dolphin = new ButtonImage();
-      dolphin.name = "dolphin.jfif";
-      dolphin.text = "דולפין";
-      dolphin.onTap = "דולפין";
-      dolphin.color = "green";
-      List<ButtonImage> products = [
-        dolphin
-      ];
+    List<ButtonImage> products = [];
+      if(subjectName == "holidays")
+        {
+          ButtonImage holiday = new ButtonImage("","חג","חג");
+          ButtonImage custom = new ButtonImage("","מנהג","מנהג");
+          ButtonImage newYear = new ButtonImage("","ראש השנה","ראש השנה");
+          products.addAll([holiday,custom,newYear]);
+        }
+      else if(subjectName == "pronoun")
+        {
+          ButtonImage she = new ButtonImage("","היא","היא");
+          products.addAll([she]);
+        }
+      else if(subjectName == "animals")
+      {
+        // words
+        ButtonImage dolphin = new ButtonImage("dolphin.jfif","דולפין","דולפין");
+        ButtonImage ant = new ButtonImage("","נמלה","נמלה");
+        ButtonImage hedgehog = new ButtonImage("","קיפוד","קיפוד");
+        ButtonImage snake = new ButtonImage("","נחש","נחש");
+        ButtonImage frog = new ButtonImage("","צפרדע","צפרדע");
+        ButtonImage donkey = new ButtonImage("","חמור","חמור");
+        ButtonImage horse = new ButtonImage("","סוס","סוס");
+        // add words to list
+        products.addAll([dolphin,ant,hedgehog,snake,frog,donkey,horse]);
+      }
+      else if(subjectName == "shapes")
+      {
+        // words
+        ButtonImage circle = new ButtonImage("","עיגול","עיגול");
+        // add words to list
+        products.addAll([circle]);
+      }
+      else if(subjectName == "body")
+      {
+        // words
+        ButtonImage braids = new ButtonImage("","צמות","צמות");
+        // add words to list
+        products.addAll([braids]);
+      }
+      else if(subjectName == "time")
+      {
+        // words
+        ButtonImage minute = new ButtonImage("","דקה","דקה");
+        // add words to list
+        products.addAll([minute]);
+      }
+      else if(subjectName == "geography")
+      {
+        ButtonImage eilat = new ButtonImage("","אילת","אילת");
+        ButtonImage ashdod = new ButtonImage("","אשדוד","אשדוד");
+        ButtonImage givatayim = new ButtonImage("","גבעתיים","גבעתיים");
+        ButtonImage kibbutz = new ButtonImage("","קיבוץ","קיבוץ");
+        products.addAll([eilat,ashdod,givatayim,kibbutz]);
+      }
+      else if(subjectName == "food")
+      {
+        ButtonImage pomegranate = new ButtonImage("","רימון","רימון");
+        products.addAll([pomegranate]);
+      }
 
       if (products == null || products.isEmpty) {
         return const <Card>[];
@@ -47,6 +104,7 @@ class _AnimalsState extends State<Animals> {
               )),
           // TODO: Adjust card heights (103)
           child: Stack(
+            clipBehavior: Clip.none,
             children: <Widget>[
               Column(
                 // TODO: Center items on the card (103)
@@ -54,39 +112,41 @@ class _AnimalsState extends State<Animals> {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: AspectRatio(
-                      aspectRatio: 18 / 12,
-                      child: Container(
-                        alignment: Alignment.bottomCenter,
-                        //width: 100.0,
-                        //height: 50.0,
-                        //color: Colors.green[100],
-                        /*child: FittedBox(
-                        child: Image.asset("assets/images/" + product.name),
-                        fit: BoxFit.fill,
-                      )*/child:Image.asset(
-                          "assets/images/" + product.name
-                      ),
-                      ),
-                    ),
+                    // child: AspectRatio(
+                    //   aspectRatio: 18 / 12,
+                    //   child: Container(
+                    //     alignment: Alignment.bottomCenter,
+                    //     //width: 100.0,
+                    //     //height: 50.0,
+                    //     //color: Colors.green[100],
+                    //     /*child: FittedBox(
+                    //     child: Image.asset("assets/images/" + product.name),
+                    //     fit: BoxFit.fill,
+                    //   )*/child:Image.asset(
+                    //       "assets/images/" + product.name
+                    //   ),
+                    //   ),
+                    // ),
                   ),
                   Expanded(
                     child: Padding(
-                      padding: EdgeInsets.fromLTRB(25.0, 35.0, 20.0, 10.0),
-                      child: Column(
-                        // TODO: Align labels to the bottom and center (103)
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        // TODO: Change innermost Column (103)
-                        children: <Widget>[
-                          // TODO: Handle overflowing labels (103)
-                          Container(alignment: Alignment.center,
-                            child: Text(
-                              product.text,
-                              style: theme.textTheme.title,
-                              maxLines: 1,
+                      padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                      child: SingleChildScrollView(
+                        child: Column(
+                          // TODO: Align labels to the bottom and center (103)
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          // TODO: Change innermost Column (103)
+                          children: <Widget>[
+                            // TODO: Handle overflowing labels (103)
+                            Container(alignment: Alignment.center,
+                              child: Text(
+                                product.text,
+                                style: theme.textTheme.title,
+                                maxLines: 2,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -139,26 +199,10 @@ class _AnimalsState extends State<Animals> {
                           context: context,
                           builder: (BuildContext context) => _buildPopupDialog(context),
                         );
-
-                        /*Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,)),
-                        );*/
-
-                        /*setState(() {
-                          this.videoPlayerDemo = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
-                          this.ind++;
-                        });*/
                       }
                   ),
                 ),
               ),
-              /*Container(
-                  child: AspectRatio(
-                      aspectRatio: 1.0,
-                      child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
-                  )
-              ),*/
             ],
           ),
         );
@@ -185,6 +229,9 @@ class _AnimalsState extends State<Animals> {
             ),
             FlatButton(
               onPressed: () {
+                if (mounted){
+
+                }
                 Navigator.of(context).pop();
               },
               child: new Text("סגור"),
@@ -243,7 +290,7 @@ class _AnimalsState extends State<Animals> {
         backgroundColor: Colors.cyan[900],
       ),
       body: GridView.count(
-          crossAxisCount: 2,
+          crossAxisCount: 3,
           padding: EdgeInsets.all(16.0),
           childAspectRatio: 8.0 / 9.0,
           children: _buildGridCards(context) // Changed code
@@ -256,5 +303,6 @@ class ButtonImage{
   String name;
   String text;
   String onTap;
-  String color;
+
+  ButtonImage(this.name, this.text,this.onTap);
 }

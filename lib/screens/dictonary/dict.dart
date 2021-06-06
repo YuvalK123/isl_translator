@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:imagebutton/imagebutton.dart';
-import 'package:isl_translator/screens/dictonary/animals.dart';
+import 'package:isl_translator/screens/dictonary/subject.dart';
+import 'package:isl_translator/screens/home/main_drawer.dart';
 import 'package:random_color/random_color.dart';
 // import 'package:isl_translator/models/button_image.dart';
 
@@ -17,28 +18,16 @@ class _DictionaryState extends State<Dictionary> {
   }
   RandomColor _randomColor = RandomColor();
   List<Card> _buildGridCards(BuildContext context) {
-    ButtonImage holidays = new ButtonImage();
-    holidays.name = "hanukkah.jfif";
-    holidays.text = "חגים ומועדים";
-    holidays.onTap = "חגים ומועדים";
+    ButtonImage holidays = new ButtonImage("hanukkah.jfif","חגים ומועדים","holidays");
+    ButtonImage pronoun = new ButtonImage("pointing.jfif","כינוי גוף","pronoun");
+    ButtonImage animals = new ButtonImage("animals.jfif","בעלי חיים","animals");
+    ButtonImage shapes = new ButtonImage("shapes.jfif", "צורות","shapes");
+    ButtonImage body = new ButtonImage("body.jfif","גוף האדם","body");
+    ButtonImage time = new ButtonImage("time.jfif","זמן","time");
+    ButtonImage geography = new ButtonImage("geography.jfif","גאוגרפיה","geography");
+    ButtonImage food = new ButtonImage("food.jfif","אוכל","food");
 
-    ButtonImage pronoun = new ButtonImage();
-    pronoun.name = "pointing.jfif";
-    pronoun.text = "כינוי גוף";
-    pronoun.onTap = "כינוי גוף";
-
-    ButtonImage animals = new ButtonImage();
-    animals.name = "animals.jfif";
-    animals.text = "בעלי חיים";
-    animals.onTap = "בעלי חיים";
-
-   ButtonImage shapes = new ButtonImage();
-    shapes.name = "shapes.jfif";
-    shapes.text = "צורות";
-    shapes.onTap = "צורות";
-
-
-    List<ButtonImage> products = [holidays,pronoun,shapes,animals,animals,animals,animals,animals,animals,animals,animals];
+    List<ButtonImage> products = [holidays,pronoun,shapes,animals,body,time,geography,food];
 
     if (products == null || products.isEmpty) {
       return const <Card>[];
@@ -57,6 +46,7 @@ class _DictionaryState extends State<Dictionary> {
             )),
         // TODO: Adjust card heights (103)
         child: Stack(
+          clipBehavior: Clip.none,
           children: <Widget>[
             Column(
               // TODO: Center items on the card (103)
@@ -83,20 +73,22 @@ class _DictionaryState extends State<Dictionary> {
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(25.0, 35.0, 20.0,10.0),
-                    child: Column(
-                      // TODO: Align labels to the bottom and center (103)
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      // TODO: Change innermost Column (103)
-                      children: <Widget>[
-                        // TODO: Handle overflowing labels (103)
-                        Container(alignment: Alignment.center,
-                          child: Text(
-                            product.text,
-                            style: theme.textTheme.title,
-                            maxLines: 1,
+                    child: SingleChildScrollView(
+                      child: Column(
+                        // TODO: Align labels to the bottom and center (103)
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        // TODO: Change innermost Column (103)
+                        children: <Widget>[
+                          // TODO: Handle overflowing labels (103)
+                          Container(alignment: Alignment.center,
+                            child: Text(
+                              product.text,
+                              style: theme.textTheme.title,
+                              maxLines: 1,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -113,7 +105,7 @@ class _DictionaryState extends State<Dictionary> {
                     onTap: (){
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => Animals()),
+                        MaterialPageRoute(builder: (context) => Subject(product.onTap)),
                       );
                     }
                 ),
@@ -132,7 +124,7 @@ class _DictionaryState extends State<Dictionary> {
         title: Container(
             alignment: Alignment.centerRight,
             child: Text(
-              "תרגום שפת הסימנים",
+              "מילון שפת הסימנים",
               textAlign: TextAlign.right,
               textDirection: TextDirection.rtl,
               style: TextStyle(fontWeight: FontWeight.bold),
@@ -153,5 +145,7 @@ class ButtonImage{
   String name;
   String text;
   String onTap;
+
+  ButtonImage(this.name, this.text,this.onTap);
 }
 

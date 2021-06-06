@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/services/show_video.dart';
+import 'package:isl_translator/shared/loading.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -162,6 +163,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   double _position = 0;
   double _buffer = 0;
   bool _lock = true;
+  bool _isReady = false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<int, VoidCallback> _listeners = {};
   Set<String> _urls;
@@ -179,6 +181,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
     if (widget.myUrls.length > 0) {
       _initController(0).then((_) {
         setState(() {
+          this._isReady = true;
           this.borderColor = Colors.black;
           // this.borderColor = Theme.of(context)
         });
@@ -324,8 +327,14 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo> {
   }
 
   @override
+  void dispose(){
+    _controller(index).dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return !this._isReady ? Loading() : Scaffold(
       body: Stack(
         children: <Widget>[
           GestureDetector(
