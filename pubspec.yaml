@@ -40,6 +40,8 @@ dependencies:
   cupertino_icons: ^1.0.2
   camera: ^0.7.0
   shared_preferences: ^2.0.6
+  imagebutton: ^0.0.6
+  random_color: ^1.0.5
   disk_lru_cache: ^0.0.2
   path_provider: ^2.0.2
 #dependency_overrides:
