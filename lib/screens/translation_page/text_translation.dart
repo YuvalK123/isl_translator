@@ -2,9 +2,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
 import 'package:isl_translator/services/show_video.dart';
+import 'package:quick_feedback/quick_feedback.dart';
 import 'package:video_player/video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
+import 'package:isl_translator/services/database_feedback.dart';
+import 'package:isl_translator/services/add_feedback.dart';
+
+
 
 class TranslatePage extends StatefulWidget {
   TranslatePage({Key key, this.title}) : super(key: key);
@@ -22,6 +27,7 @@ class _TranslatePage extends State<TranslatePage> {
   List<String> myUrls;
   int index = 0;
   int ind = 1;
+  String inputSentence;
   double _position = 0;
   double _buffer = 0;
   bool _lock = true;
@@ -64,6 +70,39 @@ class _TranslatePage extends State<TranslatePage> {
     super.dispose();
   }
 
+  // void _showFeedback(context) {
+  //   showDialog(
+  //     context: context,
+  //     builder: (context) {
+  //       return QuickFeedback(
+  //         title: '?איך היה התרגום', // Title of dialog
+  //         showTextBox: true, // default false
+  //         textBoxHint:
+  //         'שתפ/י אותנו עוד', // Feedback text field hint text default: Tell us more
+  //         submitText: 'שלח', // submit button text default: SUBMIT
+  //         onSubmitCallback: (feedback) {
+  //           print('$feedback');
+  //           addFeedback(feedback['rating'],feedback['feedback'],inputSentence);
+  //           Navigator.of(context).pop();
+  //         },
+  //         askLaterText: 'ביטול',
+  //         onAskLaterCallback: () {
+  //           print('Do something on ask later click');
+  //           //Navigator.of(context).pop();
+  //         }
+  //       );
+  //     },
+  //   );
+  // }
+  //
+  // Future addFeedback(int newRating, String newText, String newSentence) async{
+  //   await DatabaseFeedbackService(uid: inputSentence).updateFeedbackData(
+  //     rating: newRating,
+  //     text: newText,
+  //     sentence: newSentence,
+  //   );
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -90,6 +129,7 @@ class _TranslatePage extends State<TranslatePage> {
                   onPressed: () async {
                     String sentence =
                     myController.text; // got the sentence from the user
+                    inputSentence = sentence;
                     List<String> splitSentenceList =
                     splitSentence(sentence); // split the sentence
                     String url;
@@ -129,12 +169,22 @@ class _TranslatePage extends State<TranslatePage> {
                   color: Colors.black12,
                 ),
                 Container(
-
                   child: AspectRatio(
                     aspectRatio: 1.0,
                       child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
                       )
                   ),
+                SingleChildScrollView(
+                    child: Container(
+                      child: Center(
+                        child:
+                            videoPlayerDemo.myUrls.length < 1 ? null : FlatButton(onPressed: () => showFeedback(context,inputSentence), // this will trigger the feedback modal
+                          child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
+                        ),
+                      ),
+                    ),
+                ),
+
               ]
           ),
         ),

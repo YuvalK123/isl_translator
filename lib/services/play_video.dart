@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
+import 'package:quick_feedback/quick_feedback.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/main.dart';
@@ -277,6 +278,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
       //_controller(index) = null;
       _nextVideo();
       if(index ==widget.myUrls.length -1){
+
         //add replay button
       }
       //playHi(sentence, index+1);
@@ -333,7 +335,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
 
   @override
   void dispose(){
-    _controller(index).dispose();
+    _controller(index)?.dispose();
     super.dispose();
   }
 
