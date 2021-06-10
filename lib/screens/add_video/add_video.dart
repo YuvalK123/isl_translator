@@ -1,6 +1,11 @@
+// import 'dart:html';
+
+import 'dart:async';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinbox/material.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 
 import 'package:path/path.dart';
@@ -21,6 +26,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
   List cameras;
   int selectedCameraIndex;
   String imgPath;
+  int recordingDelay = 5;
+  int recordingTime = 3;
 
   @override
   void initState() {
@@ -142,9 +149,77 @@ class _AddVideoPageState extends State<AddVideoPage> {
     );
   }
 
+  Widget timing(BuildContext context){
+    return Expanded(
+      child: Align(
+        child: FlatButton.icon(
+            onPressed: () {
+              int delay = recordingDelay;
+              int time = recordingTime;
+              return showDialog(
+                  context: context,
+                  builder: (context){
+                    return AlertDialog(
+                      title: Text('תזמון'),
+                      content: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text('השהיה'),
+                          SpinBox(
+                            max: 15,
+                            min: 0,
+                            value: recordingDelay.toDouble(),
+                            onChanged: (value) => delay = value.toInt(),
+                          ),
+                          Text('זמן צילום'),
+                          SpinBox(
+                            max: 15,
+                            min: 0,
+                            value: recordingTime.toDouble(),
+                            onChanged: (value) => time = value.toInt(),
+                          ),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        MaterialButton(
+                          child: Icon(Icons.check),
+                            onPressed: () {
+                            recordingDelay = delay;
+                            print(recordingDelay);
+                            recordingTime = time;
+                            Navigator.of(context).pop();
+                            }
+                        )
+                      ],
+                    );
+                  });
+
+            },
+            icon: Icon(
+                Icons.timer,
+              color: Colors.white,
+              size: 24,
+            ),
+            label: Text(
+              'תזמון',
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w500,
+            ),
+            ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('הוסף וידאו',textDirection: TextDirection.rtl),
+        backgroundColor: Colors.deepPurple[300],
+      ),
       body: Container(
         child: SafeArea(
           child: Column(
@@ -166,7 +241,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
                     children: <Widget>[
                       cameraToggleRowWidget(),
                       cameraControlWidget(context),
-                      Spacer()
+                      timing(context),
+                      // Spacer()
                     ],
                   ),
                 ),
@@ -183,12 +259,24 @@ class _AddVideoPageState extends State<AddVideoPage> {
     print(errorText);
   }
 
-  void onCapturePressed(context) async {
-    try {
-      final path = join((await getTemporaryDirectory()).path,
-          '${DateTime.now()}.mp4');
 
-      await controller.startVideoRecording();
+
+  void onCapturePressed(context) async {
+    int counter = recordingDelay;
+    Timer timer;
+
+    try {
+      timer = Timer.periodic(Duration(seconds: 1), (timer){
+        setState(() {
+          if (counter > 0) {
+            counter--;
+          } else {
+            timer.cancel();
+          }
+        });
+      });
+
+      // await controller.startVideoRecording();
 
       // Navigator.push(
       //     context,
