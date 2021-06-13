@@ -120,7 +120,7 @@ class _TranslatePage extends State<TranslatePage> {
                     myUrls = urls;
                     print("hello this is the urls ==> " + urls.toString());
                     setState(() {
-                      this.videoPlayerDemo = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
+                      this.videoPlayerDemo = VideoPlayerDemo(key: UniqueKey(),myUrls: urls,);
                       this.ind++;
                     });
 

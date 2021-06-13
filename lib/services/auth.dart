@@ -7,7 +7,7 @@ class AuthService {
 
   // create user based on firebase user
   UserModel _userFromFirebase(User user){
-    var dbs = DatabaseUserService(uid: user.uid);
+    // var dbs = DatabaseUserService(uid: user.uid);
     return user != null ? UserModel(
       uid: user.uid,
     ) : null ;
@@ -35,23 +35,27 @@ class AuthService {
 
   // sign in with email and password
   Future signInUserWithEmailAndPassword(String email, String password) async{
+    print("email $email pass $password auth $_auth");
     try{
       UserCredential result = await _auth.signInWithEmailAndPassword(
-          email: email, password: password
+          email: email.replaceAll(' ', ''), password: password
       );
+      print("sign in result $result");
       User user = result.user;
+      print("user from auth sign in $user");
       return _userFromFirebase(user);
     }catch(e){
-      print(e.toString());
-      return null;
+      print("sign in err ${e.toString()}");
+      return e.toString().split("]")[1].replaceFirst(' ', '');
     }
   }
 
   // register with email & password
   Future registerUserWithEmailAndPassword(String email, String password) async{
+    // print("")
     try{
       UserCredential result = await _auth.createUserWithEmailAndPassword(
-          email: email, password: password
+          email: email.replaceAll(' ', ''), password: password
       );
       User user = result.user;
       // create a new document for the user with the uid

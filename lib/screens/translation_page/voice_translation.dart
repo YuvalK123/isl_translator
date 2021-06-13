@@ -91,7 +91,8 @@ class _RecordPage extends State<RecordPage> {
               Container(
                 child: AspectRatio(
                     aspectRatio: 100/100,
-                    child: _videoPlayerDemo.myUrls.length < 1 ? null : _videoPlayerDemo
+                    child: _videoPlayerDemo.myUrls.length < 1 ?
+                    Container(width: 0.0, height: 0.0,) : _videoPlayerDemo
                 ),
               ),
             ],
@@ -105,13 +106,16 @@ class _RecordPage extends State<RecordPage> {
   Future<void> stop() async {
     await _speech.stop();
     await Future.delayed(const Duration(seconds: 1));
-    setState(() async{
+    if(mounted) {
+      setState(() {
+        print("stop");
+        // this.isPressed = false;
+        this._isListening = false;
 
-      print("stop");
-      // this.isPressed = false;
-      this._isListening = false;
-      var result = await meow();
-    });
+        // _text = 'לחצ/י על הכפתור על מנת לדבר';
+      });
+    }
+    var result = await playVideos();
 
 
   }
@@ -135,8 +139,9 @@ class _RecordPage extends State<RecordPage> {
       );
 
       if (available) {
+        _text = "";
         setState(() => _isListening = true);
-        _speech.listen(
+        var res = await _speech.listen(
           onResult: (val) =>
               setState(() {
                 _text = val.recognizedWords;
@@ -148,83 +153,68 @@ class _RecordPage extends State<RecordPage> {
                 print("confd ${val.confidence}");
               }),
         );
+      } else{
+        await stop();
       }
+    } else{
+      await stop();
     }
 
-    Future<void> meoww1(String val) async{
-
-    }
-
-    /* Display video */
-    /*String sentence = _text; // got the sentence from the user
-    List<String> splitSentenceList =
-    splitSentence(sentence); // split the sentence
-    var url;
-    List<String> letters;
-    print(splitSentenceList);
-    String videoName = splitSentenceList[0]; // take the first word
-    StorageReference ref = FirebaseStorage.instance.ref().child("animation_openpose/" + videoName + ".mp4");
-    try {
-      // gets the video's url
-      url = await ref.getDownloadURL();
-    } catch (err) {
-      // Video doesn't exist - so split the work to letters
-      letters = splitToLetters(sentence);
-    }
-
-    // Display the video
-    _controller = VideoPlayerController.network('$url');
-    // Initialize the controller and store the Future for later use.
-    _initializeVideoPlayerFuture = _controller.initialize();
-    // Use the controller to loop the video.
-    _controller.setLooping(false);
-    setState(() {
-      if (!_controller.value.isPlaying) {
-        _controller.play();
-      }
-    });*/
   }
 
-  Future<void> meow() async{
-    String sentence = _text; // got the sentence from the user
-    print("sentence is $sentence");
-    List<String> splitSentenceList =
-    splitSentence(sentence); // split the sentence
-    String url;
-    List<String> letters;
-    print("split is $splitSentenceList");
-    List<String> urls = [];
-    for(int i=0; i < splitSentenceList.length; i++)
-    {
-      Reference ref = FirebaseStorage.instance
-          .ref()
-          .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
-      try {
-        // gets the video's url
-        url = await ref.getDownloadURL();
-        urls.add(url);
-      } catch (err) {
-        // Video doesn't exist - so split the work to letters
-        letters = splitToLetters(sentence);
-        for(int j=0; j < letters.length; j++){
-          Reference ref = FirebaseStorage.instance
-              .ref()
-              .child("animation_openpose/" + letters[j] + ".mp4");
-          url = await ref.getDownloadURL();
-          urls.add(url);
-        }
-      }
+  Future<void> playVideos() async{
+    print("playpl");
+    List<String> urls = await _getUrls();
+    print("urls list are $urls");
 
-      //_initController(url).whenComplete(() => _lock = false);
-    }
-    myUrls = urls;
-    print("hello this is the urls ==> " + urls.toString());
-    print("and this is the text: $_text from sentence $sentence");
     setState(() {
-      this._videoPlayerDemo = VideoPlayerDemo(myUrls: urls, key: Key(this.keys.toString()),);
+
+      this._videoPlayerDemo = VideoPlayerDemo(myUrls: urls, key: UniqueKey(),);
       print("video demo ind in voice translation: ${this.keys}");
       this.keys++;
     });
+  }
+
+  Future<List<String>> _getUrls() async{
+    String sentence = _text; // got the sentence from the user
+    List<String> splitSentenceList = splitSentence(sentence); // split the sentence
+    List<String> urls = [];
+    for(int i=0; i < splitSentenceList.length; i++) {
+      print("($i) split word ${splitSentenceList[i]}");
+      await _getWordUrl(splitSentenceList[i], urls, i);
+    }
+    print("and this is the text: $_text from sentence $sentence");
+    print("and urls are $urls");
+    return urls;
+  }
+
+  Future<void> _getWordUrl(String word, List<String> urls, int i) async{
+    String url;
+    List<String> letters = [];
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("animation_openpose/" + word + ".mp4");
+    try {
+      // gets the video's url
+      url = await ref.getDownloadURL();
+      // urls[i] = url;
+      urls.add(url);
+    } catch (err) {
+      print("err is $err");
+      // Video doesn't exist - so split the work to letters
+      letters = splitToLetters(word);
+      for (int j = 0; j < letters.length; j++) {
+        Reference ref = FirebaseStorage.instance
+            .ref()
+            .child("animation_openpose/" + letters[j] + ".mp4");
+        url = await ref.getDownloadURL();
+        print("url is $url");
+        urls.add(url);
+      }
+    }
+    print("($i) hello this is the urls ==> " + urls.toString());
 
   }
+
+
 }

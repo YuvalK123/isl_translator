@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_switch/flutter_switch.dart';
 import 'package:isl_translator/screens/home/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/loading.dart';
@@ -14,13 +15,18 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+  String username;
+  Gender gender;
+  bool vidType = false;
 
 
   @override
   Widget build(BuildContext context) {
     final user = getUser(context);
     print("user: $user");
-    var _userStream = DatabaseUserService(uid: user.uid ?? "").users;
+    var uid = user?.uid ?? "";
+    print("uid is $uid");
+    // var _userStream = DatabaseUserService(uid: uid).users ?? null;
     return user == null ? Loading() : Scaffold(
         appBar: AppBar(
           title: Container(
@@ -35,16 +41,18 @@ class _ProfileState extends State<Profile> {
             .of(context)
             .backgroundColor,
         endDrawer: MainDrawer(currPage: pageButton.PROFILE,),
-        body: StreamBuilder<UserModel>(
+        body: StreamBuilder(
           // catchError: (_,_) => null,
-            stream: _userStream,
+          initialData: null,
+
+            stream: mounted ? DatabaseUserService(uid: getUser(context)?.uid ?? "").users : null,
             builder: (context, snapshot) {
               if(snapshot.hasError) {
                 print("snapshot error in profile: ${snapshot.error}");
                 return Container(width: 0.0,height: 0.0,);
               }
               if (!snapshot.hasData){
-                print(snapshot);
+                print("snapshot dont has data ${snapshot.hasData}");
                 return Loading();
               }
               UserModel userModel = snapshot.data;
@@ -55,7 +63,7 @@ class _ProfileState extends State<Profile> {
                     Row(
                       children: [
                         Spacer(),
-                        Text("new user", textAlign: TextAlign.center,),
+                        Text(userModel.username, textAlign: TextAlign.center,),
                         Spacer(),
                         Align(
                           alignment: Alignment.topRight,
@@ -77,36 +85,84 @@ class _ProfileState extends State<Profile> {
                       ],
                     ),
                     SizedBox(height: 20.0,),
-                    Row(
-                      children: [
-                        Expanded(
-                          // width: 1.0,
-                          child: ListTile(
-                            title: TextField(
-                              textAlign: TextAlign.center,
-                              decoration: InputDecoration(
-                                hintText: "משתמש חדש",
-                                hintStyle: TextStyle(
+                    Center(
+                      child: Row(
+                        children: [
+
+                          Expanded(
+                            // width: 1.0,
+                            child: ListTile(
+                              title: TextField(
+                                textAlign: TextAlign.center,
+                                decoration: InputDecoration(
+                                  hintText: "משתמש חדש",
+                                  hintStyle: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                  fillColor: Colors.grey[400],
+                                  filled: true,
+
+                                ),
+                                style: TextStyle(
                                   color: Colors.white,
                                 ),
-                                fillColor: Colors.grey[400],
-                                filled: true,
-
-                              ),
-                              style: TextStyle(
-                                color: Colors.white,
                               ),
                             ),
                           ),
-                        ),
-                        Text(
-                          "שם משתמש",
-                          style: TextStyle(
-                              fontSize: 18.0
+                          Text(
+                            "שם משתמש",
+                            style: TextStyle(
+                                fontSize: 18.0
+                            ),
+                          ),
+
+                        ],
+
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: RadioListTile(
+                        title: Text('נקבה'),
+                        value: Gender.FEMALE,
+                        groupValue: userModel.genderModel,
+                        onChanged: (newVal) {userModel.genderModel = newVal;},
+                      ),
+                    ),
+                    RadioListTile(
+                      title: Text('זכר'),
+                      value: Gender.MALE,
+                      groupValue: userModel.genderModel,
+                      onChanged: (newVal) {userModel.genderModel = newVal;},
+                    ),
+                    RadioListTile(
+                      title: Text('אחר'),
+                      value: Gender.OTHER,
+                      groupValue: userModel.genderModel,
+                      onChanged: (newVal) {userModel.genderModel = newVal;},
+                    ),
+                    Row(
+                      children: [
+                        Spacer(),
+                        Text("Animation"),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                          child: FlutterSwitch(
+                            activeColor: Colors.pink[200],
+                              inactiveColor: Colors.pink[400],
+                              value: vidType,
+                              onToggle: (val) {
+                                setState(() {
+                                  vidType = val;
+                                });
+
+                              }
                           ),
                         ),
+                        Text("Live"),
+                        Spacer(),
                       ],
-                    ),
+                    )
                   ],
                 ),
               );
@@ -118,6 +174,12 @@ class _ProfileState extends State<Profile> {
 
 
   UserModel getUser(BuildContext context){
+    print("get user");
+    try{
+      return Provider.of<UserModel>(context);
+    } catch (e){
+      return null;
+    }
     final user = Provider.of<UserModel>(context);
     print("user is $user");
     return user;
