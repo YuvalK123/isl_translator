@@ -1,15 +1,11 @@
-// import 'dart:html';
-
 import 'dart:async';
 
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 import 'package:flutter_spinbox/material.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
-
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
 
 
 class AddVideoPage extends StatefulWidget {
@@ -28,6 +24,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
   String imgPath;
   int recordingDelay = 5;
   int recordingTime = 3;
+  Timer timer;
+  int counter = 0;
 
   @override
   void initState() {
@@ -203,11 +201,11 @@ class _AddVideoPageState extends State<AddVideoPage> {
             ),
             label: Text(
               'תזמון',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
             ),
-            ),
+          ),
         ),
       ),
     );
@@ -227,7 +225,21 @@ class _AddVideoPageState extends State<AddVideoPage> {
             children: <Widget>[
               Expanded(
                 flex: 1,
-                child: cameraPreviewWidget(),
+                child: Stack(
+                  alignment: AlignmentDirectional.center,
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    cameraPreviewWidget(),
+                    Text(
+                        (counter > 0)? '$counter':'',
+                      style: TextStyle(
+                        fontSize: 40,
+                        color: Colors.white,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
@@ -262,31 +274,29 @@ class _AddVideoPageState extends State<AddVideoPage> {
 
 
   void onCapturePressed(context) async {
-    int counter = recordingDelay;
-    Timer timer;
+    counter = recordingDelay + 1;
 
-    try {
-      timer = Timer.periodic(Duration(seconds: 1), (timer){
-        setState(() {
-          if (counter > 0) {
-            counter--;
-          } else {
-            timer.cancel();
-          }
-        });
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (counter > 0) {
+          counter--;
+        } else {
+          timer.cancel();
+        }
       });
-
-      // await controller.startVideoRecording();
-
-      // Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //         builder: (context) => AddVideoPage(imgPath: path)
-      //     )
-      // );
-    } catch (e) {
-      showCameraException(e);
-    }
+    });
+    // try {
+    //   // await controller.startVideoRecording();
+    //
+    //   // Navigator.push(
+    //   //     context,
+    //   //     MaterialPageRoute(
+    //   //         builder: (context) => AddVideoPage(imgPath: path)
+    //   //     )
+    //   // );
+    // } catch (e) {
+    //   showCameraException(e);
+    // }
   }
 
   void onSwitchCamera() {
