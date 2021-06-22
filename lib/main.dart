@@ -4,10 +4,15 @@ import 'package:isl_translator/services/auth.dart';
 import 'models/user.dart';
 import 'package:isl_translator/screens/wrapper.dart';
 import 'package:provider/provider.dart';
+import 'package:isl_translator/services/show_video.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // get all terms
+  Future<List<String>> futureTerms = findTermsDB();
+  futureTerms.then((result) => saveTerms=  result)
+      .catchError((e) => print('error in find terms'));
   runApp(MyApp());
 }
 
@@ -27,3 +32,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+

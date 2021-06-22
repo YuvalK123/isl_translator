@@ -34,8 +34,8 @@ dependencies:
   speech_to_text: ^3.2.0
   avatar_glow: ^2.0.1
   highlight_text: ^1.0.0
-  chewie: ^0.12.2
-  video_player: ^1.0.1
+  #  chewie: ^0.12.2
+  video_player: ^2.1.6
   youtube_player_flutter: ^7.0.0+7
   cupertino_icons: ^1.0.2
   camera: ^0.7.0
@@ -43,8 +43,11 @@ dependencies:
   imagebutton: ^0.0.6
   random_color: ^1.0.5
   disk_lru_cache: ^0.0.2
+  cached_video_player: ^1.0.3
   path_provider: ^2.0.2
+  flutter_switch: ^0.3.1
   quick_feedback: ^0.1.1
+
 #dependency_overrides:
 #  firebase_core: ^0.7.0
 

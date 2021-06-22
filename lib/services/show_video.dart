@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+List<String> saveTerms;
+
 /* Split the word to letters */
 List<String> splitToLetters(String word) {
   List<String> lettersList = List<String>(word.length);
@@ -38,7 +40,6 @@ Future<List<String>> findTermsDB() async {
       }
     }
   });
-  print(terms);
   return terms;
 }
 
@@ -47,18 +48,18 @@ List<String> splitSentence(String sentence) {
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
   List sentenceList = newSentence.split(" "); //split the sentence to words
-  List<String> saveTerms = [
-    'יום הזיכרון',
-    'ארבעת המינים',
-    'כרטיס ברכה'
-  ]; // list of terms(need to create one)
+  // List<String> saveTerms = [
+  //   'יום הזיכרון',
+  //   'ארבעת המינים',
+  //   'כרטיס ברכה'
+  // ]; // list of terms(need to create one)
 
-  // get all terms
-  /*Future<List<String>> futureTerms = findTermsDB();
-  print('futureTerms');
-  futureTerms.then((result) => print("bla" + result.toString()))
-      .catchError((e) => print('error'));*/
-
+  // // get all terms
+  // Future<List<String>> futureTerms = findTermsDB();
+  // print('futureTerms');
+  // futureTerms.then((result) => saveTerms=  result)
+  //     .catchError((e) => print('error'));
+  print("hello save terms ==> " + saveTerms.toString());
   List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
 
   //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
