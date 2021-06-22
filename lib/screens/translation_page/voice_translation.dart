@@ -220,6 +220,8 @@ import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:isl_translator/services/show_video.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:isl_translator/services/add_feedback.dart';
+
 
 
 class RecordPage extends StatefulWidget {
@@ -238,6 +240,7 @@ class _RecordPage extends State<RecordPage> {
   int keys = 0;
   List<String> myUrls = [];
   VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("-1"), myUrls: [],);
+  String inputSentence;
 
   //video controller
   VideoPlayerController _controller;
@@ -307,6 +310,16 @@ class _RecordPage extends State<RecordPage> {
                     child: _videoPlayerDemo.myUrls.length < 1 ? null : _videoPlayerDemo
                 ),
               ),
+              SingleChildScrollView(
+                child: Container(
+                  child: Center(
+                    child:
+                    _videoPlayerDemo.myUrls.length < 1 ? null : FlatButton(onPressed: () => showFeedback(context,inputSentence), // this will trigger the feedback modal
+                      child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -369,6 +382,7 @@ class _RecordPage extends State<RecordPage> {
 
   Future<void> meow() async{
     String sentence = _text; // got the sentence from the user
+    inputSentence = sentence;
     print("sentence is $sentence");
     List<String> splitSentenceList =
     splitSentence(sentence); // split the sentence

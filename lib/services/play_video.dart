@@ -267,9 +267,10 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   }
 
   void checkIfVideoFinished() {
-    if (_controller == null ||
+    if (_controller(index) == null ||
         _controller(index).value == null ||
-        _controller(index).value.position == null) return;
+        _controller(index).value.position == null ||
+        _controller(index).value.duration == null) return;
     if (_controller(index).value.position.inSeconds ==
         _controller(index).value.duration.inSeconds)
     {
@@ -278,7 +279,6 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
       //_controller(index) = null;
       _nextVideo();
       if(index ==widget.myUrls.length -1){
-
         //add replay button
       }
       //playHi(sentence, index+1);
