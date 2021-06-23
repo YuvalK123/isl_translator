@@ -169,7 +169,12 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   }
 
   void _nextVideo() async {
+    if (_lock && index == widget.myUrls.length - 1) {
+      print("lock1");
+      _stopController(index);
+    }
     if (_lock || index == widget.myUrls.length - 1) {
+      print("lock2");
       setState(() {
         this.state = false;
         // this.index = 0;

@@ -4,11 +4,23 @@ import 'package:isl_translator/services/show_video.dart';
 
 
 
-List<String> verbs = [
-  "אהב" , "בגד" , "בדק" , "בא", "בלע", "ברח", "ברר",
-  "אסף", "בקר", "אכל", "גהץ", "אחל", "אפה",
-  "בטל", "בקש", "ארגן", "", "", "",
-];
+
+List<String> prepositionalLetters = ["ב","כ","מ","ל", "ו", "ה"];
+
+List<String> endingRelative = ["","","","","",""];
+
+Map<String, String> endings = {
+  "ת": "ה",
+
+};
+
+Future<String> getNonPrepositional(String word) async{
+  if (!prepositionalLetters.contains(word[0])){
+    return null;
+  }
+  return await getUrl(word.substring(1));
+}
+
 
 String nonAsciiChar = "[^\x00-\x7F]";
 // String reg = "הת$nonAsciiChar$nonAsciiChar$nonAsciiChar";
@@ -205,112 +217,44 @@ String getVerb(String root){
 
 String getRoot(int index, String pattern, String word){
   String root = "";
-  int i = 0;
+  int i = 0, ii = 0;
   print("start root loop");
   for (i =0; i < pattern.length; i++){
     var letter = pattern[i];
     print("($i) $letter");
     if (letter == "."){
       root += word[i];
-    }else if(letter == "{" || letter == "1" || letter == "2" ||
-        letter == "," || letter == "}"){
+    }else if(letter == "{"){
       print("break");
+      ii = i + 5;
       break;
     }
   }
+  // print("pattern at ii = ${pattern[ii]}");
   for (int j = i; j < word.length; j++){
     print("at j loop");
+    if (pattern.length > ii && pattern[ii] != "."){
+      print("ii nono $ii ${pattern[ii]}");
+      ii++;
+      continue;
+    }
+    print("yay $i");
     root += word[j];
   }
   return root;
-  switch (index){
-    case 0: // אהבתי
-      break;
-    case 1: // אוהב
-      break;
-    case 2: // מאוהב
-      break;
-    case 3: // מאוהבת
-      break;
-    case 4: // אתאהב
-      break;
-    case 5: // יתאהב
-      break;
-    case 6: // תתאהב
-      break;
-    case 7: // יאהב
-      break;
-    case 8: // תאהב
-      break;
-    case 9: // אהב
-      break;
-    case 10: //אהוב
-      break;
-    case 11: // אהבנו
-      break;
-    case 12: // אהבת
-      break;
-    case 13: // אהבו
-      break;
-    case 14: // אהבתן
-      break;
-    default: // אהבתם
-      break;
-  }
-   return null;
-  if (pattern == patterns[0]){ // אהבתי
-
-  }
-  if (pattern == patterns[1]){
-
-  }
-  if (pattern == patterns[2]){
-
-  }
-  if (pattern == patterns[3]){
-
-  }
-  if (pattern == patterns[4]){
-
-  }
-  if (pattern == patterns[5]){
-
-  }
-  if (pattern == patterns[6]){
-
-  }
-  if (pattern == patterns[7]){
-
-  }
-  if (pattern == patterns[8]){
-
-  }
-  if (pattern == patterns[9]){
-
-  }
-  if (pattern == patterns[10]){
-
-  }
-  if (pattern == patterns[11]){
-
-  }
-  if (pattern == patterns[12]){
-
-  }
-  if (pattern == patterns[13]){
-
-  }
 }
 
 // רציתי -> רציתי, רצו, רציתן/ם
 
 List<String> patterns = [
   "...{1,2}תי", // אהבתי
+  ".ו..{1,2}ת", // אוהבת
   ".ו..{1,2}", // אוהב
   "מ.ו..{1,2}", // מאוהב
   "מ.ו..{1,2}ת", // מאוהבת
   "את...{1,2}", // אתאהב
   "ית...{1,2}", //יתאהב
+  "נת...{1,2}", //נתאהב
   "תת...{1,2}", //תתאהב
   "י...{1,2}", //יאהב
   "ת...{1,2}", //תאהב
@@ -322,6 +266,12 @@ List<String> patterns = [
   "...{1,2}תם", // אהבתם
   "מ...{1,2}", // מפעל
   "...{1,2}", // אהב
+];
+
+List<String> pluralVerbs = [
+  "", // נפעול
+  "", // נפעול
+  "", // תפעלו
 ];
 
 // List<String> patterns = [

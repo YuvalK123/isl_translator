@@ -4,7 +4,6 @@ import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/dictonary/dict.dart';
 import 'package:isl_translator/screens/profile/profile.dart';
-import 'package:isl_translator/screens/profile/profile2.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/database.dart';
