@@ -165,6 +165,7 @@ class MapScreenState extends State<ProfilePage>
                               padding: EdgeInsets.only(
                                   left: 25.0, right: 25.0, top: 25.0),
                               child: new Row(
+
                                 mainAxisSize: MainAxisSize.max,
                                 children: <Widget>[
                                   new Column(
@@ -269,52 +270,55 @@ class MapScreenState extends State<ProfilePage>
                                 ],
                               )),
                     Center(
-                      child: Row(
-                          children: [
-                            Expanded(
-                              child:Align(
-                                alignment: Alignment.centerRight,
-                                child: RadioListTile(
-                                  title: Text('נקבה',textDirection: TextDirection.rtl,),
-                                  value: Gender.FEMALE,
-                                  groupValue: userModel.genderModel,
-                                  onChanged: (newVal) {userModel.genderModel = newVal;},
-                                  controlAffinity: ListTileControlAffinity.trailing,
+                      child: IntrinsicWidth(
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Expanded(
+                                child:Align(
+                                  alignment: Alignment.centerRight,
+                                  child: RadioListTile(
+                                    title: Text('נקבה',textDirection: TextDirection.rtl,),
+                                    value: Gender.FEMALE,
+                                    groupValue: userModel.genderModel,
+                                    onChanged: (newVal) {userModel.genderModel = newVal;},
+                                    controlAffinity: ListTileControlAffinity.trailing,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child:Align(
-                                alignment: Alignment.centerLeft,
-                                child:RadioListTile(
-                                  title: Text('זכר',textDirection: TextDirection.rtl,),
-                                  value: Gender.MALE,
-                                  groupValue: userModel.genderModel,
-                                  onChanged: (newVal) {userModel.genderModel = newVal;},
-                                  controlAffinity: ListTileControlAffinity.trailing,
+                              Expanded(
+                                child:Align(
+                                  alignment: Alignment.centerLeft,
+                                  child:RadioListTile(
+                                    title: Text('זכר',textDirection: TextDirection.rtl,),
+                                    value: Gender.MALE,
+                                    groupValue: userModel.genderModel,
+                                    onChanged: (newVal) {userModel.genderModel = newVal;},
+                                    controlAffinity: ListTileControlAffinity.trailing,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Expanded(
-                              child:Align(
-                                alignment: Alignment.center,
-                                child:RadioListTile(
-                                  title: Text('אחר',textDirection: TextDirection.rtl,),
-                                  value: Gender.OTHER,
-                                  groupValue: userModel.genderModel,
-                                  onChanged: (newVal) {userModel.genderModel = newVal;},
-                                  controlAffinity: ListTileControlAffinity.trailing,
+                              Expanded(
+                                child:Align(
+                                  alignment: Alignment.center,
+                                  child:RadioListTile(
+                                    title: Text('אחר',textDirection: TextDirection.rtl,),
+                                    value: Gender.OTHER,
+                                    groupValue: userModel.genderModel,
+                                    onChanged: (newVal) {userModel.genderModel = newVal;},
+                                    controlAffinity: ListTileControlAffinity.trailing,
+                                  ),
                                 ),
                               ),
-                            ),
-                            Text(
-                              "מגדר",
-                              style: TextStyle(
-                                fontSize: 18.0,
-                                //backgroundColor: Colors.cyan[50]
+                              Text(
+                                "מגדר",
+                                style: TextStyle(
+                                  fontSize: 18.0,
+                                  //backgroundColor: Colors.cyan[50]
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                        ),
                       ),
                     ),
                           Row(
