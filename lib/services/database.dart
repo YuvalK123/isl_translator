@@ -14,7 +14,7 @@ class DatabaseUserService{
 
   Future updateUserData({String username, int age, String gender}) async {
     return await usersCollection.doc(uid).set({
-      'name' : username,
+      'username' : username,
       'age' : age,
       'gender' : gender
     });

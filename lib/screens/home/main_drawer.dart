@@ -4,7 +4,6 @@ import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/dictonary/dict.dart';
 import 'package:isl_translator/screens/profile/profile.dart';
-import 'package:isl_translator/screens/profile/profile2.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/database.dart';
@@ -29,7 +28,9 @@ class MainDrawer extends StatelessWidget {
     String imgUrl = 'https://static.toiimg.com/photo/msid-67586673/67586673.jpg';
     final user = Provider.of<UserModel>(context);
     print("user: ${user.toString()}");
-    final DatabaseUserService userService = DatabaseUserService(uid: user.uid);
+    var x = DatabaseUserService(uid: user.uid).users;
+    print("x is $x");
+    // final DatabaseUserService userService = DatabaseUserService(uid: user.uid);
     return Drawer(
 
       child: Column(
@@ -90,21 +91,37 @@ class MainDrawer extends StatelessWidget {
               icon: Icon(Icons.video_library),
             isCurrPage: this.currPage == pageButton.ADDVID,
           ),
-          DrawerButton(
-              title: "מילון",
-              onTap: () => pushPage(context, Dictionary()),
-              icon: Icon(Icons.book),
-            isCurrPage: this.currPage == pageButton.DICT,
+        DrawerButton(
+          title: "מילון",
+          onTap: () => pushPage(context, Dictionary()),
+          icon: Icon(Icons.book),
+          isCurrPage: this.currPage == pageButton.DICT,
+        ),
+          StreamBuilder<UserModel>(
+            initialData: null,
+            stream: DatabaseUserService(uid: user.uid).users ?? null,
+            builder: (context, snapshot) {
+              if(snapshot.hasError) {
+                print("snapshot error in profile: ${snapshot.error}");
+                return Container(width: 0.0,height: 0.0,);
+              }
+              if (!snapshot.hasData){
+                print("snapshot dont has data ${snapshot.hasData}");
+                return Container(width: 0.0,height: 0.0,);
+              }
+              return DrawerButton(
+                title: "איזור אישי",
+                onTap:  () => pushPage(context, Profile()),
+                icon: Icon(Icons.person),
+                isCurrPage: this.currPage == pageButton.PROFILE,
+              );
+            }
           ),
-          DrawerButton(
-              title: "איזור אישי",
-              onTap:  () => pushPage(context, ProfilePage()),
-              icon: Icon(Icons.person),
-            isCurrPage: this.currPage == pageButton.PROFILE,
-          ),
+
           DrawerButton(
               title: "התנתק/י",
               onTap: () async {
+                // Navigator.of(context).pop();
                 await _auth.signOut();
               },
               icon: Icon(Icons.logout),
