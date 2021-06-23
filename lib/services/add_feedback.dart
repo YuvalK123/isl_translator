@@ -31,7 +31,6 @@ void showFeedback(context,inputSentence) {
 Future addFeedback(int newRating, String newText, String newSentence) async{
   FirebaseAuth auth = FirebaseAuth.instance;
   String id = auth.currentUser.uid;
-  print("id is $id");
   await DatabaseFeedbackService(uid: "$id$newSentence" ).updateFeedbackData(
     rating: newRating,
     text: newText,

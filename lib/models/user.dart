@@ -16,6 +16,7 @@
 // }
 
 enum Gender {MALE, FEMALE, OTHER}
+enum VideoType {ANIMATION, LIVE}
 
 class UserModel {
 
@@ -23,6 +24,7 @@ class UserModel {
   final String username;
   final int age;
   final String gender;
+  final VideoType videoType;
   Gender genderModel;
   String ImgURL = "....";
   //
@@ -30,7 +32,7 @@ class UserModel {
   //   return _gender;
   // }
 
-  UserModel({ this.uid, this.username, this.age, this.gender }){
+  UserModel({ this.uid, this.username, this.age, this.gender, this.videoType }){
     switch (gender){
       case 'f':
         this.genderModel = Gender.FEMALE;
