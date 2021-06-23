@@ -313,7 +313,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.sentence.isEmpty) return Container();
+    if (widget.sentence == "") return Container();
     print("isready = ${this._isReady}, loading? ${this._videoFetcher.loading}");
     return !this._isReady && !this._videoFetcher.loading ? Loading() : Scaffold(
       body: Stack(
