@@ -111,7 +111,7 @@ class MainDrawer extends StatelessWidget {
               }
               return DrawerButton(
                 title: "איזור אישי",
-                onTap:  () => pushPage(context, Profile()),
+                onTap:  () => pushPage(context, ProfilePage()),
                 icon: Icon(Icons.person),
                 isCurrPage: this.currPage == pageButton.PROFILE,
               );
