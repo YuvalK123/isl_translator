@@ -27,9 +27,9 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return loading ? Loading() : Scaffold(
-      backgroundColor: Colors.brown[100],
+      backgroundColor: Colors.grey[100],
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
+        backgroundColor: Colors.cyan[800],
         elevation: 0.0,
         title: Text('Register to ISL-Translator'),
         actions: <Widget> [
@@ -73,7 +73,7 @@ class _RegisterState extends State<Register> {
                 ),
                 SizedBox(height: 20.0,),
                 RaisedButton(
-                  color: Colors.pink[400],
+                  color: Colors.grey[600],
                   child: Text("Register",
                       style: TextStyle(color: Colors.white)
                   ),
@@ -93,7 +93,7 @@ class _RegisterState extends State<Register> {
                   },
                 ),
                 SizedBox(height: 12.0,),
-                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),)
+                Text(error, style: TextStyle(color: Colors.grey, fontSize: 14.0),)
               ],
             ),
           ),
@@ -122,7 +122,7 @@ class FormField extends StatelessWidget {
             borderSide: BorderSide(color: Colors.white, width: 2.0)
         ),
         focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.pink[300], width: 2.0)
+            borderSide: BorderSide(color: Colors.grey[300], width: 2.0)
         ),
       ),
       validator: this.validator,

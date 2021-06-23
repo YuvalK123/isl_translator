@@ -134,6 +134,7 @@ class MapScreenState extends State<ProfilePage>
                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                   mainAxisSize: MainAxisSize.max,
                                   children: <Widget>[
+                                    Spacer(),
                                     new Column(
                                       mainAxisAlignment: MainAxisAlignment.start,
                                       mainAxisSize: MainAxisSize.min,
@@ -151,13 +152,6 @@ class MapScreenState extends State<ProfilePage>
                                         ),
                                       ],
                                     ),
-                                    new Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        _status ? _getEditIcon() : new Container(),
-                                      ],
-                                    )
                                   ],
                                 ),
                               ),
@@ -205,6 +199,7 @@ class MapScreenState extends State<ProfilePage>
                                   child: new Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
+                                      Spacer(),
                                       new Column(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
@@ -225,7 +220,6 @@ class MapScreenState extends State<ProfilePage>
                                   child: new Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
-                                      Spacer(),
                                       new Flexible(
                                         child: new TextField(
                                           decoration: const InputDecoration(
@@ -241,6 +235,7 @@ class MapScreenState extends State<ProfilePage>
                                   child: new Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
+                                      Spacer(),
                                       new Column(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,

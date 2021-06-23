@@ -43,6 +43,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
 
     print("new page");
     super.initState();
+    this.isInit[getKey(0)] = false;
     this.state = true;
     print("my urls!!");
     print(widget.myUrls);
@@ -69,6 +70,9 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     }
   }
 
+  String getKey(int index){
+    return widget.myUrls[index] + index.toString();
+  }
 
   VoidCallback _listenerSpawner() {
 
@@ -109,7 +113,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     var controller = VideoPlayerController.network(widget.myUrls[index]);
     _controllers[widget.myUrls[index] + index.toString()] = controller;
     await controller.initialize();
-    isInit[widget.myUrls[index] + index.toString()] = true;
+
     print("finished $index init");
   }
 
@@ -137,6 +141,10 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     //
     // }
     //_controller(index).addListener(checkIfVideoFinished);
+    setState(() {
+      isInit[getKey(index)] = true;
+    });
+
     await _controller(index).play();
     setState(() {});
   }
@@ -250,6 +258,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   //   if (index - 1 >= 0) {
   //     _removeController(index - 1);
   //   }
+  //   }
   //
   //   _playController(++index);
   //
@@ -268,7 +277,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
 
   @override
   Widget build(BuildContext context) {
-    return !this._isReady ? Loading() : Scaffold(
+    return ( !this._isReady && !this.isInit[getKey(index)])? Loading() : Scaffold(
       body: Stack(
         children: <Widget>[
           GestureDetector(
