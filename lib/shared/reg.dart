@@ -2,6 +2,8 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/services/show_video.dart';
 
+
+
 List<String> verbs = [
   "אהב" , "בגד" , "בדק" , "בא", "בלע", "ברח", "ברר",
   "אסף", "בקר", "אכל", "גהץ", "אחל", "אפה",
@@ -182,8 +184,7 @@ String handleFinalLetter(String infin){
   // if last letter is a final letter small letter, handle it
   String lastLetter = infin[infin.length - 1], newInfin = "";
   if (lastLetter == "כ"){
-    // newInfin = infin[-1];
-    // infin[infin.length - 1] = "ך";
+
   } else if (lastLetter == "מ"){
 
   } else if (lastLetter == "נ"){
@@ -300,6 +301,8 @@ String getRoot(int index, String pattern, String word){
 
   }
 }
+
+// רציתי -> רציתי, רצו, רציתן/ם
 
 List<String> patterns = [
   "...{1,2}תי", // אהבתי

@@ -29,7 +29,7 @@ class _VerifyScreenState extends State<VerifyScreen> {
   Widget build(BuildContext context) {
     return Container(
       child: Center(
-        child: Text("An email has been sent to ${user.email}.\n pleae verify.",
+        child: Text("An email has been sent to ${user.email}.\n please verify.",
         textAlign: TextAlign.center,),
       ),
     );
