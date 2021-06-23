@@ -23,7 +23,7 @@ class Wrapper extends StatelessWidget {
     // if (user != null){
     //   if (_auth.currentUser.emailVerified)
     // }
-    if (user != null && _auth.currentUser.emailVerified){
+    if (user != null && (_auth.currentUser.emailVerified || _auth.currentUser.isAnonymous)){
       saveTermsForShow();
       return TranslationWrapper();
     }

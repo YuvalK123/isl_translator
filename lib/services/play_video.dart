@@ -141,24 +141,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     setState(() {});
   }
 
-  // void checkIfVideoFinished() {
-  //   if (_controller(index) == null ||
-  //       _controller(index).value == null ||
-  //       _controller(index).value.position == null ||
-  //       _controller(index).value.duration == null) return;
-  //   if (_controller(index).value.position.inSeconds ==
-  //       _controller(index).value.duration.inSeconds)
-  //   {
-  //     _controller(index).removeListener(() => checkIfVideoFinished());
-  //     //_controller.dispose();
-  //     //_controller(index) = null;
-  //     _nextVideo();
-  //     if(index ==widget.myUrls.length -1){
-  //       //add replay button
-  //     }
-  //     //playHi(sentence, index+1);
-  //   }
-  // }
+
 
   void _previousVideo() {
     if (_lock || index == 0) {
@@ -191,7 +174,6 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   }
 
   void _nextVideo() async {
-    // if (_lock && )
     if (_lock)
     {
       print("lock1");
@@ -225,41 +207,25 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
       //   }
     }
   }
-  // void _nextVideo() async {
-  //   // if (_lock && index != widget.myUrls.length - 1) {
-  //   //   print("lock1");
-  //   //   _stopController(index);
-  //   //   // await _controller(index)?.pause();
-  //   //   // await _controller(index)?.play();
-  //   // }
-  //    if (_lock || index == widget.myUrls.length - 1) {
-  //     print("lock");
-  //     this.state = false;
-  //     // setState(() {
-  //     //   this.state = false;
-  //     //   // this.index = 0;
-  //     //   // this._urls = widget.myUrls;
-  //     // });
-  //    //_nextVideo();
-  //     return;
-  //   }
-  //   _lock = true;
-  //
-  //   _stopController(index);
-  //
-  //   if (index - 1 >= 0) {
-  //     _removeController(index - 1);
-  //   }
-  //
-  //   _playController(++index);
-  //
-  //   if (index == widget.myUrls.length - 1) {
-  //     _lock = false;
-  //   } else {
-  //     _initController(index + 1).whenComplete(() => _lock = false);
+
+  // void checkIfVideoFinished() {
+  //   if (_controller(index) == null ||
+  //       _controller(index).value == null ||
+  //       _controller(index).value.position == null ||
+  //       _controller(index).value.duration == null) return;
+  //   if (_controller(index).value.position.inSeconds ==
+  //       _controller(index).value.duration.inSeconds)
+  //   {
+  //     _controller(index).removeListener(() => checkIfVideoFinished());
+  //     //_controller.dispose();
+  //     //_controller(index) = null;
+  //     _nextVideo();
+  //     if(index ==widget.myUrls.length -1){
+  //       //add replay button
+  //     }
+  //     //playHi(sentence, index+1);
   //   }
   // }
-
   @override
   void dispose(){
     _controller(index)?.dispose();

@@ -199,6 +199,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
 import 'package:isl_translator/services/show_video.dart';
+import 'package:isl_translator/services/video_fetcher.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:isl_translator/shared/reg.dart';
 import 'package:video_player/video_player.dart';
@@ -219,7 +220,7 @@ class _TranslatePage extends State<TranslatePage> {
   // Create a text controller and use it to retrieve the current value
   // of the TextField.
   final myController = TextEditingController();
-  VideoPlayerDemo videoPlayerDemo = VideoPlayerDemo(key: UniqueKey(), myUrls: [],);
+  // VideoPlayerDemo videoPlayerDemo = VideoPlayerDemo(key: UniqueKey(), myUrls: [],);
   List<String> myUrls;
   int index = 0;
   int ind = 1;
@@ -227,9 +228,7 @@ class _TranslatePage extends State<TranslatePage> {
   double _position = 0;
   double _buffer = 0;
   bool _lock = true;
-  Map<String, VideoPlayerController> _controllers = {};
-  Map<int, VoidCallback> _listeners = {};
-  Set<String> _urls;
+  VideoPlayer2 _videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: "",);
   var _showContainer;
 
   @override
@@ -301,19 +300,20 @@ class _TranslatePage extends State<TranslatePage> {
 
                     child: AspectRatio(
                         aspectRatio: 1.0,
-                        child: videoPlayerDemo.myUrls.length < 1 ? Container() : videoPlayerDemo
+                        child: _videoFetcher,
+                        // child: videoPlayerDemo.myUrls.length < 1 ? Container() : videoPlayerDemo
                     )
                 ),
-                SingleChildScrollView(
-                    child: Container(
-                      child: Center(
-                        child:
-                            videoPlayerDemo.myUrls.length < 1 ? null : FlatButton(onPressed: () => showFeedback(context,myController.text), // this will trigger the feedback modal
-                          child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
-                        ),
-                      ),
-                    ),
-                ),
+                // SingleChildScrollView(
+                //     child: Container(
+                //       child: Center(
+                //         child:
+                //             videoPlayerDemo.myUrls.length < 1 ? null : FlatButton(onPressed: () => showFeedback(context,myController.text), // this will trigger the feedback modal
+                //           child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
+                //         ),
+                //       ),
+                //     ),
+                // ),
               ]
           ),
         ),
@@ -383,26 +383,33 @@ class _TranslatePage extends State<TranslatePage> {
   }
 
   Future<void> playVideos() async{
+    String sentence = myController.text;
     if (mounted){
       setState(() {
-        this.isLoading = true;
+        this._videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: sentence,);
       });
     }
-    List<String> urls = await getUrls();
-    print("urls length == > " + urls.length.toString());
-    // myUrls = urls;
-    print("hello this is the urls ==> " + urls.toString());
-    if (mounted){
-      setState(() {
-        this.isLoading = false;
-        this.ind++;
-        var videoPlayer = VideoPlayerDemo(key: UniqueKey(),myUrls: urls,);
-        //var videoPlayer = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
-
-        this.videoPlayerDemo = videoPlayer;
-
-      });
-    }
+    // _videoFetcher.
+    // if (mounted){
+    //   setState(() {
+    //     this.isLoading = true;
+    //   });
+    // }
+    // List<String> urls = await getUrls();
+    // print("urls length == > " + urls.length.toString());
+    // // myUrls = urls;
+    // print("hello this is the urls ==> " + urls.toString());
+    // if (mounted){
+    //   setState(() {
+    //     this.isLoading = false;
+    //     this.ind++;
+    //     var videoPlayer = VideoPlayerDemo(key: UniqueKey(),myUrls: urls,);
+    //     //var videoPlayer = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
+    //
+    //     this.videoPlayerDemo = videoPlayer;
+    //
+    //   });
+    // }
 
 
   }
