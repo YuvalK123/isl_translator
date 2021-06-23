@@ -343,6 +343,11 @@ class _TranslatePage extends State<TranslatePage> {
 
         urls.add(url);
       } catch (err) {
+        var nonPre = await getNonPrepositional(splitSentenceList[i]);
+        if (nonPre != null){
+          urls.add(nonPre);
+          continue;
+        }
         print("check for verb...");
         var nonPre = await getNonPrepositional(splitSentenceList[i]);
         if (nonPre != null){
