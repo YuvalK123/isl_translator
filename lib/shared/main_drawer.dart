@@ -8,7 +8,7 @@ import 'package:isl_translator/screens/translation_page/translation_wrapper.dart
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:provider/provider.dart';
-import 'home.dart';
+import '../screens/home/home.dart';
 
 enum pageButton{
   TRANSLATION, ADDVID, PROFILE, DICT

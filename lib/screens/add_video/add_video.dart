@@ -2,7 +2,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
-import 'package:isl_translator/screens/home/main_drawer.dart';
+import '../../shared/main_drawer.dart';
 
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';

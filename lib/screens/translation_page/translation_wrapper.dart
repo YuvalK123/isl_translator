@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
 import 'package:isl_translator/screens/home/home.dart';
-import 'package:isl_translator/screens/home/main_drawer.dart';
+import '../../shared/main_drawer.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'voice_translation.dart';
 import 'text_translation.dart';

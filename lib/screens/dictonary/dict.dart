@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 // import 'package:imagebutton/imagebutton.dart';
 import 'package:isl_translator/screens/dictonary/subject.dart';
-import 'package:isl_translator/screens/home/main_drawer.dart';
+import '../../shared/main_drawer.dart';
 import 'package:random_color/random_color.dart';
 // import 'package:isl_translator/models/button_image.dart';
 
