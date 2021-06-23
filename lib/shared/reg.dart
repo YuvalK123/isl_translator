@@ -43,6 +43,15 @@ Map<String, String> hebrewChars = {
   "ת" : "U+05EA",
 };
 
+List<String> prepositionalLetters = ["ה", "ו", "כ", "ל", "מ", "ב"];
+
+Future<String> getNonPrepositional(String word) async{
+  if (!prepositionalLetters.contains(word[0])){
+    return null;
+  }
+  return await getUrl(word.substring(1));
+}
+
 Future<String> getUrl(String word) async{
   Reference ref = FirebaseStorage.instance
       .ref()
@@ -205,107 +214,36 @@ String getVerb(String root){
 
 String getRoot(int index, String pattern, String word){
   String root = "";
-  int i = 0;
+  int i = 0, ii = 0;
   print("start root loop");
   for (i =0; i < pattern.length; i++){
     var letter = pattern[i];
     print("($i) $letter");
     if (letter == "."){
       root += word[i];
-    }else if(letter == "{" || letter == "1" || letter == "2" ||
-        letter == "," || letter == "}"){
+    }else if(letter == "{"){
+      ii = i + 4;
       print("break");
       break;
     }
   }
   for (int j = i; j < word.length; j++){
-    print("at j loop");
+    print("ii == $ii ${pattern.length}");
+    if (pattern.length > ii && pattern[ii] != "."){
+      ii++;
+      continue;
+    }
+    print("at j loop yay i $ii");
     root += word[j];
   }
   return root;
-  switch (index){
-    case 0: // אהבתי
-      break;
-    case 1: // אוהב
-      break;
-    case 2: // מאוהב
-      break;
-    case 3: // מאוהבת
-      break;
-    case 4: // אתאהב
-      break;
-    case 5: // יתאהב
-      break;
-    case 6: // תתאהב
-      break;
-    case 7: // יאהב
-      break;
-    case 8: // תאהב
-      break;
-    case 9: // אהב
-      break;
-    case 10: //אהוב
-      break;
-    case 11: // אהבנו
-      break;
-    case 12: // אהבת
-      break;
-    case 13: // אהבו
-      break;
-    case 14: // אהבתן
-      break;
-    default: // אהבתם
-      break;
-  }
-   return null;
-  if (pattern == patterns[0]){ // אהבתי
-
-  }
-  if (pattern == patterns[1]){
-
-  }
-  if (pattern == patterns[2]){
-
-  }
-  if (pattern == patterns[3]){
-
-  }
-  if (pattern == patterns[4]){
-
-  }
-  if (pattern == patterns[5]){
-
-  }
-  if (pattern == patterns[6]){
-
-  }
-  if (pattern == patterns[7]){
-
-  }
-  if (pattern == patterns[8]){
-
-  }
-  if (pattern == patterns[9]){
-
-  }
-  if (pattern == patterns[10]){
-
-  }
-  if (pattern == patterns[11]){
-
-  }
-  if (pattern == patterns[12]){
-
-  }
-  if (pattern == patterns[13]){
-
-  }
 }
 
 // רציתי -> רציתי, רצו, רציתן/ם
 
 List<String> patterns = [
   "...{1,2}תי", // אהבתי
+  ".ו..{1,2}ת", // אוהבת
   ".ו..{1,2}", // אוהב
   "מ.ו..{1,2}", // מאוהב
   "מ.ו..{1,2}ת", // מאוהבת

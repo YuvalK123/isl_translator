@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
+import 'package:mutex/mutex.dart';
 import 'package:quick_feedback/quick_feedback.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -26,12 +27,16 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   double _position = 0;
   double _buffer = 0;
   bool _lock = true;
+  Map<int, bool> _locks;
   bool _isReady = false;
   Map<String, VideoPlayerController> _controllers = {};
+  Map<String, bool> isInit = {};
   Map<int, VoidCallback> _listeners = {};
   Set<String> _urls;
   bool state;
   Color borderColor = Colors.transparent;
+  Mutex _mutex = Mutex();
+  double aspectRatio;
 
   @override
   void initState() {
@@ -42,11 +47,16 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     print("my urls!!");
     print(widget.myUrls);
     print("urls are at page $_urls");
+    // for(int i=0; i<widget.myUrls.length; i++)
+    //   {
+    //     _locks[i] = false;
+    //   }
     if (widget.myUrls.length > 0) {
       _initController(0).then((_) {
         setState(() {
           this._isReady = true;
           this.borderColor = Colors.black;
+          this.aspectRatio = _controller(0).value.aspectRatio;
           // this.borderColor = Theme.of(context)
         });
 
@@ -55,7 +65,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     }
 
     if (widget.myUrls.length > 1) {
-      _initController(1).whenComplete(() => _lock = false);
+      _initController(1).whenComplete(() => /*_lock = false*/flipLock());
     }
   }
 
@@ -94,9 +104,13 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
   }
 
   Future<void> _initController(int index) async {
+    print("init $index");
+    isInit[widget.myUrls[index] + index.toString()] = false;
     var controller = VideoPlayerController.network(widget.myUrls[index]);
     _controllers[widget.myUrls[index] + index.toString()] = controller;
     await controller.initialize();
+    isInit[widget.myUrls[index] + index.toString()] = true;
+    print("finished $index init");
   }
 
   void _removeController(int index) {
@@ -117,34 +131,34 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
       _listeners[index] = _listenerSpawner();
     }
     _controller(index).addListener(_listeners[index]);
-    if(index <widget.myUrls.length)
-    {
-      _controller(index).addListener(checkIfVideoFinished);
-
-    }
+    // if(index <widget.myUrls.length)
+    // {
+    //   _controller(index).addListener(checkIfVideoFinished);
+    //
+    // }
     //_controller(index).addListener(checkIfVideoFinished);
     await _controller(index).play();
     setState(() {});
   }
 
-  void checkIfVideoFinished() {
-    if (_controller(index) == null ||
-        _controller(index).value == null ||
-        _controller(index).value.position == null ||
-        _controller(index).value.duration == null) return;
-    if (_controller(index).value.position.inSeconds ==
-        _controller(index).value.duration.inSeconds)
-    {
-      _controller(index).removeListener(() => checkIfVideoFinished());
-      //_controller.dispose();
-      //_controller(index) = null;
-      _nextVideo();
-      if(index ==widget.myUrls.length -1){
-        //add replay button
-      }
-      //playHi(sentence, index+1);
-    }
-  }
+  // void checkIfVideoFinished() {
+  //   if (_controller(index) == null ||
+  //       _controller(index).value == null ||
+  //       _controller(index).value.position == null ||
+  //       _controller(index).value.duration == null) return;
+  //   if (_controller(index).value.position.inSeconds ==
+  //       _controller(index).value.duration.inSeconds)
+  //   {
+  //     _controller(index).removeListener(() => checkIfVideoFinished());
+  //     //_controller.dispose();
+  //     //_controller(index) = null;
+  //     _nextVideo();
+  //     if(index ==widget.myUrls.length -1){
+  //       //add replay button
+  //     }
+  //     //playHi(sentence, index+1);
+  //   }
+  // }
 
   void _previousVideo() {
     if (_lock || index == 0) {
@@ -168,16 +182,27 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
     }
   }
 
+  void flipLock() async{
+    await _mutex.acquire();
+    setState(() {
+      _lock = !_lock;
+    });
+    _mutex.release();
+  }
+
   void _nextVideo() async {
-    if (_lock || index == widget.myUrls.length - 1) {
-      setState(() {
-        this.state = false;
-        // this.index = 0;
-        // this._urls = widget.myUrls;
-      });
+    // if (_lock && )
+    if (_lock)
+    {
+      print("lock1");
+      _stopController(index);
+      //_nextVideo();
+      // await _controller(index)?.pause();
+      // return;
+    }
+    if(index == widget.myUrls.length - 1) {
       return;
     }
-    _lock = true;
 
     _stopController(index);
 
@@ -185,14 +210,55 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
       _removeController(index - 1);
     }
 
+    //_lock = true;
+    flipLock();
     _playController(++index);
 
     if (index == widget.myUrls.length - 1) {
-      _lock = false;
+     // _lock = false;
+      flipLock();
     } else {
-      _initController(index + 1).whenComplete(() => _lock = false);
+      _initController(index + 1).whenComplete(() => /*_lock = false*/flipLock());
+      // if(index < widget.myUrls.length - 3)
+      //   {
+      //     _initController(index + 2).whenComplete(() => _lock = false);
+      //   }
     }
   }
+  // void _nextVideo() async {
+  //   // if (_lock && index != widget.myUrls.length - 1) {
+  //   //   print("lock1");
+  //   //   _stopController(index);
+  //   //   // await _controller(index)?.pause();
+  //   //   // await _controller(index)?.play();
+  //   // }
+  //    if (_lock || index == widget.myUrls.length - 1) {
+  //     print("lock");
+  //     this.state = false;
+  //     // setState(() {
+  //     //   this.state = false;
+  //     //   // this.index = 0;
+  //     //   // this._urls = widget.myUrls;
+  //     // });
+  //    //_nextVideo();
+  //     return;
+  //   }
+  //   _lock = true;
+  //
+  //   _stopController(index);
+  //
+  //   if (index - 1 >= 0) {
+  //     _removeController(index - 1);
+  //   }
+  //
+  //   _playController(++index);
+  //
+  //   if (index == widget.myUrls.length - 1) {
+  //     _lock = false;
+  //   } else {
+  //     _initController(index + 1).whenComplete(() => _lock = false);
+  //   }
+  // }
 
   @override
   void dispose(){
@@ -210,7 +276,8 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
             onLongPressEnd: (_) => _controller(index).play(),
             child: Center(
               child: AspectRatio(
-                aspectRatio: _controller(index).value.aspectRatio,
+                aspectRatio: this.aspectRatio,
+                // aspectRatio: _controller(index).value.aspectRatio,
                 child: Center(child: Container(
                     decoration: BoxDecoration(
                         border: Border.all(
