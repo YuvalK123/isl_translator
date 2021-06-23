@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isl_translator/services/auth.dart';
+import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
@@ -15,10 +17,10 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
-  final AuthService _auth = AuthService();
+  final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
-
+  FirebaseAuth _auth = FirebaseAuth.instance;
   String email = '';
   String password = '';
   String error = '';
@@ -74,8 +76,16 @@ class _SignInState extends State<SignIn> {
                   onPressed: () async {
                     // true - valid form. false - invalid form
                     if (_formKey.currentState.validate()){
-                      setState(() => loading = true);
-                      dynamic result = await _auth.
+                      if (_auth.currentUser.emailVerified){
+                        // get all terms
+
+                        setState(() => loading = true
+                        );
+                        // futureTerms.then((result) => saveTerms=  result)
+                            // .catchError((e) => print('error in find terms'));
+                      }
+
+                      dynamic result = await _authService.
                       signInUserWithEmailAndPassword(email, password);
                       print("result sign in $result");
                       if (result.runtimeType == String){
@@ -93,7 +103,7 @@ class _SignInState extends State<SignIn> {
                   child: Text("Sign in anonymously",
                       style: TextStyle(color: Colors.white)),
                     onPressed: () async {
-                    dynamic result = await _auth.signInAnon();
+                    dynamic result = await _authService.signInAnon();
                     if (result == null){
                       setState(() {
                         loading = false;
@@ -111,4 +121,7 @@ class _SignInState extends State<SignIn> {
       ),
     );
   }
+
+
+
 }

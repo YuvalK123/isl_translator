@@ -4,11 +4,23 @@ import 'package:isl_translator/services/show_video.dart';
 
 
 
-List<String> verbs = [
-  "אהב" , "בגד" , "בדק" , "בא", "בלע", "ברח", "ברר",
-  "אסף", "בקר", "אכל", "גהץ", "אחל", "אפה",
-  "בטל", "בקש", "ארגן", "", "", "",
-];
+
+List<String> prepositionalLetters = ["ב","כ","מ","ל", "ו", "ה"];
+
+List<String> endingRelative = ["","","","","",""];
+
+Map<String, String> endings = {
+  "ת": "ה",
+
+};
+
+Future<String> getNonPrepositional(String word) async{
+  if (!prepositionalLetters.contains(word[0])){
+    return null;
+  }
+  return await getUrl(word.substring(1));
+}
+
 
 String nonAsciiChar = "[^\x00-\x7F]";
 // String reg = "הת$nonAsciiChar$nonAsciiChar$nonAsciiChar";
@@ -42,15 +54,6 @@ Map<String, String> hebrewChars = {
   "ש" : "U+05E9",
   "ת" : "U+05EA",
 };
-
-List<String> prepositionalLetters = ["ה", "ו", "כ", "ל", "מ", "ב"];
-
-Future<String> getNonPrepositional(String word) async{
-  if (!prepositionalLetters.contains(word[0])){
-    return null;
-  }
-  return await getUrl(word.substring(1));
-}
 
 Future<String> getUrl(String word) async{
   Reference ref = FirebaseStorage.instance
@@ -222,18 +225,20 @@ String getRoot(int index, String pattern, String word){
     if (letter == "."){
       root += word[i];
     }else if(letter == "{"){
-      ii = i + 4;
       print("break");
+      ii = i + 5;
       break;
     }
   }
+  // print("pattern at ii = ${pattern[ii]}");
   for (int j = i; j < word.length; j++){
-    print("ii == $ii ${pattern.length}");
+    print("at j loop");
     if (pattern.length > ii && pattern[ii] != "."){
+      print("ii nono $ii ${pattern[ii]}");
       ii++;
       continue;
     }
-    print("at j loop yay i $ii");
+    print("yay $i");
     root += word[j];
   }
   return root;
@@ -249,6 +254,7 @@ List<String> patterns = [
   "מ.ו..{1,2}ת", // מאוהבת
   "את...{1,2}", // אתאהב
   "ית...{1,2}", //יתאהב
+  "נת...{1,2}", //נתאהב
   "תת...{1,2}", //תתאהב
   "י...{1,2}", //יאהב
   "ת...{1,2}", //תאהב
@@ -260,6 +266,12 @@ List<String> patterns = [
   "...{1,2}תם", // אהבתם
   "מ...{1,2}", // מפעל
   "...{1,2}", // אהב
+];
+
+List<String> pluralVerbs = [
+  "", // נפעול
+  "", // נפעול
+  "", // תפעלו
 ];
 
 // List<String> patterns = [

@@ -1,3 +1,5 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:isl_translator/screens/authenticate/Verify_screen.dart';
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
@@ -16,10 +18,11 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
 
-  final AuthService _auth = AuthService();
+  final AuthService _authService = AuthService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
-
+  bool verify = false;
   String email = '';
   String password = '';
   String error = '';
@@ -27,9 +30,9 @@ class _RegisterState extends State<Register> {
   @override
   Widget build(BuildContext context) {
     return loading ? Loading() : Scaffold(
-      backgroundColor: Colors.grey[100],
+      backgroundColor: Colors.brown[100],
       appBar: AppBar(
-        backgroundColor: Colors.cyan[800],
+        backgroundColor: Colors.brown[400],
         elevation: 0.0,
         title: Text('Register to ISL-Translator'),
         actions: <Widget> [
@@ -63,7 +66,7 @@ class _RegisterState extends State<Register> {
                 TextFormField( // password
                   decoration: textInputDecoration.copyWith(hintText: 'Password'),
                   validator: (val) =>
-                  val.length < 6 ? 'Enter a password 6+ chars long' : null,
+                  val.length < 1 ? 'Enter a password 1+ chars long' : null,
                   onChanged: (val) {
                     setState(() {
                       password = val;
@@ -73,27 +76,43 @@ class _RegisterState extends State<Register> {
                 ),
                 SizedBox(height: 20.0,),
                 RaisedButton(
-                  color: Colors.grey[600],
+                  color: Colors.pink[400],
                   child: Text("Register",
                       style: TextStyle(color: Colors.white)
                   ),
                   onPressed: () async {
+                    print("pressed");
                     if (_formKey.currentState.validate()){
-                      setState(() => loading = true);
+                      print("validated");
+
                       print("email $email , password $password");
-                      dynamic result = await _auth.
+                      dynamic result = await _authService.
                       registerUserWithEmailAndPassword(email, password);
+                      setState(() {
+                        if (_auth.currentUser.emailVerified){
+                          this.verify = false;
+                          loading = true;
+                        }
+                      });
+                      print("registered");
                       if (result == null){
+                        print("res == null");
                         setState(() {
                           loading = false;
                           error = 'Please supply a valid email';
                         } );
+                      }else{
+                        setState(() {
+                          this.verify = true;
+                        });
+
                       }
                     }
                   },
                 ),
                 SizedBox(height: 12.0,),
-                Text(error, style: TextStyle(color: Colors.grey, fontSize: 14.0),)
+                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),),
+                this.verify ? VerifyScreen() : Container(),
               ],
             ),
           ),
@@ -122,7 +141,7 @@ class FormField extends StatelessWidget {
             borderSide: BorderSide(color: Colors.white, width: 2.0)
         ),
         focusedBorder: OutlineInputBorder(
-            borderSide: BorderSide(color: Colors.grey[300], width: 2.0)
+            borderSide: BorderSide(color: Colors.pink[300], width: 2.0)
         ),
       ),
       validator: this.validator,
