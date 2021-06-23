@@ -17,6 +17,7 @@ class DatabaseUserService{
       'username' : username,
       'age' : age,
       'gender' : gender
+
     });
   }
 

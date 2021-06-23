@@ -24,6 +24,7 @@ class UserModel {
   final int age;
   final String gender;
   Gender genderModel;
+  String ImgURL = "....";
   //
   // Gender get genderModel{
   //   return _gender;
@@ -38,7 +39,7 @@ class UserModel {
         this.genderModel = Gender.MALE;
         break;
       default:
-        this.genderModel = Gender.MALE;
+        this.genderModel = Gender.OTHER;
     }
   }
 

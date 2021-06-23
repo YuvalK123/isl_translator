@@ -349,11 +349,6 @@ class _TranslatePage extends State<TranslatePage> {
           continue;
         }
         print("check for verb...");
-        var nonPre = await getNonPrepositional(splitSentenceList[i]);
-        if (nonPre != null){
-          urls.add(nonPre);
-          continue;
-        }
         final stopWatch = Stopwatch()..start();
         var verb = await checkIfVerb(splitSentenceList[i]);
         print("elapsed: ${stopWatch.elapsed} is verb??? $verb");

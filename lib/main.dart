@@ -10,8 +10,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   // get all terms
-  List<String> futureTerms = await findTermsDB();
-  saveTerms = futureTerms;
+  // List<String> futureTerms = await findTermsDB();
+  // saveTerms = futureTerms;
   // futureTerms.then((result) => saveTerms=  result)
   //     .catchError((e) => print('error in find terms'));
   runApp(MyApp());

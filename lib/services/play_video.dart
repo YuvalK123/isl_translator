@@ -198,7 +198,7 @@ class _VideoPlayerDemoState extends State<VideoPlayerDemo>{
       _stopController(index);
       //_nextVideo();
       // await _controller(index)?.pause();
-      // return;
+      return;
     }
     if(index == widget.myUrls.length - 1) {
       return;
