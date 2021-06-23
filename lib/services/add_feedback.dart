@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isl_translator/services/database_feedback.dart';
 import 'package:quick_feedback/quick_feedback.dart';
 import 'package:flutter/material.dart';
@@ -28,7 +29,9 @@ void showFeedback(context,inputSentence) {
 }
 
 Future addFeedback(int newRating, String newText, String newSentence) async{
-  await DatabaseFeedbackService(uid: newSentence).updateFeedbackData(
+  FirebaseAuth auth = FirebaseAuth.instance;
+  String id = auth.currentUser.uid;
+  await DatabaseFeedbackService(uid: "$id$newSentence" ).updateFeedbackData(
     rating: newRating,
     text: newText,
     sentence: newSentence,

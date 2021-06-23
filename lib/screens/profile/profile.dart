@@ -4,12 +4,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:isl_translator/services/auth.dart';
 import '../../shared/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:isl_translator/models/user.dart';
+
+// enum SingingCharacter { female, male, other }
 
 class ProfilePage extends StatefulWidget {
   @override
@@ -24,10 +27,31 @@ class MapScreenState extends State<ProfilePage>
   Gender gender;
   bool vidType = false;
 
+  Gender _character = Gender.FEMALE;
+  UserModel currUserModel;
+  final nameController = TextEditingController();
+  final emailController = TextEditingController();
+  final phoneController = TextEditingController();
+
+  final int index = 0;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    loadUser();
+
+  }
+
+  void loadUser() async{
+    final auth = FirebaseAuth.instance;
+    String uid = auth.currentUser.uid;
+    await for (var value in DatabaseUserService(uid: uid).users){
+      setState(() {
+        this.currUserModel = value;
+        _character = value.genderModel;
+      });
+    }
+    print("done, $_character");
   }
 
   @override
@@ -63,6 +87,8 @@ class MapScreenState extends State<ProfilePage>
               return Loading();
             }
             UserModel userModel = snapshot.data;
+            //this._character = userModel.genderModel;
+            // currUserModel = userModel;
             print("userModel is $userModel");
             return Container(
               alignment: Alignment.topRight,
@@ -73,7 +99,7 @@ class MapScreenState extends State<ProfilePage>
                     children: <Widget>[
                       new Container(
                         alignment: Alignment.topRight,
-                        height: 200.0,
+                        height: 160.0,
                         color: Colors.white,
                         child: new Column(
                           children: <Widget>[
@@ -128,39 +154,33 @@ class MapScreenState extends State<ProfilePage>
                             crossAxisAlignment: CrossAxisAlignment.start,
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: <Widget>[
-                              Container(
-                                alignment: Alignment.topRight,
-                                child: new Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  mainAxisSize: MainAxisSize.max,
-                                  children: <Widget>[
-                                    new Column(
-                                      mainAxisAlignment: MainAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        Container(
-                                          alignment: Alignment.topRight,
-                                          child: new Text(
-                                            'פרטים אישיים',
-                                            textDirection: TextDirection.rtl,
-                                            textAlign: TextAlign.right,
-                                            style: TextStyle(
-                                                fontSize: 18.0,
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    new Column(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: <Widget>[
-                                        _status ? _getEditIcon() : new Container(),
-                                      ],
-                                    )
-                                  ],
-                                ),
-                              ),
+                              // Container(
+                              //   alignment: Alignment.topRight,
+                              //   child: new Row(
+                              //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              //     mainAxisSize: MainAxisSize.max,
+                              //     children: <Widget>[
+                              //       Spacer(),
+                              //       new Column(
+                              //         mainAxisAlignment: MainAxisAlignment.start,
+                              //         mainAxisSize: MainAxisSize.min,
+                              //         children: <Widget>[
+                              //           Container(
+                              //             alignment: Alignment.topRight,
+                              //             child: new Text(
+                              //               'פרטים אישיים',
+                              //               textDirection: TextDirection.rtl,
+                              //               textAlign: TextAlign.right,
+                              //               style: TextStyle(
+                              //                   fontSize: 18.0,
+                              //                   fontWeight: FontWeight.bold),
+                              //             ),
+                              //           ),
+                              //         ],
+                              //       ),
+                              //     ],
+                              //   ),
+                              // ),
                               Padding(
                                   padding: EdgeInsets.only(
                                       left: 25.0, right: 25.0, top: 25.0),
@@ -191,6 +211,7 @@ class MapScreenState extends State<ProfilePage>
                                       new Flexible(
                                         child: new TextField(
                                           textDirection: TextDirection.rtl,
+                                          controller: nameController,
                                           decoration: InputDecoration(
                                             hintText: "הכנס/י שם משתמש",
                                           ),
@@ -205,6 +226,7 @@ class MapScreenState extends State<ProfilePage>
                                   child: new Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
+                                      Spacer(),
                                       new Column(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
@@ -225,12 +247,13 @@ class MapScreenState extends State<ProfilePage>
                                   child: new Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
-                                      Spacer(),
                                       new Flexible(
                                         child: new TextField(
+                                          textDirection: TextDirection.rtl,
+                                          controller: emailController,
                                           decoration: const InputDecoration(
                                               hintText: "הכנס/י מייל"),
-                                          enabled: !_status,
+                                          textAlign: TextAlign.right,
                                         ),
                                       ),
                                     ],
@@ -241,12 +264,13 @@ class MapScreenState extends State<ProfilePage>
                                   child: new Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
+                                      Spacer(),
                                       new Column(
                                         mainAxisAlignment: MainAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
                                           new Text(
-                                            'פלאפון',
+                                            'מגדר',
                                             style: TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
@@ -256,69 +280,87 @@ class MapScreenState extends State<ProfilePage>
                                     ],
                                   )),
                               Padding(
+                                padding: EdgeInsets.only(
+                                    left: 0, right: 0, top: 4.0),
+                                child: Center(
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child:Align(
+                                          alignment: Alignment.centerRight,
+                                          child: RadioListTile(
+                                            title: Text('נקבה',textDirection: TextDirection.rtl,),
+                                            value: Gender.FEMALE,
+                                            groupValue: _character,
+                                            onChanged: (Gender value) {
+                                              setState(() {
+                                                _character = value;
+                                              });
+                                            },
+                                            //onChanged: (newVal) {userModel.genderModel = newVal;},
+                                            controlAffinity: ListTileControlAffinity.trailing,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child:Align(
+                                          alignment: Alignment.centerLeft,
+                                          child:RadioListTile(
+                                            title: Text('זכר',textDirection: TextDirection.rtl,),
+                                            value: Gender.MALE,
+                                            groupValue: _character,
+                                            onChanged: (Gender value) {
+                                              setState(() {
+                                                userModel.genderModel = value;
+                                                _character = value;
+                                              });
+                                            },
+                                            controlAffinity: ListTileControlAffinity.trailing,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child:Align(
+                                          alignment: Alignment.center,
+                                          child:RadioListTile(
+                                            title: Text('אחר',textDirection: TextDirection.rtl,),
+                                            value: Gender.OTHER,
+                                            groupValue: _character,
+                                            onChanged: (Gender value) {
+                                              setState(() {
+                                                _character = value;
+                                              });
+                                            },
+                                            controlAffinity: ListTileControlAffinity.trailing,
+                                          ),
+                                        ),
+                                      ),
+
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              Padding(
                                   padding: EdgeInsets.only(
-                                      left: 25.0, right: 25.0, top: 2.0),
+                                      left: 25.0, right: 25.0, top: 25.0),
                                   child: new Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: <Widget>[
-                                      new Flexible(
-                                        child: new TextField(
-                                          decoration: const InputDecoration(
-                                              hintText: "הכנס/י מספר פלאפון"),
-                                          enabled: !_status,
-                                        ),
+                                      Spacer(),
+                                      new Column(
+                                        mainAxisAlignment: MainAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: <Widget>[
+                                          new Text(
+                                            'סוג תרגום',
+                                            style: TextStyle(
+                                                fontSize: 16.0,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   )),
-                              Center(
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child:Align(
-                                        alignment: Alignment.centerRight,
-                                        child: RadioListTile(
-                                          title: Text('נקבה',textDirection: TextDirection.rtl,),
-                                          value: Gender.FEMALE,
-                                          groupValue: userModel.genderModel,
-                                          onChanged: (newVal) {userModel.genderModel = newVal;},
-                                          controlAffinity: ListTileControlAffinity.trailing,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child:Align(
-                                        alignment: Alignment.centerLeft,
-                                        child:RadioListTile(
-                                          title: Text('זכר',textDirection: TextDirection.rtl,),
-                                          value: Gender.MALE,
-                                          groupValue: userModel.genderModel,
-                                          onChanged: (newVal) {userModel.genderModel = newVal;},
-                                          controlAffinity: ListTileControlAffinity.trailing,
-                                        ),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child:Align(
-                                        alignment: Alignment.center,
-                                        child:RadioListTile(
-                                          title: Text('אחר',textDirection: TextDirection.rtl,),
-                                          value: Gender.OTHER,
-                                          groupValue: userModel.genderModel,
-                                          onChanged: (newVal) {userModel.genderModel = newVal;},
-                                          controlAffinity: ListTileControlAffinity.trailing,
-                                        ),
-                                      ),
-                                    ),
-                                    Text(
-                                      "מגדר",
-                                      style: TextStyle(
-                                        fontSize: 18.0,
-                                        //backgroundColor: Colors.cyan[50]
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -340,13 +382,6 @@ class MapScreenState extends State<ProfilePage>
                                   ),
                                   Text("סרטון"),
                                   Spacer(),
-                                  Text(
-                                    "סוג תרגום",
-                                    style: TextStyle(
-                                      fontSize: 18.0,
-                                      //backgroundColor: Colors.cyan[50]
-                                    ),
-                                  ),
                                 ],
                               ),
                               _getActionButtons(),
@@ -388,9 +423,13 @@ class MapScreenState extends State<ProfilePage>
                     textColor: Colors.white,
                     color: Colors.green,
                     onPressed: () {
+                      print("pressed");
+                      saveData();
+                      print("After");
                       setState(() {
                         _status = true;
                         FocusScope.of(context).requestFocus(new FocusNode());
+
                       });
                     },
                     shape: new RoundedRectangleBorder(
@@ -399,26 +438,26 @@ class MapScreenState extends State<ProfilePage>
             ),
             flex: 2,
           ),
-          Expanded(
-            child: Padding(
-              padding: EdgeInsets.only(left: 10.0),
-              child: Container(
-                  child: new RaisedButton(
-                    child: new Text("ביטול"),
-                    textColor: Colors.white,
-                    color: Colors.red,
-                    onPressed: () {
-                      setState(() {
-                        _status = true;
-                        FocusScope.of(context).requestFocus(new FocusNode());
-                      });
-                    },
-                    shape: new RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(20.0)),
-                  )),
-            ),
-            flex: 2,
-          ),
+          // Expanded(
+          //   child: Padding(
+          //     padding: EdgeInsets.only(left: 10.0),
+          //     child: Container(
+          //         child: new RaisedButton(
+          //           child: new Text("ביטול"),
+          //           textColor: Colors.white,
+          //           color: Colors.red,
+          //           onPressed: () {
+          //             setState(() {
+          //               _status = true;
+          //               FocusScope.of(context).requestFocus(new FocusNode());
+          //             });
+          //           },
+          //           shape: new RoundedRectangleBorder(
+          //               borderRadius: new BorderRadius.circular(20.0)),
+          //         )),
+          //   ),
+          //   flex: 2,
+          // ),
         ],
       ),
     );
@@ -453,5 +492,69 @@ class MapScreenState extends State<ProfilePage>
     final user = Provider.of<UserModel>(context);
     print("user is $user");
     return user;
+  }
+
+  void saveData() async{
+    // get the user id
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+
+    // get the new data from the text field
+    String newName = nameController.text;
+    if (newName == "")
+      {
+        newName = currUserModel.username; // name does not change
+      }
+
+    String newMail = emailController.text;
+    if (newMail != "")
+    {
+      changeEmail(newMail); // change mail
+    }
+
+    String newGender = _character.toString();
+    if(_character == Gender.MALE)
+      {
+        newGender = "m";
+      }
+    else if(_character == Gender.FEMALE)
+    {
+      newGender = "f";
+    }
+    else
+      {
+        newGender = "o";
+      }
+
+    print("new gender == > " + newGender);
+
+    final newVidType = vidType == false ? VideoType.ANIMATION : VideoType.LIVE;
+    // if(vidType == false)
+    //   {
+    //     newVidType = "animation";
+    //   }
+    // else
+    //   {
+    //     newVidType = "video";
+    //   }
+
+    //update data in data (name, gender) in firebase
+    await DatabaseUserService(uid: id).updateUserData2(
+        username: newName,
+        gender: newGender,
+        videoType: newVidType,
+    );
+  }
+
+  void changePass(String newPassword) async{
+    final auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    await user.updatePassword(newPassword).then((value) => null).catchError((error) => print(error));
+  }
+
+  void changeEmail(String newEmail) async{
+    final auth = FirebaseAuth.instance;
+    final user = auth.currentUser;
+    await user.updateEmail(newEmail).then((value) => null).catchError((error) => print(error));
   }
 }
