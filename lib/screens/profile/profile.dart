@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:isl_translator/screens/home/main_drawer.dart';
+import '../../shared/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:provider/provider.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:isl_translator/screens/home/main_drawer.dart';
+import '../../shared/main_drawer.dart';
 
 class HomeScreen extends StatelessWidget {
   @override
