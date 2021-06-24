@@ -17,7 +17,7 @@ import 'add_feedback.dart';
 // }
 
 class VideoFetcher { // extends State<VideoFetcher> {
-  bool loading = true;
+  bool doneLoading = false;
   List<String> urls = [];
   final String sentence;
 
@@ -82,7 +82,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
       }
     }
     this.urls = urls;
-    this.loading = false;
+    this.doneLoading = true;
     return urls;
   }
 
@@ -313,9 +313,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   @override
   Widget build(BuildContext context) {
-    if (widget.sentence == "") return Container();
-    print("isready = ${this._isReady}, loading? ${this._videoFetcher.loading}");
-    return !this._isReady && !this._videoFetcher.loading ? Loading() : Scaffold(
+    print("sentence2 is ${widget.sentence}");
+    if (widget.sentence == null) {
+      return Container();
+    }
+    print("isready = ${this._isReady}, loading? ${this._videoFetcher.doneLoading}");
+    return !this._isReady && !this._videoFetcher.doneLoading ? Loading() : Scaffold(
       body: Stack(
         children: <Widget>[
           GestureDetector(

@@ -228,7 +228,7 @@ class _TranslatePage extends State<TranslatePage> {
   double _position = 0;
   double _buffer = 0;
   bool _lock = true;
-  VideoPlayer2 _videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: "",);
+  VideoPlayer2 _videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: null,);
   var _showContainer;
 
   @override
@@ -384,6 +384,10 @@ class _TranslatePage extends State<TranslatePage> {
 
   Future<void> playVideos() async{
     String sentence = myController.text;
+    if (sentence == ""){
+      sentence = null;
+    }
+    print("sentence is == $sentence");
     if (mounted){
       setState(() {
         this._videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: sentence,);
