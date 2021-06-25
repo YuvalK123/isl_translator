@@ -383,43 +383,48 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     }
     print("isready = ${this._isReady}, loading? ${this._videoFetcher.doneLoading}");
     return !this._isReady && !this._videoFetcher.doneLoading ? Loading() : Scaffold(
-      body: Stack(
-        children: <Widget>[
-          GestureDetector(
-            onLongPressStart: (_) => _controller(index).pause(),
-            onLongPressEnd: (_) => _controller(index).play(),
-            child: Center(
-              child: AspectRatio(
-                aspectRatio: this.aspectRatio ?? 1.0,
-                // aspectRatio: _controller(index).value.aspectRatio,
-                child: Center(child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                          color: this.borderColor,
-                          width: 4.0,
-
-                        ),
-                        borderRadius: BorderRadius.all(
-                          Radius.circular(7.0),
-                        )
-                    ),
-                    child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
-                ),
-
-              ),
-            ),
-          ),
-          SingleChildScrollView(
-              child: Container(
+      body: SingleChildScrollView(
+        child: Column(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onLongPressStart: (_) => _controller(index).pause(),
+                onLongPressEnd: (_) => _controller(index).play(),
                 child: Center(
-                  child:
-                  FlatButton(onPressed: () => showFeedback(context, widget.sentence), // this will trigger the feedback modal
-                    child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
+                  child: AspectRatio(
+                    aspectRatio: this.aspectRatio ?? 1.0,
+                    // aspectRatio: _controller(index).value.aspectRatio,
+                    child: Center(child: Container(
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: this.borderColor,
+                              width: 4.0,
+
+                            ),
+                            borderRadius: BorderRadius.all(
+                              Radius.circular(7.0),
+                            )
+                        ),
+                        child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
+                    ),
+
                   ),
                 ),
               ),
-          ),
-        ],
+            ),
+            SingleChildScrollView(
+                child: Container(
+                  child: Center(
+                    child:
+                    FlatButton(onPressed: () => showFeedback(context, widget.sentence), // this will trigger the feedback modal
+                      child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
+                    ),
+                  ),
+                ),
+            ),
+          ],
+        ),
       ),
     );
   }
