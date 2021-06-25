@@ -1,9 +1,15 @@
+import 'dart:io' as io;
+
+import 'package:cached_video_player/cached_video_player.dart';
+import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:isl_translator/shared/reg.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'package:mutex/mutex.dart';
 
@@ -25,13 +31,97 @@ class VideoFetcher { // extends State<VideoFetcher> {
   // VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("0"), myUrls: [],);
 
 
+  static Future<List<String>> getDowloadLinks(List<Reference> refs) =>
+      Future.wait(refs.map((ref) => ref.getDownloadURL()).toList());
+
+  Future<bool> _requestPermission(Permission permission) async{
+    if (await permission.isGranted){
+      return true;
+    }
+    var result = await permission.request();
+    return PermissionStatus.granted.isGranted;
+  }
+
+  Future<bool> saveFile(String url, String fileName) async{
+    io.Directory directory;
+    Dio dio = Dio();
+    try {
+      if (io.Platform.isAndroid){
+        if (await _requestPermission(Permission.storage)){
+          directory = await getExternalStorageDirectory();
+          print(directory.path);
+          String newPath = "";
+          List<String> folders = directory.path.split("/");
+          for (int i = 1; i < folders.length; i++){
+            String folder = folders[i];
+            if (folder != "android"){
+              newPath += "/"+folder;
+            }else{
+              break;
+            }
+          }
+          newPath = newPath + "/Cache";
+          directory = io.Directory(newPath);
+        }
+      }else{
+        // apple
+
+      }
+      if (await directory.exists()){
+        String fullName = directory.path + "/$fileName";
+        io.File saveFile = io.File(fullName);
+        await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
+      }
+    }
+    catch (e){
+
+    }
+    return false;
+  }
+
+
+  Future<List<String>> proccessWord(String word) async{
+    var nonPre = await getNonPrepositional(word);
+    List<String> urls = [];
+    if (nonPre != null){
+      urls.add(nonPre);
+      return urls;
+    }
+    print("check for verb...");
+    final stopWatch = Stopwatch()..start();
+    var verb = await checkIfVerb(word);
+    print("elapsed: ${stopWatch.elapsed} is verb??? $verb");
+    if (verb != null){
+      urls.add(verb);
+      return urls;
+    }
+    // Video doesn't exist - so split the work to letters
+    var letters = splitToLetters(word);
+    List<String> lettersUrls = [];
+    for(int j=0; j < letters.length; j++){
+      Reference ref = FirebaseStorage.instance
+          .ref("animation_openpose").child("${letters[j]}.mp4");
+      // .child("animation_openpose/" + letters[j] + ".mp4");
+      print ("ref = $ref");
+      var url = await ref.getDownloadURL();
+      print("got url at $url. adding to $urls");
+      urls.add(url);
+      print("letter added ==> " + letters[j]);
+    }
+    return urls;
+    // print("letters urls are = $lettersUrls");
+    // for(int l=0; l < lettersUrls.length; l++){
+    //   print("adding" + lettersUrls[l]);
+    //   urls.add(lettersUrls[l]);
+    //   print("Hiiii adding to $urls");
+    // }
+    // print("got url at $url. adding to $urls");
+  }
+
 
   Future<List> getUrls() async {
-    List<String> splitSentenceList =
-    splitSentence(sentence); // split the sentence
-    String url;
-    List<String> letters;
-    print(splitSentenceList);
+    List<String> splitSentenceList = splitSentence(sentence); // split the sentence
+    print("splitSentenceList $splitSentenceList");
     List<String> urls = [];
     int i = 0, j = 0;
     for(i=0; i < splitSentenceList.length; i++)
@@ -41,44 +131,14 @@ class VideoFetcher { // extends State<VideoFetcher> {
           .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
       try {
         // gets the video's url
-        url = await ref.getDownloadURL();
-
+        String url = await ref.getDownloadURL();
         urls.add(url);
       } catch (err) {
-        var nonPre = await getNonPrepositional(splitSentenceList[i]);
-        if (nonPre != null){
-          urls.add(nonPre);
-          continue;
+        var urlsList = await proccessWord(splitSentenceList[i]);
+        print("urls list for ${splitSentenceList[i]} is $urlsList}");
+        for (var url in urlsList){
+          urls.add(url);
         }
-        print("check for verb...");
-        final stopWatch = Stopwatch()..start();
-        var verb = await checkIfVerb(splitSentenceList[i]);
-        print("elapsed: ${stopWatch.elapsed} is verb??? $verb");
-        if (verb != null){
-          urls.add(verb);
-          continue;
-        }
-        // Video doesn't exist - so split the work to letters
-        letters = splitToLetters(splitSentenceList[i]);
-        List<String> lettersUrls = [];
-        for(j=0; j < letters.length; j++){
-          Reference ref = FirebaseStorage.instance
-              .ref("animation_openpose").child("${letters[j]}.mp4");
-          // .child("animation_openpose/" + letters[j] + ".mp4");
-          print ("ref = $ref");
-          url = await ref.getDownloadURL();
-          print("got url at $url. adding to $urls");
-          lettersUrls.add(url);
-          print("letter added ==> " + letters[j]);
-
-        }
-        print("letters urls are = $lettersUrls");
-        for(int l=0; l < lettersUrls.length; l++){
-          print("adding" + lettersUrls[l]);
-          urls.add(lettersUrls[l]);
-          print("Hiiii adding to $urls");
-        }
-        print("got url at $url. adding to $urls");
       }
     }
     this.urls = urls;
@@ -102,8 +162,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
     //
     //   });
     // }
-
-
   }
 }
 
@@ -202,6 +260,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     var myUrls = this._videoFetcher.urls;
     print("init $index");
     isInit[myUrls[index] + index.toString()] = false;
+    VideoPlayerOptions options = VideoPlayerOptions(mixWithOthers: true);
     var controller = VideoPlayerController.network(myUrls[index]);
     _controllers[myUrls[index] + index.toString()] = controller;
     await controller.initialize();
@@ -233,6 +292,11 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     //
     // }
     //_controller(index).addListener(checkIfVideoFinished);
+    if (mounted){
+      setState(() {
+        this._isReady = true;
+      });
+    }
     await _controller(index).play();
     setState(() {});
   }

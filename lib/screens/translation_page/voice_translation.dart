@@ -214,13 +214,9 @@
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
-import 'package:highlight_text/highlight_text.dart';
-import 'package:isl_translator/services/play_video.dart';
+import 'package:isl_translator/services/video_fetcher.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
-import 'package:isl_translator/services/show_video.dart';
 import 'package:video_player/video_player.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:isl_translator/services/add_feedback.dart';
 
 
 
@@ -239,8 +235,9 @@ class _RecordPage extends State<RecordPage> {
   double _confidence = 1.0;
   int keys = 0;
   List<String> myUrls = [];
-  VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("-1"), myUrls: [],);
+  // VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("-1"), myUrls: [],);
   String inputSentence;
+  VideoPlayer2 _videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: null,);
 
   //video controller
   VideoPlayerController _controller;
@@ -306,20 +303,21 @@ class _RecordPage extends State<RecordPage> {
               SizedBox(height: 5.0,),
               Container(
                 child: AspectRatio(
-                    aspectRatio: 100/100,
-                    child: _videoPlayerDemo.myUrls.length < 1 ? null : _videoPlayerDemo
+                    aspectRatio: 1.0,
+                    child: _videoFetcher,
+                    // child: _videoPlayerDemo.myUrls.length < 1 ? null : _videoPlayerDemo
                 ),
               ),
-              SingleChildScrollView(
-                child: Container(
-                  child: Center(
-                    child:
-                    _videoPlayerDemo.myUrls.length < 1 ? null : FlatButton(onPressed: () => showFeedback(context,inputSentence), // this will trigger the feedback modal
-                      child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
-                    ),
-                  ),
-                ),
-              ),
+              // SingleChildScrollView(
+              //   child: Container(
+              //     child: Center(
+              //       child:
+              //       _videoPlayerDemo.myUrls.length < 1 ? null : FlatButton(onPressed: () => showFeedback(context,inputSentence), // this will trigger the feedback modal
+              //         child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
+              //       ),
+              //     ),
+              //   ),
+              // ),
             ],
           ),
         ),
@@ -329,10 +327,17 @@ class _RecordPage extends State<RecordPage> {
     // );
   }
   Future<void> stop() async {
-    await _speech.stop();
+    var result = await _speech.stop();
+    // print("result ${result}");
     await Future.delayed(const Duration(seconds: 1));
-    this._isListening = false;
-    var result = await meow();
+    if (mounted){
+      setState(() {
+        this._isListening = false;
+        this._videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: this._text,);
+      });
+    }
+
+    // var result = await meow();
     // setState(() async{
     //   print("stop");
     //   // this.isPressed = false;
@@ -380,47 +385,47 @@ class _RecordPage extends State<RecordPage> {
 
   }
 
-  Future<void> meow() async{
-    String sentence = _text; // got the sentence from the user
-    inputSentence = sentence;
-    print("sentence is $sentence");
-    List<String> splitSentenceList =
-    splitSentence(sentence); // split the sentence
-    String url;
-    List<String> letters;
-    print("split is $splitSentenceList");
-    List<String> urls = [];
-    for(int i=0; i < splitSentenceList.length; i++)
-    {
-      Reference ref = FirebaseStorage.instance
-          .ref()
-          .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
-      try {
-        // gets the video's url
-        url = await ref.getDownloadURL();
-        urls.add(url);
-      } catch (err) {
-        // Video doesn't exist - so split the work to letters
-        letters = splitToLetters(sentence);
-        for(int j=0; j < letters.length; j++){
-          Reference ref = FirebaseStorage.instance
-              .ref()
-              .child("animation_openpose/" + letters[j] + ".mp4");
-          url = await ref.getDownloadURL();
-          urls.add(url);
-        }
-      }
-
-      //_initController(url).whenComplete(() => _lock = false);
-    }
-    myUrls = urls;
-    print("hello this is the urls ==> " + urls.toString());
-    print("and this is the text: $_text from sentence $sentence");
-    setState(() {
-      this._videoPlayerDemo = VideoPlayerDemo(myUrls: urls, key: Key(this.keys.toString()),);
-      print("video demo ind in voice translation: ${this.keys}");
-      this.keys++;
-    });
-
-  }
+  // Future<void> meow() async{
+  //   String sentence = _text; // got the sentence from the user
+  //   inputSentence = sentence;
+  //   print("sentence is $sentence");
+  //   List<String> splitSentenceList =
+  //   splitSentence(sentence); // split the sentence
+  //   String url;
+  //   List<String> letters;
+  //   print("split is $splitSentenceList");
+  //   List<String> urls = [];
+  //   for(int i=0; i < splitSentenceList.length; i++)
+  //   {
+  //     Reference ref = FirebaseStorage.instance
+  //         .ref()
+  //         .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
+  //     try {
+  //       // gets the video's url
+  //       url = await ref.getDownloadURL();
+  //       urls.add(url);
+  //     } catch (err) {
+  //       // Video doesn't exist - so split the work to letters
+  //       letters = splitToLetters(sentence);
+  //       for(int j=0; j < letters.length; j++){
+  //         Reference ref = FirebaseStorage.instance
+  //             .ref()
+  //             .child("animation_openpose/" + letters[j] + ".mp4");
+  //         url = await ref.getDownloadURL();
+  //         urls.add(url);
+  //       }
+  //     }
+  //
+  //     //_initController(url).whenComplete(() => _lock = false);
+  //   }
+  //   myUrls = urls;
+  //   print("hello this is the urls ==> " + urls.toString());
+  //   print("and this is the text: $_text from sentence $sentence");
+  //   setState(() {
+  //     this._videoPlayerDemo = VideoPlayerDemo(myUrls: urls, key: Key(this.keys.toString()),);
+  //     print("video demo ind in voice translation: ${this.keys}");
+  //     this.keys++;
+  //   });
+  //
+  // }
 }
