@@ -4,6 +4,11 @@ import 'package:disk_lru_cache/disk_lru_cache.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:isl_translator/services/video_fetcher.dart';
+
+List<String> lettersList = ["א","ב","ג","ד","ה","ו","ז","ח","ט",
+                         "י","כ","ך","ל","מ","ם","נ","ן","ס",
+                          "ע","פ","ף","צ","ץ","ק","ר","ש","ת"];
 
 class LruCache{
   final LruMap<String,String> map = LruMap();
@@ -11,6 +16,21 @@ class LruCache{
 
   DiskLruCache get cache {
     return _cache;
+  }
+
+  String getPath() {
+    return Directory.current.path;
+  }
+
+  static Future<void> saveLetters() async{
+    print("save letters");
+    for (var letter in lettersList){
+      print("on $letter.mp4");
+      String url = await VideoFetcher.getUrl("$letter");
+      print("downloaded letter url $url");
+      VideoFetcher().saveFile(url, "$letter.mp4");
+      print("saved!!");
+    }
   }
 
   LruCache(){

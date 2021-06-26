@@ -45,6 +45,9 @@ Future<List<String>> findTermsDB() async {
 
 /* Split the sentence to word/term and return a list of the split sentence*/
 List<String> splitSentence(String sentence) {
+  if (sentence == null){
+    return null;
+  }
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
   List sentenceList = newSentence.split(" "); //split the sentence to words
