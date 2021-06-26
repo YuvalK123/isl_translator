@@ -34,6 +34,7 @@ class MapScreenState extends State<ProfilePage>
   String username;
   Gender gender;
   bool vidType = false;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   Gender _character = Gender.FEMALE;
   UserModel currUserModel;
@@ -42,11 +43,10 @@ class MapScreenState extends State<ProfilePage>
   final phoneController = TextEditingController();
 
 
+
   // for select pic
   File _image;
   final picker = ImagePicker();
-
-
   /// Variables
   var imageUrl;
   File imageFile;
@@ -56,7 +56,18 @@ class MapScreenState extends State<ProfilePage>
     // TODO: implement initState
     super.initState();
     loadUser();
-    imageUrl = ProfileImage.getImageUrl();
+    initImgUrl();
+
+  }
+
+  void initImgUrl() async{
+    var img = await ProfileImage.getImageUrl();
+    if(mounted){
+      setState(() {
+        this.imageUrl =img;
+      });
+    }
+
   }
 
   void loadUser() async{
@@ -66,9 +77,16 @@ class MapScreenState extends State<ProfilePage>
       setState(() {
         this.currUserModel = value;
         _character = value.genderModel;
+        print(_character);
+        print("videp type == > " + value.videoType.toString());
+        if(value.videoType == VideoType.LIVE)
+          {
+            vidType= true;
+          }
       });
     }
     print("done, $_character");
+    print("done, $vidType");
   }
 
   @override
@@ -251,7 +269,7 @@ class MapScreenState extends State<ProfilePage>
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
                                           new Text(
-                                            'שם משתמש',
+                                             'שם משתמש: ' + userModel.username,
                                             style: TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
@@ -271,7 +289,7 @@ class MapScreenState extends State<ProfilePage>
                                           textDirection: TextDirection.rtl,
                                           controller: nameController,
                                           decoration: InputDecoration(
-                                            hintText: "הכנס/י שם משתמש",
+                                            hintText: "החלפ/י שם משתמש",
                                           ),
                                           textAlign: TextAlign.right,
                                         ),
@@ -290,7 +308,7 @@ class MapScreenState extends State<ProfilePage>
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
                                           new Text(
-                                            'מייל',
+                                            _auth.currentUser.email + " :אימייל",
                                             style: TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
@@ -310,7 +328,7 @@ class MapScreenState extends State<ProfilePage>
                                           textDirection: TextDirection.rtl,
                                           controller: emailController,
                                           decoration: const InputDecoration(
-                                              hintText: "הכנס/י מייל"),
+                                              hintText: "החלפ/י מייל"),
                                           textAlign: TextAlign.right,
                                         ),
                                       ),
@@ -427,8 +445,8 @@ class MapScreenState extends State<ProfilePage>
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                     child: FlutterSwitch(
-                                        activeColor: Colors.grey[300],
-                                        inactiveColor: Colors.grey[300],
+                                        activeColor: Colors.cyan[700],
+                                        inactiveColor: Colors.cyan[700],
                                         value: vidType,
                                         onToggle: (val) {
                                           setState(() {
@@ -554,8 +572,7 @@ class MapScreenState extends State<ProfilePage>
 
   void saveData() async{
     // get the user id
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
+    String id = _auth.currentUser.uid;
 
     // get the new data from the text field
     String newName = nameController.text;
@@ -587,14 +604,6 @@ class MapScreenState extends State<ProfilePage>
     print("new gender == > " + newGender);
 
     final newVidType = vidType == false ? VideoType.ANIMATION : VideoType.LIVE;
-    // if(vidType == false)
-    //   {
-    //     newVidType = "animation";
-    //   }
-    // else
-    //   {
-    //     newVidType = "video";
-    //   }
 
     //update data in data (name, gender) in firebase
     await DatabaseUserService(uid: id).updateUserData2(
@@ -604,7 +613,10 @@ class MapScreenState extends State<ProfilePage>
     );
 
     // upload profile picture to the firebase
-    uploadFile();
+    if(imageFile != null)
+      {
+        uploadFile();
+      }
   }
 
   void changePass(String newPassword) async{
@@ -616,6 +628,7 @@ class MapScreenState extends State<ProfilePage>
   void changeEmail(String newEmail) async{
     final auth = FirebaseAuth.instance;
     final user = auth.currentUser;
+    print(user.email);
     await user.updateEmail(newEmail).then((value) => null).catchError((error) => print(error));
   }
 

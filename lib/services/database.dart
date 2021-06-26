@@ -49,6 +49,7 @@ class DatabaseUserService{
     return UserModel(
       uid: this.uid,
       username: documentSnapshot.data()["username"] ?? "anon user",
+      videoTypeStr: documentSnapshot.data()["videoType"] ?? VideoType.ANIMATION.toString(),
       gender: documentSnapshot.data()["gender"],
       age: documentSnapshot.data()["age"],
     );

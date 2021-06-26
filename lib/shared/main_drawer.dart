@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
 import 'package:isl_translator/models/profile_image.dart';
@@ -19,6 +20,7 @@ class MainDrawer extends StatelessWidget {
   final pageButton currPage;
   final AuthService _auth = AuthService();
   final ProfileImage _profileImage = ProfileImage();
+  // final _auth = FirebaseAuth.instance;
   MainDrawer({this.currPage = pageButton.TRANSLATION}){
     // this.img = null;
     // this.imageUrl = null;
@@ -101,27 +103,13 @@ class MainDrawer extends StatelessWidget {
               icon: Icon(Icons.book),
               isCurrPage: this.currPage == pageButton.DICT,
             ),
-              StreamBuilder<UserModel>(
-                initialData: null,
-                stream: DatabaseUserService(uid: user.uid).users ?? null,
-                builder: (context, snapshot) {
-                  if(snapshot.hasError) {
-                    print("snapshot error in profile: ${snapshot.error}");
-                    return Container(width: 0.0,height: 0.0,);
-                  }
-                  if (!snapshot.hasData){
-                    print("snapshot dont has data ${snapshot.hasData}");
-                    return Container(width: 0.0,height: 0.0,);
-                  }
-                  return DrawerButton(
+              FirebaseAuth.instance.currentUser.isAnonymous ? Container() :
+              DrawerButton(
                     title: "איזור אישי",
                     onTap:  () => pushPage(context, ProfilePage()),
                     icon: Icon(Icons.person),
                     isCurrPage: this.currPage == pageButton.PROFILE,
-                  );
-                }
-              ),
-
+                  ),
               DrawerButton(
                   title: "התנתק/י",
                   onTap: () async {
