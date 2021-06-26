@@ -1,16 +1,23 @@
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:isl_translator/services/auth.dart';
 import '../../shared/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:isl_translator/models/user.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:isl_translator/services/profilePic/home_screen.dart';
+import 'package:isl_translator/services/profilePic/try.dart';
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:path/path.dart' as Path;
 
 // enum SingingCharacter { female, male, other }
 
@@ -33,13 +40,22 @@ class MapScreenState extends State<ProfilePage>
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
 
-  final int index = 0;
+
+  // for select pic
+  File _image;
+  final picker = ImagePicker();
+
+
+  /// Variables
+  var imageUrl;
+  File imageFile;
+  String _uploadedFileURL;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     loadUser();
-
+    getImage();
   }
 
   void loadUser() async{
@@ -117,8 +133,9 @@ class MapScreenState extends State<ProfilePage>
                                         decoration: new BoxDecoration(
                                           shape: BoxShape.circle,
                                           image: new DecorationImage(
-                                              image: NetworkImage(
-                                                  'https://static.toiimg.com/photo/msid-67586673/67586673.jpg'),
+                                              image: imageFile != null ? FileImage(imageFile) : NetworkImage(imageUrl),
+                                              // image: NetworkImage(
+                                              //     'https://static.toiimg.com/photo/msid-67586673/67586673.jpg'),
                                               fit: BoxFit.fitHeight
                                             //fit: BoxFit.cover,
                                           ),
@@ -133,11 +150,53 @@ class MapScreenState extends State<ProfilePage>
                                         new CircleAvatar(
                                           backgroundColor: Colors.red,
                                           radius: 25.0,
-                                          child: new Icon(
-                                            Icons.camera_alt,
-                                            color: Colors.white,
-                                          ),
-                                        )
+                                          child: new IconButton(
+                                            icon: new Icon(Icons.camera_alt,),
+                                            onPressed: () {
+                                              print("pressed icon");
+                                              chooseFile();
+                                              // imagePicker.showDialog(context),
+                                              // child: new Center(
+                                              // child: _image == null
+                                              // ? new Stack(
+                                              // children: <Widget>[
+                                              //
+                                              // new Center(
+                                              // child: new CircleAvatar(
+                                              // radius: 80.0,
+                                              // backgroundColor: const Color(0xFF778899),
+                                              // ),
+                                              // ),
+                                              // new Center(
+                                              // child: new Image.asset("assets/photo_camera.png"),
+                                              // ),
+                                              //
+                                              // ],
+                                              // )
+                                              //     : new Container(
+                                              // height: 160.0,
+                                              // width: 160.0,
+                                              // decoration: new BoxDecoration(
+                                              // color: const Color(0xff7c94b6),
+                                              // image: new DecorationImage(
+                                              // image: new ExactAssetImage(_image.path),
+                                              // fit: BoxFit.cover,
+                                              // ),
+                                              // border:
+                                              // Border.all(color: Colors.red, width: 5.0),
+                                              // borderRadius:
+                                              // new BorderRadius.all(const Radius.circular(80.0)),
+                                              // ),
+                                              // ),
+                                              // ),
+
+                                            },
+                                          )
+                                          // child: new Icon(
+                                          //   Icons.camera_alt,
+                                          //   color: Colors.white,
+                                          // ),
+                                        ),
                                       ],
                                     )),
                               ]),
@@ -544,6 +603,9 @@ class MapScreenState extends State<ProfilePage>
         gender: newGender,
         videoType: newVidType,
     );
+
+    // upload profile picture to the firebase
+    uploadFile();
   }
 
   void changePass(String newPassword) async{
@@ -557,4 +619,97 @@ class MapScreenState extends State<ProfilePage>
     final user = auth.currentUser;
     await user.updateEmail(newEmail).then((value) => null).catchError((error) => print(error));
   }
+
+  /// Get from gallery
+  _getFromGallery() async {
+    PickedFile pickedFile = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    print("pickedFile.path" + pickedFile.path);
+    File bla = File(pickedFile.path);
+    imageFile = bla;
+    setState(() {imageFile = bla;});    //_cropImage(pickedFile.path);
+  }
+
+  Future chooseFile() async {
+    await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
+      setState(() {
+        imageFile = image;
+      });
+    });
+  }
+
+  Future uploadFile2(File file) async {
+    FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    var storageRef = storage.ref().child('users_profile_pic/$id}');
+    print("file image: " + file.toString());
+    UploadTask uploadTask = storageRef.putFile(file);
+    await uploadTask.whenComplete(() => print('File Uploaded'));
+    //var completeTask = await uploadTask.onComplete;
+    storageRef.getDownloadURL().then((fileURL) {
+      setState(() {
+        _uploadedFileURL = fileURL;
+      });
+    });
+  }
+
+  Future uploadFile() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    var storageReference = FirebaseStorage.instance
+        .ref()
+        .child('users_profile_pic/${Path.basename(id)}');
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    await uploadTask.whenComplete(() => print('File Uploaded'));
+    print('File Uploaded');
+    storageReference.getDownloadURL().then((fileURL) {
+      setState(() {
+        _uploadedFileURL = fileURL;
+      });
+    });
+  }
+
+  Future getImage() async{
+    var isImageExist = true;
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    //Reference ref = FirebaseStorage.instance.ref().child('users_profile_pic/$id}');
+    var storageReference = FirebaseStorage.instance.ref().child('users_profile_pic/${Path.basename(id)}');
+    try {
+      // gets the video's url
+      imageUrl = await storageReference.getDownloadURL();
+      print("got it!");
+    } catch (err) {
+      print("don't exist");
+      isImageExist = false;
+
+    }
+
+    if(isImageExist == false)
+      {
+        storageReference = FirebaseStorage.instance.ref().child('users_profile_pic/${Path.basename("user.png")}');
+        try {
+          // gets the video's url
+          imageUrl = await storageReference.getDownloadURL();
+        } catch (err) {
+          print("don't exist");
+        }
+      }
+    print("done get image");
+  }
+// FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
+  // uploadFile(File file) async{
+  //   FirebaseAuth auth = FirebaseAuth.instance;
+  //   String id = auth.currentUser.uid;
+  //
+  //   var storageRef = storage.ref().child("user/profile/${id}");
+  //   var uploadTask = storageRef.putFile(file);
+  //   var completeTask = await uploadTask.onComplete;
+  //
+  // }
+
 }
