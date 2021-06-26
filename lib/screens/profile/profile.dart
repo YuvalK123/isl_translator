@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:isl_translator/models/profile_image.dart';
 import '../../shared/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/loading.dart';
@@ -55,7 +56,7 @@ class MapScreenState extends State<ProfilePage>
     // TODO: implement initState
     super.initState();
     loadUser();
-    getImage();
+    imageUrl = ProfileImage.getImageUrl();
   }
 
   void loadUser() async{
@@ -134,8 +135,6 @@ class MapScreenState extends State<ProfilePage>
                                           shape: BoxShape.circle,
                                           image: new DecorationImage(
                                               image: imageFile != null ? FileImage(imageFile) : NetworkImage(imageUrl),
-                                              // image: NetworkImage(
-                                              //     'https://static.toiimg.com/photo/msid-67586673/67586673.jpg'),
                                               fit: BoxFit.fitHeight
                                             //fit: BoxFit.cover,
                                           ),
@@ -673,34 +672,7 @@ class MapScreenState extends State<ProfilePage>
     });
   }
 
-  Future getImage() async{
-    var isImageExist = true;
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
-    //Reference ref = FirebaseStorage.instance.ref().child('users_profile_pic/$id}');
-    var storageReference = FirebaseStorage.instance.ref().child('users_profile_pic/${Path.basename(id)}');
-    try {
-      // gets the video's url
-      imageUrl = await storageReference.getDownloadURL();
-      print("got it!");
-    } catch (err) {
-      print("don't exist");
-      isImageExist = false;
 
-    }
-
-    if(isImageExist == false)
-      {
-        storageReference = FirebaseStorage.instance.ref().child('users_profile_pic/${Path.basename("user.png")}');
-        try {
-          // gets the video's url
-          imageUrl = await storageReference.getDownloadURL();
-        } catch (err) {
-          print("don't exist");
-        }
-      }
-    print("done get image");
-  }
 // FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
   // uploadFile(File file) async{
   //   FirebaseAuth auth = FirebaseAuth.instance;

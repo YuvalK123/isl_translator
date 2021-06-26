@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
+import 'package:isl_translator/models/profile_image.dart';
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/dictonary/dict.dart';
@@ -17,9 +18,15 @@ class MainDrawer extends StatelessWidget {
 
   final pageButton currPage;
   final AuthService _auth = AuthService();
+  final ProfileImage _profileImage = ProfileImage();
+  MainDrawer({this.currPage = pageButton.TRANSLATION}){
+    // this.img = null;
+    // this.imageUrl = null;
+    // imageUrl = getImage(imageUrl);
+    // this.img = ProfilePage
+  }
 
 
-  MainDrawer({this.currPage = pageButton.TRANSLATION});
 
   @override
   Widget build(BuildContext context) {
