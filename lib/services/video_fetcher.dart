@@ -12,6 +12,9 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'package:mutex/mutex.dart';
+import 'package:isl_translator/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:isl_translator/services/database.dart';
 
 import 'add_feedback.dart';
 
@@ -29,6 +32,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
   VideoFetcher({this.sentence});
   // VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("0"), myUrls: [],);
+
 
 
   static Future<List<String>> getDowloadLinks(List<Reference> refs) =>
@@ -102,7 +106,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
 
-  Future<List<String>> proccessWord(String word) async{
+  Future<List<String>> proccessWord(String word, String dirName) async{
     var nonPre = await getNonPrepositional(word);
     List<String> urls = [];
     if (nonPre != null){
@@ -122,7 +126,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     List<String> lettersUrls = [];
     for(int j=0; j < letters.length; j++){
       Reference ref = FirebaseStorage.instance
-          .ref("animation_openpose").child("${letters[j]}.mp4");
+          .ref("$dirName").child("${letters[j]}.mp4");
       // .child("animation_openpose/" + letters[j] + ".mp4");
       print ("ref = $ref");
       var url = await ref.getDownloadURL();
@@ -141,14 +145,15 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
 
-  static Future<String> getUrl(String word) async{
+  static Future<String> getUrl(String word,String dirName) async{
+    String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("animation_openpose/" + word + ".mp4");
+        .child("$dirName" + word + "$exec");
     return await ref.getDownloadURL();
   }
 
-  Future<List> getUrls() async {
+  Future<List> getUrls(String dirName) async {
     if (this.sentence == null) return null;
     List<String> splitSentenceList = splitSentence(sentence); // split the sentence
     print("splitSentenceList $splitSentenceList");
@@ -158,10 +163,10 @@ class VideoFetcher { // extends State<VideoFetcher> {
     {
       try {
         // gets the video's url
-        String url = await getUrl(splitSentenceList[i]);
+        String url = await getUrl(splitSentenceList[i],dirName);
         urls.add(url);
       } catch (err) {
-        var urlsList = await proccessWord(splitSentenceList[i]);
+        var urlsList = await proccessWord(splitSentenceList[i],dirName);
         print("urls list for ${splitSentenceList[i]} is $urlsList}");
         for (var url in urlsList){
           urls.add(url);
@@ -173,8 +178,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
     return urls;
   }
 
-  Future<void> playVideos() async{
-    List<String> urls = await getUrls();
+  Future<void> playVideos(String dirName) async{
+    List<String> urls = await getUrls(dirName);
 
     print("urls length == > " + urls.length.toString());
     // myUrls = urls;
@@ -218,6 +223,10 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   double aspectRatio;
   VideoFetcher _videoFetcher;
 
+  bool vidType = false;
+  String dirName = "animation_openpose/";
+  UserModel currUserModel;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -226,9 +235,30 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     toBeNamed();
   }
 
+  // need to move the function to another class
+  Future<void> loadUser() async{
+    final auth = FirebaseAuth.instance;
+    String uid = auth.currentUser.uid;
+    await for (var value in DatabaseUserService(uid: uid).users){
+      setState(() {
+        this.currUserModel = value;
+        print("videp type == > " + value.videoType.toString());
+        if(value.videoType == VideoType.LIVE)
+        {
+          vidType= true;
+          this.dirName = "sign_language_videos/";
+        }
+      });
+      break;
+    }
+  }
+
   void toBeNamed() async {
-    await this._videoFetcher.getUrls();
+    await loadUser(); // load user for getting the dirName
+    print("current dir name --> " + dirName);
+    await this._videoFetcher.getUrls(dirName);
     print(_videoFetcher.urls);
+
     if (_videoFetcher.urls.length > 0) {
       _initController(0).then((_) {
         setState(() {
@@ -365,10 +395,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       flipLock(false);
     } else {
       _initController(index + 1).whenComplete(() => /*_lock = false*/flipLock(false));
-      // if(index < widget.myUrls.length - 3)
-      //   {
-      //     _initController(index + 2).whenComplete(() => _lock = false);
-      //   }
     }
   }
 

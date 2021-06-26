@@ -37,5 +37,6 @@ class Wrapper extends StatelessWidget {
     List<String> futureTerms = await findTermsDB();
     saveTerms = futureTerms;
     hasLoaded = true;
+    print("finish saved terms");
   }
 }
