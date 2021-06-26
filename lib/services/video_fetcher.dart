@@ -32,7 +32,9 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
 
   static Future<List<String>> getDowloadLinks(List<Reference> refs) =>
-      Future.wait(refs.map((ref) => ref.getDownloadURL()).toList());
+      Future.wait(refs.map((ref) {
+        ref.getDownloadURL();
+      }).toList());
 
   Future<bool> _requestPermission(Permission permission) async{
     if (await permission.isGranted){
@@ -46,14 +48,19 @@ class VideoFetcher { // extends State<VideoFetcher> {
     io.Directory directory;
     Dio dio = Dio();
     try {
+      print("android");
       if (io.Platform.isAndroid){
+        print("downloading for android");
         if (await _requestPermission(Permission.storage)){
+          print("got permission");
           directory = await getExternalStorageDirectory();
-          print(directory.path);
+          print("path is ${directory.path}");
           String newPath = "";
           List<String> folders = directory.path.split("/");
           for (int i = 1; i < folders.length; i++){
             String folder = folders[i];
+            print("folder == $folder");
+            newPath += "/" + folder;
             if (folder != "android"){
               newPath += "/"+folder;
             }else{
@@ -61,20 +68,35 @@ class VideoFetcher { // extends State<VideoFetcher> {
             }
           }
           newPath = newPath + "/Cache";
+          print("newPath is $newPath");
           directory = io.Directory(newPath);
         }
       }else{
         // apple
 
       }
+      print("tmp is ${await getTemporaryDirectory()}");
+      print("directory is ${io.Directory}");
+      if (!(await directory.exists())){
+        print("recursive");
+        await directory.create(recursive: true);
+        print("recursed");
+      }
       if (await directory.exists()){
+        print("exists");
         String fullName = directory.path + "/$fileName";
+        print("full name is $fullName");
         io.File saveFile = io.File(fullName);
+        print("saved! now downloading");
         await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
+        print("downloaded!!");
+      }
+      else{
+        print("doesnt exist");
       }
     }
     catch (e){
-
+      print("save err is $e");
     }
     return false;
   }
@@ -119,19 +141,24 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
 
+  static Future<String> getUrl(String word) async{
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("animation_openpose/" + word + ".mp4");
+    return await ref.getDownloadURL();
+  }
+
   Future<List> getUrls() async {
+    if (this.sentence == null) return null;
     List<String> splitSentenceList = splitSentence(sentence); // split the sentence
     print("splitSentenceList $splitSentenceList");
     List<String> urls = [];
     int i = 0, j = 0;
     for(i=0; i < splitSentenceList.length; i++)
     {
-      Reference ref = FirebaseStorage.instance
-          .ref()
-          .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
       try {
         // gets the video's url
-        String url = await ref.getDownloadURL();
+        String url = await getUrl(splitSentenceList[i]);
         urls.add(url);
       } catch (err) {
         var urlsList = await proccessWord(splitSentenceList[i]);
@@ -186,7 +213,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   Map<String, bool> isInit = {};
   Map<int, VoidCallback> _listeners = {};
   Set<String> _urls;
-  bool state;
   Color borderColor = Colors.transparent;
   Mutex _mutex = Mutex();
   double aspectRatio;
@@ -202,7 +228,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   void toBeNamed() async {
     await this._videoFetcher.getUrls();
-    this.state = true;
     print(_videoFetcher.urls);
     if (_videoFetcher.urls.length > 0) {
       _initController(0).then((_) {
@@ -253,7 +278,10 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   VideoPlayerController _controller(int index) {
     print("index == $index");
-    return _controllers[this._videoFetcher.urls[index] + index.toString()];
+    if (this._videoFetcher.urls.length > index){
+      return _controllers[this._videoFetcher.urls[index] + index.toString()];
+    }
+    return null;
   }
 
   Future<void> _initController(int index) async {
@@ -299,30 +327,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     }
     await _controller(index).play();
     setState(() {});
-  }
-
-
-
-  void _previousVideo() {
-    if (_lock || index == 0) {
-      return;
-    }
-    _lock = true;
-
-    _stopController(index);
-
-    if (index + 1 < this._videoFetcher.urls.length) {
-      _removeController(index + 1);
-    }
-
-    _playController(--index);
-
-    if (index == 0) {
-      _lock = false;
-
-    } else {
-      _initController(index - 1).whenComplete(() => _lock = false);
-    }
   }
 
   void flipLock(bool val) async{

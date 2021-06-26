@@ -195,6 +195,7 @@
 // }
 
 import 'package:flutter/material.dart';
+import 'package:isl_translator/services/video_cache.dart';
 import 'package:isl_translator/services/video_fetcher.dart';
 
 class TranslatePage extends StatefulWidget {
@@ -278,13 +279,12 @@ class _TranslatePage extends State<TranslatePage> {
                       border: OutlineInputBorder(), hintText: 'הכנס/י טקסט'),
                   textAlign: TextAlign.right,
                 ),
-
-                // ignore: deprecated_member_use
                 FlatButton(
                   onPressed: playVideos,
                   child: Text("תרגם"),
                   color: Colors.black12,
                 ),
+                IconButton(onPressed: LruCache.saveLetters, icon: Icon(Icons.download)),
                 Container(
 
                     child: AspectRatio(

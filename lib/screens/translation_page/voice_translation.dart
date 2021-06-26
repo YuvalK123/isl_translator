@@ -337,13 +337,6 @@ class _RecordPage extends State<RecordPage> {
       });
     }
 
-    // var result = await meow();
-    // setState(() async{
-    //   print("stop");
-    //   // this.isPressed = false;
-    //   this._isListening = false;
-    //   var result = await meow();
-    // });
 
 
   }
