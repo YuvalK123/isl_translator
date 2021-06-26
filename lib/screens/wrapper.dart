@@ -9,9 +9,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 
 
+bool hasLoaded = false;
 
 class Wrapper extends StatelessWidget {
-
   final _auth = FirebaseAuth.instance;
 
   @override
@@ -23,7 +23,7 @@ class Wrapper extends StatelessWidget {
     // if (user != null){
     //   if (_auth.currentUser.emailVerified)
     // }
-    if (user != null && _auth.currentUser.emailVerified){
+    if (user != null && (_auth.currentUser.emailVerified || _auth.currentUser.isAnonymous)){
       saveTermsForShow();
       return TranslationWrapper();
     }
@@ -31,7 +31,11 @@ class Wrapper extends StatelessWidget {
   }
 
   Future<void> saveTermsForShow() async{
+    if (hasLoaded){
+      return;
+    }
     List<String> futureTerms = await findTermsDB();
     saveTerms = futureTerms;
+    hasLoaded = true;
   }
 }

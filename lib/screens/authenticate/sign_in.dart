@@ -76,14 +76,7 @@ class _SignInState extends State<SignIn> {
                   onPressed: () async {
                     // true - valid form. false - invalid form
                     if (_formKey.currentState.validate()){
-                      if (_auth.currentUser.emailVerified){
-                        // get all terms
 
-                        setState(() => loading = true
-                        );
-                        // futureTerms.then((result) => saveTerms=  result)
-                            // .catchError((e) => print('error in find terms'));
-                      }
 
                       dynamic result = await _authService.
                       signInUserWithEmailAndPassword(email, password);
@@ -93,6 +86,14 @@ class _SignInState extends State<SignIn> {
                           loading = false;
                           error = '${result.toString()}\nCould not sign in';
                         });
+                      }
+                      if (_auth.currentUser.emailVerified){
+                        // get all terms
+
+                        setState(() => loading = true
+                        );
+                        // futureTerms.then((result) => saveTerms=  result)
+                        // .catchError((e) => print('error in find terms'));
                       }
                     }
                   },
