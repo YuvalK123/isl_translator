@@ -16,6 +16,10 @@ import 'package:mutex/mutex.dart';
 
 import 'add_feedback.dart';
 
+import 'package:isl_translator/models/user.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:isl_translator/services/database.dart';
+
 // class VideoFetcher extends StatefulWidget {
 //   @override
 //   _VideoFetcherState createState() => _VideoFetcherState();
@@ -115,8 +119,9 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
   // List<String> specialChars = ["*","-","_","'","\"","\\","/","=","+",",",".","?","!"];
 
-  Future<List<String>> proccessWord(String word) async{
-    var nonPre = await getNonPrepositional(word);
+  Future<List<String>> proccessWord(String word,String dirName) async{
+    String exec = dirName == "animation_openpose/" ? "mp4" : "mkv";
+    var nonPre = await getNonPrepositional(word, dirName);
     List<String> urls = [];
     if (nonPre != null){
       urls.add(nonPre);
@@ -124,7 +129,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     }
     print("check for verb...");
     final stopWatch = Stopwatch()..start();
-    var verb = await checkIfVerb(word);
+    var verb = await checkIfVerb(word, dirName);
     print("elapsed: ${stopWatch.elapsed} is verb??? $verb");
     if (verb != null){
       urls.add(verb);
@@ -137,12 +142,13 @@ class VideoFetcher { // extends State<VideoFetcher> {
       if (!hebrewChars.containsKey(letters[j])){
         continue;
       }
+      print("working on ${letters[j]}.$exec");
       Reference ref = FirebaseStorage.instance
-          .ref("animation_openpose").child("${letters[j]}.mp4");
+          .ref("$dirName").child("${letters[j]}.$exec");
       // .child("animation_openpose/" + letters[j] + ".mp4");
       print ("ref = $ref");
       var url = await ref.getDownloadURL();
-      print("got url at $url. adding to $urls");
+      print("got url at $url for letter ${letters[j]}. adding to $urls");
       urls.add(url);
       print("letter added ==> " + letters[j]);
     }
@@ -158,14 +164,15 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
 
-  static Future<String> getUrl(String word) async{
+  static Future<String> getUrl(String word, String dirName) async{
+    String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
     Reference ref = FirebaseStorage.instance
         .ref()
-        .child("animation_openpose/" + word + ".mp4");
+        .child("$dirName" + word + "$exec");
     return await ref.getDownloadURL();
   }
 
-  Future<List> getUrls() async {
+  Future<List> getUrls(String dirName) async {
     if (this.sentence == null) return null;
     List<String> splitSentenceList = splitSentence(sentence); // split the sentence
     print("splitSentenceList $splitSentenceList");
@@ -179,7 +186,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
       print("yoyo ($i)");
       try {
         // gets the video's url
-        String url = await getUrl(splitSentenceList[i]);
+        String url = await getUrl(splitSentenceList[i], dirName);
         indexToUrl[j++] = url;
         urls.add(url);
       } on io.SocketException catch (err) {
@@ -187,7 +194,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
         print("no internet connection");
         // CupertinoAlertDialog(title: "No internet Connection");
       } catch (err){
-        var urlsList = await proccessWord(splitSentenceList[i]);
+        var urlsList = await proccessWord(splitSentenceList[i], dirName);
         print("urls list for ${splitSentenceList[i]} is $urlsList}");
         for (var url in urlsList){
           indexToUrl[j++] = url;
@@ -203,8 +210,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
     return urls;
   }
 
-  Future<void> playVideos() async{
-    List<String> urls = await getUrls();
+  Future<void> playVideos(String dirName) async{
+    List<String> urls = await getUrls(dirName);
 
     print("urls length == > " + urls.length.toString());
     // myUrls = urls;
@@ -248,6 +255,10 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   double aspectRatio;
   VideoFetcher _videoFetcher;
 
+  bool vidType = false;
+  String dirName = "animation_openpose/";
+  UserModel currUserModel;
+  FirebaseAuth _auth = FirebaseAuth.instance;
 
   @override
   void initState() {
@@ -257,8 +268,28 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     toBeNamed();
   }
 
+  // need to move the function to another class
+  Future<void> loadUser() async{
+    final auth = FirebaseAuth.instance;
+    String uid = auth.currentUser.uid;
+    await for (var value in DatabaseUserService(uid: uid).users){
+      setState(() {
+        this.currUserModel = value;
+        print("videp type == > " + value.videoType.toString());
+        if(value.videoType == VideoType.LIVE)
+        {
+          vidType= true;
+          this.dirName = "live_videos/";
+        }
+      });
+      break;
+    }
+  }
+
   void toBeNamed() async {
-    await this._videoFetcher.getUrls();
+    await loadUser(); // load user for getting the dirName
+    print("current dir name --> " + dirName);
+    await this._videoFetcher.getUrls(dirName);
     print("indexToUrl is ${_videoFetcher.indexToUrl}");
     if (_videoFetcher.indexToUrl.isNotEmpty) {
       _initController(0).then((_) {
@@ -378,7 +409,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       _stopController(index);
       //_nextVideo();
       // await _controller(index)?.pause();
-      return;
+      //return;
     }
     if(index == this._videoFetcher.urls.length - 1) {
       return;
@@ -457,7 +488,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                             )
                         ),
                         child: VideoPlayer(_controller(index))),
-                        // child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
+                      // child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
                     ),
 
                   ),
@@ -465,14 +496,14 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
               ),
             ),
             SingleChildScrollView(
-                child: Container(
-                  child: Center(
-                    child:
-                    FlatButton(onPressed: () => showFeedback(context, widget.sentence), // this will trigger the feedback modal
-                      child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
-                    ),
+              child: Container(
+                child: Center(
+                  child:
+                  FlatButton(onPressed: () => showFeedback(context, widget.sentence), // this will trigger the feedback modal
+                    child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
                   ),
                 ),
+              ),
             ),
           ],
         ),
@@ -480,4 +511,3 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     );
   }
 }
-
