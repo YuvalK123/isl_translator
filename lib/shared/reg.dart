@@ -11,8 +11,9 @@ List<String> endingRelative = ["","","","","",""];
 
 Map<String, String> endings = {
   "ת": "ה",
-
 };
+
+
 
 Future<String> getNonPrepositional(String word) async{
   if (!prepositionalLetters.contains(word[0])){
@@ -88,6 +89,13 @@ Future<String> checkIfVerb(String word) async{
   return null;
 }
 
+String handleRootH(String root){
+  if (root.endsWith("ה") || root.endsWith("י")){
+    return root.substring(0, root.length-2) + "ת";
+  }
+  return root;
+}
+
 List<String> wordToInitiatives(String word){
   List<String> wordInitiative = [];
   // verbs.forEach((verb) {
@@ -149,10 +157,10 @@ Pair<String, int> getVerbPattern(String word){
 List<String> handleVerbMatch(int index, String pattern, String word){
   print("search root...");
   String root = getRoot(index, pattern, word);
-  print("root is $root");
+  root = handleRootH(root);
+  print("root after process is $root");
   List<String> wordInitiatives = [];
   for (var infinitive in infinitives){ // get list of infinitives
-    print("in for infinitive");
     int rootIndex = 0;
     print("infinitive is $infinitive, root is $root");
     String infin = "";
@@ -168,14 +176,6 @@ List<String> handleVerbMatch(int index, String pattern, String word){
       } else if (letter != "+"){ // is not a verb letter
           infin += letter;
       }
-      // } else if (letter == "{" && rootIndex < root.length){
-      //   for (int j = rootIndex; j < root.length; j++){
-      //     infin += root[j];
-      //   }
-      // } else if (letter != "{" || letter != "1" || letter != "2" ||
-      //     letter != "," || letter != "}"){ // is not a verb letter
-      //   infin += letter;
-      // }
     }
     infin = handleFinalLetter(infin);
     wordInitiatives.add(infin);
@@ -268,11 +268,81 @@ List<String> patterns = [
   "...{1,2}", // אהב
 ];
 
+Map<int, String> indexToInfti = {
+  1 : "ללכת",
+  2: "לרוץ",
+  3 : "לקום",
+  4: "לתת",
+
+};
+
+Map<String, int> shortRootsVerbs = {
+  "הלך" : 1,
+  "הלכה" : 1,
+  "ילך" : 1,
+  "תלך" : 1,
+  "הלכו" : 1,
+  "ילכו" : 1,
+  "הולכים" : 1,
+  "נלכנה" : 1,
+  "הלכתי" : 1,
+  "הלכנו" : 1,
+  "הלכתם" : 1,
+  "הלכתן" : 1,
+  "אתהלך" : 1,
+  "הולך" : 1,
+  "הולכת" : 1,
+
+  "רץ" : 2,
+  "רצה" : 2,
+  "ירוץ" : 2,
+  "תרוץ" : 2,
+  "רצו" : 2,
+  "ירוצו" : 2,
+  "רצים" : 2,
+  "נרוץ" : 2,
+  "רצתי" : 2,
+  "רצנו" : 2,
+  "רצתם" : 2,
+  "רצתן" : 2,
+  "ארוץ" : 2,
+
+  "קם" : 3,
+  "קמה" : 3,
+  "יקום" : 3,
+  "קמו" : 3,
+  "קמות" : 3,
+  "קמים" : 3,
+  "יקומו" : 3,
+  "תקומו" : 3,
+
+  "נתן" : 4,
+  "יתן" : 4,
+  "תתן" : 4,
+  "נתנו" : 4,
+  "יתנו" : 4,
+  "נותנים" : 4,
+  "נותנות" : 4,
+  "תתנו" : 4,
+};
+
 List<String> pluralVerbs = [
   "", // נפעול
   "", // נפעול
   "", // תפעלו
 ];
+
+// to be continued
+
+void checkGenderCase(String word){
+  // checks if its male/female word - גרפיקאי->גרפיקאית
+
+}
+
+void checkPluralCase(String word){
+  // checks if plural/singular case - גרוש->גרושים
+}
+
 
 // List<String> patterns = [
 //   "...+${hebrewChars["ת"]}${hebrewChars["י"]}", // אהבתי

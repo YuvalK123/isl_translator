@@ -48,15 +48,16 @@ class MapScreenState extends State<ProfilePage>
 
 
   /// Variables
-  var imageUrl;
+  // var imageUrl;
   File imageFile;
+  ProfileImage _profileImage = ProfileImage(false);
   String _uploadedFileURL;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     loadUser();
-    imageUrl = ProfileImage.getImageUrl();
+    // imageUrl = ProfileImage.getImageUrl();
   }
 
   void loadUser() async{
@@ -133,8 +134,9 @@ class MapScreenState extends State<ProfilePage>
                                         height: 140.0,
                                         decoration: new BoxDecoration(
                                           shape: BoxShape.circle,
-                                          image: new DecorationImage(
-                                              image: imageFile != null ? FileImage(imageFile) : NetworkImage(imageUrl),
+                                          image: !this._profileImage.hasImg ? null : new DecorationImage(
+                                              image: this._profileImage.img,
+                                              // image: imageFile != null ? FileImage(imageFile) : NetworkImage(imageUrl),
                                               fit: BoxFit.fitHeight
                                             //fit: BoxFit.cover,
                                           ),
@@ -151,9 +153,13 @@ class MapScreenState extends State<ProfilePage>
                                           radius: 25.0,
                                           child: new IconButton(
                                             icon: new Icon(Icons.camera_alt,),
-                                            onPressed: () {
+                                            onPressed: () async{
                                               print("pressed icon");
-                                              chooseFile();
+                                              var profileImg = ProfileImage(true);
+                                              await profileImg.chooseFile();
+                                              setState(() {
+                                                this._profileImage = profileImg;
+                                              });
                                               // imagePicker.showDialog(context),
                                               // child: new Center(
                                               // child: _image == null
@@ -341,63 +347,63 @@ class MapScreenState extends State<ProfilePage>
                                 padding: EdgeInsets.only(
                                     left: 0, right: 0, top: 4.0),
                                 child: Center(
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child:Align(
-                                          alignment: Alignment.centerRight,
-                                          child: RadioListTile(
-                                            title: Text('נקבה',textDirection: TextDirection.rtl,),
-                                            value: Gender.FEMALE,
-                                            groupValue: _character,
-                                            onChanged: (Gender value) {
-                                              setState(() {
-                                                _character = value;
-                                              });
-                                            },
-                                            //onChanged: (newVal) {userModel.genderModel = newVal;},
-                                            controlAffinity: ListTileControlAffinity.trailing,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child:Align(
+                                            alignment: Alignment.centerRight,
+                                            child: RadioListTile(
+                                              title: Text('נקבה',textDirection: TextDirection.rtl,),
+                                              value: Gender.FEMALE,
+                                              groupValue: _character,
+                                              onChanged: (Gender value) {
+                                                setState(() {
+                                                  _character = value;
+                                                });
+                                              },
+                                              //onChanged: (newVal) {userModel.genderModel = newVal;},
+                                              controlAffinity: ListTileControlAffinity.trailing,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child:Align(
-                                          alignment: Alignment.centerLeft,
-                                          child:RadioListTile(
-                                            title: Text('זכר',textDirection: TextDirection.rtl,),
-                                            value: Gender.MALE,
-                                            groupValue: _character,
-                                            onChanged: (Gender value) {
-                                              setState(() {
-                                                userModel.genderModel = value;
-                                                _character = value;
-                                              });
-                                            },
-                                            controlAffinity: ListTileControlAffinity.trailing,
+                                        Expanded(
+                                          child:Align(
+                                            alignment: Alignment.centerLeft,
+                                            child:RadioListTile(
+                                              title: Text('זכר',textDirection: TextDirection.rtl,),
+                                              value: Gender.MALE,
+                                              groupValue: _character,
+                                              onChanged: (Gender value) {
+                                                setState(() {
+                                                  userModel.genderModel = value;
+                                                  _character = value;
+                                                });
+                                              },
+                                              controlAffinity: ListTileControlAffinity.trailing,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Expanded(
-                                        child:Align(
-                                          alignment: Alignment.center,
-                                          child:RadioListTile(
-                                            title: Text('אחר',textDirection: TextDirection.rtl,),
-                                            value: Gender.OTHER,
-                                            groupValue: _character,
-                                            onChanged: (Gender value) {
-                                              setState(() {
-                                                _character = value;
-                                              });
-                                            },
-                                            controlAffinity: ListTileControlAffinity.trailing,
+                                        Expanded(
+                                          child:Align(
+                                            alignment: Alignment.center,
+                                            child:RadioListTile(
+                                              title: Text('אחר',textDirection: TextDirection.rtl,),
+                                              value: Gender.OTHER,
+                                              groupValue: _character,
+                                              onChanged: (Gender value) {
+                                                setState(() {
+                                                  _character = value;
+                                                });
+                                              },
+                                              controlAffinity: ListTileControlAffinity.trailing,
+                                            ),
                                           ),
                                         ),
-                                      ),
 
-                                    ],
+                                      ],
+                                    ),
                                   ),
                                 ),
-                              ),
                               Padding(
                                   padding: EdgeInsets.only(
                                       left: 25.0, right: 25.0, top: 25.0),
@@ -604,7 +610,7 @@ class MapScreenState extends State<ProfilePage>
     );
 
     // upload profile picture to the firebase
-    uploadFile();
+    // uploadFile();
   }
 
   void changePass(String newPassword) async{
@@ -619,58 +625,7 @@ class MapScreenState extends State<ProfilePage>
     await user.updateEmail(newEmail).then((value) => null).catchError((error) => print(error));
   }
 
-  /// Get from gallery
-  _getFromGallery() async {
-    PickedFile pickedFile = await ImagePicker().getImage(
-      source: ImageSource.gallery,
-      maxWidth: 1800,
-      maxHeight: 1800,
-    );
-    print("pickedFile.path" + pickedFile.path);
-    File bla = File(pickedFile.path);
-    imageFile = bla;
-    setState(() {imageFile = bla;});    //_cropImage(pickedFile.path);
-  }
 
-  Future chooseFile() async {
-    await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
-      setState(() {
-        imageFile = image;
-      });
-    });
-  }
-
-  Future uploadFile2(File file) async {
-    FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
-    var storageRef = storage.ref().child('users_profile_pic/$id}');
-    print("file image: " + file.toString());
-    UploadTask uploadTask = storageRef.putFile(file);
-    await uploadTask.whenComplete(() => print('File Uploaded'));
-    //var completeTask = await uploadTask.onComplete;
-    storageRef.getDownloadURL().then((fileURL) {
-      setState(() {
-        _uploadedFileURL = fileURL;
-      });
-    });
-  }
-
-  Future uploadFile() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
-    var storageReference = FirebaseStorage.instance
-        .ref()
-        .child('users_profile_pic/${Path.basename(id)}');
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-    await uploadTask.whenComplete(() => print('File Uploaded'));
-    print('File Uploaded');
-    storageReference.getDownloadURL().then((fileURL) {
-      setState(() {
-        _uploadedFileURL = fileURL;
-      });
-    });
-  }
 
 
 // FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");

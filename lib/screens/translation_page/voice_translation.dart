@@ -329,6 +329,10 @@ class _RecordPage extends State<RecordPage> {
   Future<void> stop() async {
     var result = await _speech.stop();
     // print("result ${result}");
+    if (this._text == ""){
+      this._text = 'לחצ/י על הכפתור על מנת לדבר';
+      return;
+    }
     await Future.delayed(const Duration(seconds: 1));
     if (mounted){
       setState(() {
@@ -345,7 +349,7 @@ class _RecordPage extends State<RecordPage> {
     // setState(() {
     //   this.isPressed = true;
     // });
-
+    this._text = "";
     if (!_isListening) {
       bool available = await _speech.initialize(
         onStatus: (val) async{

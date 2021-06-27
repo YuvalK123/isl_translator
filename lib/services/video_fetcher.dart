@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:cached_video_player/cached_video_player.dart';
@@ -26,10 +27,19 @@ class VideoFetcher { // extends State<VideoFetcher> {
   bool doneLoading = false;
   List<String> urls = [];
   final String sentence;
+  Map<int, String> indexToUrl = Map<int,String>();
+
+  bool get isFirstLoaded {
+    return indexToUrl.containsKey(0);
+  }
 
   VideoFetcher({this.sentence});
   // VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("0"), myUrls: [],);
 
+
+  void downloadThenDo(){
+
+  }
 
   static Future<List<String>> getDowloadLinks(List<Reference> refs) =>
       Future.wait(refs.map((ref) {
@@ -102,6 +112,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
 
+
+
   Future<List<String>> proccessWord(String word) async{
     var nonPre = await getNonPrepositional(word);
     List<String> urls = [];
@@ -130,6 +142,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
       urls.add(url);
       print("letter added ==> " + letters[j]);
     }
+
     return urls;
     // print("letters urls are = $lettersUrls");
     // for(int l=0; l < lettersUrls.length; l++){
@@ -156,18 +169,31 @@ class VideoFetcher { // extends State<VideoFetcher> {
     int i = 0, j = 0;
     for(i=0; i < splitSentenceList.length; i++)
     {
+      if (i > 2){
+        this.doneLoading = true;
+      }
+      print("yoyo ($i)");
       try {
         // gets the video's url
         String url = await getUrl(splitSentenceList[i]);
+        indexToUrl[j++] = url;
         urls.add(url);
-      } catch (err) {
+      } on io.SocketException catch (err) {
+        print(err);
+        print("no internet connection");
+        // CupertinoAlertDialog(title: "No internet Connection");
+      } catch (err){
         var urlsList = await proccessWord(splitSentenceList[i]);
         print("urls list for ${splitSentenceList[i]} is $urlsList}");
         for (var url in urlsList){
+          indexToUrl[j++] = url;
           urls.add(url);
         }
       }
     }
+    // Future.wait(refs.map((ref) {
+    //   ref.getDownloadURL();
+    // }).toList());
     this.urls = urls;
     this.doneLoading = true;
     return urls;
@@ -221,15 +247,16 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   @override
   void initState() {
-    this._videoFetcher = VideoFetcher(sentence: widget.sentence);
     super.initState();
+    this._videoFetcher = VideoFetcher(sentence: widget.sentence);
+    // this._videoFetcher.getUrls();
     toBeNamed();
   }
 
   void toBeNamed() async {
     await this._videoFetcher.getUrls();
-    print(_videoFetcher.urls);
-    if (_videoFetcher.urls.length > 0) {
+    print("indexToUrl is ${_videoFetcher.indexToUrl}");
+    if (_videoFetcher.indexToUrl.isNotEmpty) {
       _initController(0).then((_) {
         setState(() {
           this.aspectRatio = _controller(0).value.aspectRatio;
@@ -238,12 +265,13 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         });
 
         _playController(0);
-      });
+      })..onError((error, stackTrace) {print("error on loading at 0 $error");});
+      if (_videoFetcher.indexToUrl.keys.length > 1) {
+        _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
+      }
     }
 
-    if (_videoFetcher.urls.length > 1) {
-      _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
-    }
+
   }
 
 
@@ -277,22 +305,24 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   }
 
   VideoPlayerController _controller(int index) {
-    print("index == $index");
-    if (this._videoFetcher.urls.length > index){
-      return _controllers[this._videoFetcher.urls[index] + index.toString()];
+    print("index == $index, ${this._videoFetcher.indexToUrl} ${this._videoFetcher.indexToUrl[index]}");
+    // if (this._videoFetcher.urls.length > index){
+    if(this._videoFetcher.indexToUrl.containsKey(index)){
+      return _controllers[this._videoFetcher.indexToUrl[index] + index.toString()];
     }
     return null;
   }
 
   Future<void> _initController(int index) async {
     var myUrls = this._videoFetcher.urls;
+    var urlss = this._videoFetcher.indexToUrl;
     print("init $index");
-    isInit[myUrls[index] + index.toString()] = false;
+    isInit[urlss[index] + index.toString()] = false;
     VideoPlayerOptions options = VideoPlayerOptions(mixWithOthers: true);
-    var controller = VideoPlayerController.network(myUrls[index]);
-    _controllers[myUrls[index] + index.toString()] = controller;
+    var controller = VideoPlayerController.network(urlss[index]);
+    _controllers[urlss[index] + index.toString()] = controller;
     await controller.initialize();
-    isInit[myUrls[index] + index.toString()] = true;
+    isInit[urlss[index] + index.toString()] = true;
     print("finished $index init");
   }
 
@@ -385,8 +415,20 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     if (widget.sentence == null) {
       return Container();
     }
+
     print("isready = ${this._isReady}, loading? ${this._videoFetcher.doneLoading}");
-    return !this._isReady && !this._videoFetcher.doneLoading ? Loading() : Scaffold(
+    print("is Loaded $index?? ${this._videoFetcher.indexToUrl.containsKey(index)}");
+    // if (!this._videoFetcher.indexToUrl.containsKey(index)){
+    //   return Loading();
+    // } else{
+    //   setState(() {
+    //     print("setting stateush");
+    //   });
+    // }
+    if (this._videoFetcher.doneLoading){
+      print("hazzah 123");
+    }
+    return !this._videoFetcher.doneLoading ? Loading() : Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -410,7 +452,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                               Radius.circular(7.0),
                             )
                         ),
-                        child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
+                        child: VideoPlayer(_controller(index))),
+                        // child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
                     ),
 
                   ),

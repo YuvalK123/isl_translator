@@ -18,7 +18,7 @@ class MainDrawer extends StatelessWidget {
 
   final pageButton currPage;
   final AuthService _auth = AuthService();
-  final ProfileImage _profileImage = ProfileImage();
+  final ProfileImage _profileImage = ProfileImage(false);
   MainDrawer({this.currPage = pageButton.TRANSLATION}){
     // this.img = null;
     // this.imageUrl = null;
@@ -138,7 +138,7 @@ class MainDrawer extends StatelessWidget {
   }
   
   void pushPage(BuildContext context, Widget page){
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => page,
         )
