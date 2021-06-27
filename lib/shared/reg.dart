@@ -24,7 +24,6 @@ Future<String> getNonPrepositional(String word) async{
 
 
 String nonAsciiChar = "[^\x00-\x7F]";
-// String reg = "הת$nonAsciiChar$nonAsciiChar$nonAsciiChar";
 
 Map<String, String> hebrewChars = {
   "א" : "U+05D0",
@@ -71,7 +70,7 @@ Future<String> getUrl(String word) async{
 }
 
 Future<String> checkIfVerb(String word) async{
-  List<String> initiatives = wordToInitiatives(word);
+  List<String> initiatives = wordToInitiatives(word, patterns);
   print("inits are $initiatives");
   if (initiatives == null){
     return null;
@@ -85,6 +84,23 @@ Future<String> checkIfVerb(String word) async{
     }
     print("no url for $initi");
   }
+  // 2 letters
+
+  initiatives = wordToInitiatives(word,patterns2Letters);
+  print("inits are $initiatives");
+  if (initiatives == null){
+    return null;
+  }
+  // search for url
+  for (var initi in initiatives){
+    var url = await getUrl(initi);
+    if (url != null){
+      print("found url for $initi : $url");
+      return url;
+    }
+    print("no url for $initi");
+  }
+
   // no url for this verb
   return null;
 }
@@ -96,7 +112,7 @@ String handleRootH(String root){
   return root;
 }
 
-List<String> wordToInitiatives(String word){
+List<String> wordToInitiatives(String word, List<String> patterns){
   List<String> wordInitiative = [];
   // verbs.forEach((verb) {
   //   print("now at verb $verb");
@@ -112,7 +128,7 @@ List<String> wordToInitiatives(String word){
   //     return handleVerbMatch(wordData.b, wordData.a, word); // is a verb
   //   }
   // });
-  var wordData = getVerbPattern(word); // here we check if in verb pattern
+  var wordData = getVerbPattern(word, patterns); // here we check if in verb pattern
   print("word data = $wordData");
   if (wordData != null){
     print("wordData not null!!");
@@ -122,7 +138,9 @@ List<String> wordToInitiatives(String word){
   return null;
 }
 
-Pair<String, int> getVerbPattern(String word){
+
+
+Pair<String, int> getVerbPattern(String word, List<String> patterns){
   // return pair of pattern/ pattern index
   // print("patterns length is ${patterns.length}");
   // print("patterns = $patterns");
@@ -154,9 +172,12 @@ Pair<String, int> getVerbPattern(String word){
   return null;
 }
 
+
+
 List<String> handleVerbMatch(int index, String pattern, String word){
   print("search root...");
   String root = getRoot(index, pattern, word);
+  print("root be4 process is $root");
   root = handleRootH(root);
   print("root after process is $root");
   List<String> wordInitiatives = [];
@@ -266,6 +287,24 @@ List<String> patterns = [
   "...{1,2}תם", // אהבתם
   "מ...{1,2}", // מפעל
   "...{1,2}", // אהב
+];
+
+// רץ
+// קם
+
+List<String> patterns2Letters = [
+  "..תי", // רצתי
+  "נ.ו.", //נרוץ
+  "י.ו.", //ירוץ
+  "ת.ו.", //תרוץ
+  // "..ו.{1,2}", //אהוב
+  "..נו", //רצנו
+  "..ת", // רצת
+  "..ו", // רצו
+  "..תן", // רצתן
+  "..תם", // רצתם
+  // "מ...{1,2}", // מפעל
+  "..", // רץ
 ];
 
 Map<int, String> indexToInfti = {

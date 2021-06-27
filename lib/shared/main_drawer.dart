@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
 import 'package:isl_translator/models/profile_image.dart';
@@ -18,7 +19,7 @@ class MainDrawer extends StatelessWidget {
 
   final pageButton currPage;
   final AuthService _auth = AuthService();
-  final ProfileImage _profileImage = ProfileImage(false);
+  final ProfileImage _profileImage = ProfileImage(uid: FirebaseAuth.instance.currentUser.uid);
   MainDrawer({this.currPage = pageButton.TRANSLATION}){
     // this.img = null;
     // this.imageUrl = null;
@@ -74,7 +75,8 @@ class MainDrawer extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                              image: NetworkImage(imgUrl),
+                            image: this._profileImage.img,
+                              // image: NetworkImage(imgUrl),
                               fit: BoxFit.fitHeight
                           ),
                         ),

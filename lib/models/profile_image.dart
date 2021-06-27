@@ -9,44 +9,44 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 class ProfileImage{
   String imageUrl;
-  Image _img;
-  bool isLocal = false;
-  bool loaded = false;
+  ImageProvider _img;
+  // bool loaded = false;
   File _imageFile;
-  NetworkImage _networkImage;
-  FileImage _fileImage;
+  // NetworkImage _networkImage;
+  // FileImage _fileImage;
   String _uploadedFileURL;
   String uid;
 
 
-  bool get hasImg {
-    return _fileImage != null || _networkImage != null;
-}
+//   bool get hasImg {
+//     return _fileImage != null || _networkImage != null;
+// }
 
   ImageProvider get img{
-    return this.isLocal ? _fileImage : _networkImage;
+    return _img != null ? _img : AssetImage("assets/user.png");
   }
 
-  ProfileImage(bool isLocal){
-    this.isLocal = isLocal;
-    _setImageUrl();
+  ProfileImage({this.uid}){
+    setImage();
   }
 
-  void _setImageUrl() async{
-
-    await setImage();
-  }
+  // void _setImageUrl() async{
+  //
+  //   await setImage();
+  // }
 
   Future<void> setImage() async{
     // if (imageUrl == null){
     //   return;
     // }
-    if (this.isLocal){
-      this._fileImage = FileImage(_imageFile);
-    }else{
-      this.imageUrl = await getImageUrl();
-      this._networkImage = NetworkImage(this.imageUrl);
-    }
+    // if (this.isLocal){
+    //   this._fileImage = FileImage(_imageFile);
+    // }else{
+    //   this.imageUrl = await getImageUrl();
+    //   this._networkImage = NetworkImage(this.imageUrl);
+    // }
+    this.imageUrl = await getImageUrl();
+    this._img = NetworkImage(this.imageUrl);
 
   }
 
@@ -104,8 +104,7 @@ class ProfileImage{
   Future uploadFile2(File file) async {
     FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
     FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
-    var storageRef = storage.ref().child('users_profile_pic/$id}');
+    var storageRef = storage.ref().child('users_profile_pic/${this.uid}}');
     print("file image: " + file.toString());
     UploadTask uploadTask = storageRef.putFile(file);
     await uploadTask.whenComplete(() => print('File Uploaded'));
@@ -117,10 +116,9 @@ class ProfileImage{
 
   Future uploadFile() async {
     FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
     var storageReference = FirebaseStorage.instance
         .ref()
-        .child('users_profile_pic/${Path.basename(id)}');
+        .child('users_profile_pic/${Path.basename(this.uid)}');
     UploadTask uploadTask = storageReference.putFile(_imageFile);
     await uploadTask.whenComplete(() => print('File Uploaded'));
     print('File Uploaded');
