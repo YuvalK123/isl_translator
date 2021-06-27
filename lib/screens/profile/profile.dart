@@ -1,27 +1,18 @@
-import 'package:firebase_core/firebase_core.dart';
+import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:isl_translator/models/profile_image.dart';
+import '../../models/profile_image.dart';
 import '../../shared/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:isl_translator/models/user.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:isl_translator/services/profilePic/home_screen.dart';
-import 'package:isl_translator/services/profilePic/try.dart';
-import 'dart:io';
-import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:path/path.dart' as Path;
 
-// enum SingingCharacter { female, male, other }
 
 class ProfilePage extends StatefulWidget {
   @override

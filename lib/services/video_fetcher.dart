@@ -277,17 +277,19 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   Future<void> loadUser() async{
     final auth = FirebaseAuth.instance;
     String uid = auth.currentUser.uid;
-    await for (var value in DatabaseUserService(uid: uid).users){
-      setState(() {
-        this.currUserModel = value;
-        print("videp type == > " + value.videoType.toString());
-        if(value.videoType == VideoType.LIVE)
-        {
-          vidType= true;
-          this.dirName = "live_videos/";
-        }
-      });
-      break;
+    if (!auth.currentUser.isAnonymous){
+      await for (var value in DatabaseUserService(uid: uid).users){
+        setState(() {
+          this.currUserModel = value;
+          print("videp type == > " + value.videoType.toString());
+          if(value.videoType == VideoType.LIVE)
+          {
+            vidType= true;
+            this.dirName = "live_videos/";
+          }
+        });
+        break;
+      }
     }
   }
 

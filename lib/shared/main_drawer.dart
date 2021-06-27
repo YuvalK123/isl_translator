@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
-import 'package:isl_translator/models/profile_image.dart';
+import '../models/profile_image.dart';
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/screens/dictonary/dict.dart';

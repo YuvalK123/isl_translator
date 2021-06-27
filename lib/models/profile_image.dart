@@ -23,7 +23,7 @@ class ProfileImage{
 // }
 
   ImageProvider get img{
-    return _img != null ? _img : AssetImage("assets/user.png");
+    return this._img != null ? _img : AssetImage("assets/user.png");
   }
 
   ProfileImage({this.uid}){
@@ -68,7 +68,7 @@ class ProfileImage{
 
     }
 
-    if(isImageExist == false)
+    if(!isImageExist)
     {
       storageReference = FirebaseStorage.instance.ref("assets").child('user.png');
       try {
@@ -102,7 +102,9 @@ class ProfileImage{
   }
 
   Future uploadFile2(File file) async {
-    FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
+    FirebaseStorage storage = FirebaseStorage.instanceFor(
+        bucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files"
+    );
     FirebaseAuth auth = FirebaseAuth.instance;
     var storageRef = storage.ref().child('users_profile_pic/${this.uid}}');
     print("file image: " + file.toString());
