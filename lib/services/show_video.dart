@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:isl_translator/shared/reg.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
@@ -48,15 +49,23 @@ List<String> splitSentence(String sentence) {
   if (sentence == null){
     return null;
   }
+  List<String> hebrewLetters = hebrewChars.keys.toList();
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
-  newSentence = newSentence.replaceAll("?", "");
-  newSentence = newSentence.replaceAll(",", "");
-  newSentence = newSentence.replaceAll("-", "");
-  newSentence = newSentence.replaceAll("/", "");
-  newSentence = newSentence.replaceAll("\\", "");
-  newSentence = newSentence.replaceAll(".", "");
-  newSentence = newSentence.replaceAll("*", "");
+  print("^[${hebrewLetters.toString()}]'");
+  var vals = hebrewLetters.toString().substring(1,hebrewLetters.toString().length - 1).replaceAll(",", "");
+  newSentence = newSentence.replaceAll(RegExp('[^$vals]'), "");
+  print("fixed sentence is $newSentence");
+  if (newSentence.isEmpty){
+    return null;
+  }
+  // newSentence = newSentence.replaceAll("?", "");
+  // newSentence = newSentence.replaceAll(",", "");
+  // newSentence = newSentence.replaceAll("-", "");
+  // newSentence = newSentence.replaceAll("/", "");
+  // newSentence = newSentence.replaceAll("\\", "");
+  // newSentence = newSentence.replaceAll(".", "");
+  // newSentence = newSentence.replaceAll("*", "");
   List<String> sentenceList = newSentence.split(" "); //split the sentence to words
 
   // List<String> saveTerms = [

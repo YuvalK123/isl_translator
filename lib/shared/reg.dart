@@ -3,9 +3,51 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/services/show_video.dart';
 
 
+List<String> infinitivess = [
+  "להדיח", "לסלק", "להדיח כלים", "להעתיק",  "לסתום", "לצבוע",
+  "לפתוח דלת", "לרתוח", "לדעת", "להיכשל בבחינה", "לפתוח", "להטיל ספק",
+  "לפתוח חלון", "לעקור שן", "לפרוץ בבכי", "לעקור", "לרכוב",
+  "לרכוב על אופניים", "לרכוב על סוס", "לפתוח תיק", "למעוך אוכל", "למעוך",
+  "לעקור צמח", "לרחוץ בעל חיים", "לרחוץ", "לנקד", "לסרב", "לצחצח נעליים",
+  "לצחצח שיניים", "לנעוץ", "להבריק", "לצחצח", "לקצר", "להתרחץ", "להסתפר",
+  "להתאבד", "לעלות", "לעלות במדרגות", "לקטוף פרי", "לקטוף",
+  "לגדוע", "לעלות במדרגות נעות", "לכרות", "לנפח", "לקטוע", "לנפח גלגל",
+  "לעלות במעלית", "לאהוב", "לאהוב משהו", "לבקר", "לימוד", "להדליק טלוויזיה",
+  "להדליק מדורה", "להדליק אור", "להדליק", "להדליק גפרור", "להתחנן",
+  "לתפוס בשעת מעשה", "לברור", "לישון", "לכבות מדורה", "להשתיק", "להתנחל",
+  "לכבות שריפה", "להשתמש", "לכבות גפרור", "לדחות", "לכבות", "לטייל",
+  "להסתובב", "לכבות את האור", "לטעון", "לחם", "ליל הסדר", "לפחד", "לפת",
+  "למשוך", "לחסום", "לקרוא", "לרוץ", "לקום", "לנתק", "לי", "להבטיח", "לשיר",
+  "לעשות", "לצחוק", "לטוס", "לקלף", "לשבוע", "להיפרד", "להיפרד לשלום",
+  "לבגוד", "להחליף", "לבגוד במדינה", "לטפל", "לסדר", "לארגן", "להחליט",
+  "לנום", "להיכנס", "להתחיל", "לדרוך", "להשקיט", "לרמוס", "לנוח", "להגר",
+  "למיין", "לעזוב את הארץ", "לתפוס על חם", "לבזבז", "לחשוב", "לתפוס",
+  "לקלוט", "לגלח", "לעטוף", "לרקוד", "לגהץ", "לטרוף", "לנבוח", "לשלם",
+  "לתמוך", "להתאכזב", "לחייך", "להאמין", "להזיע", "לבכות", "ליפול", "לבוא",
+  "להמציא", "להצטבר", "לפטפט", "לשדרג", "להשפיע", "להיכשל", "לעודד",
+  "להכין", "להשקיף", "לראות", "לפייס", "להזמין", "להצטרף", "להרביץ",
+  "לנצל", "לשמוע", "לך", "לברוא", "לסבול", "לרכז", "להצליח", "לקשט",
+  "לפסול",  "לשכנע", "לשים לב", "לברך", "להתפלל",
+  "לידה", "לולב", "להמיר",  "ללמוד",  "לשתות", "לנגוס", "ללגום",
+  "למזוג",  "לאחל", "ללמד",
+  "לתקוע בשופר", "לדבר", "לסרוג", "לצלול", "לקחת", "לשכוח", "לחתור", "לבקש", "להיזהר",
+  "לשאול", "לקנות", "להילחם", "להסתכל סביב", "להתפטר", "לנאום", "לקפל", "לפטר", "לבדוק", "לשטוף", "להיכנע",
+  "להמריא", "לתת", "להשתעל", "לנמנם", "לנחם", "לסמוך", "לחשוד", "לברוח", "להפריד", "לטפס", "לנו",
+  "להתעורר", "לרחם", "לחפש", "להפריע", "ללוות", "לצפות", "ללוש", "לבטל", "לגרש", "לדקור", "לזרוק", "להתרגש",
+  "לשנוא", "להתנגד", "לטבול", "לזרוע", "לחנוק", "לרשום", "להפסיד", "להחזיר", "להטעין", "לזלזל", "למרוח",
+  "לכעוס", "לאסוף", "להשתדל", "להתפלא", "להעביר", "לנגוע", "למצוא", "לערבב", "להתקרב", "להוציא", "למהר", "להפוך",
+  "לעזוב", "לסגור", "לגעור", "להכניס", "להתלונן", "לשלוח", "לנדוד", "לצוות", "להתרכז", "לזעום", "להסכים", "להגיע",
+  "לשבת", "ללטף", "לשכב", "להתחרט", "לחגוג", "להגיד", "לאכול", "לבלוע", "להירדם", "לדרוש", "לשאוב", "לדרוס",
+  "לעבוד", "לנגב",  "להצטער", "להתקשר", "לירות", "לחתוך", "ללעוג", "לשחק", "להודיע", "להיבהל", "לא יודע",
+  "למכור", "לקבל", "ללבוש", "לצייר", "להחליק", "לצעוק", "להקים", "להתבייש", "לשמור", "להרוג", "להשתתף", "לעזור",
+  "לנסות", "לחטוף", "להתחשב",
+  "להיעלב", "לחלות", "לפגוש", "להריח", "לחזור", "לשים", "לא יכול", "לבחור", "להוסיף", "לגזור", "לעמוד", "לנחות",
+  "לעצור", "להקשיב", "להתחייב", "להתלבט", "לכם", "לעקוץ", "לכתוב", "לזכור", "לנסוע", "לרצות", "לא מבין", "לא מכיר", "להחזיק",
+  "להכיר", "לרדוף", "לפזר", "לקפוץ", "לנחש", "להרגיש", "להיפגע", "לחבב", "להבין", "להביא", "לאפות", "לקבוע", "להתעמל"
+];
 
-
-List<String> prepositionalLetters = ["ב","כ","מ","ל", "ו", "ה"];
+List<String> prepositionalLetters = ["ב","כ","מ","ל", "ו", "ה", "ש"];
+List<String> prepositionalsWords = ["של","כ","מ","ל", "ו", "ה", "ש"];
 
 List<String> endingRelative = ["","","","","",""];
 
@@ -70,13 +112,7 @@ Future<String> getUrl(String word,String dirName) async{
   }
 }
 
-Future<String> checkIfVerb(String word, String dirName) async{
-  List<String> initiatives = wordToInitiatives(word, patterns);
-  print("inits are $initiatives");
-  if (initiatives == null){
-    return null;
-  }
-  // search for url
+Future<String> checkForUrl(List<String> initiatives, String dirName) async{
   for (var initi in initiatives){
     var url = await getUrl(initi, dirName);
     if (url != null){
@@ -85,22 +121,46 @@ Future<String> checkIfVerb(String word, String dirName) async{
     }
     print("no url for $initi");
   }
+  return null;
+}
+
+Future<String> checkIfVerb(String word, String dirName) async{
+  checkGenderCase(word, dirName);
+  List<String> initiatives = wordToInitiatives(word, patterns, infinitives);
+  print("1 inits are $initiatives");
+  if (initiatives != null){
+    String url = await checkForUrl(initiatives, dirName);
+    if (url != null){
+      return url;
+    }
+  }
+
+  // search for url
+
   // 2 letters
 
-  initiatives = wordToInitiatives(word, patterns2Letters);
-  print("inits are $initiatives");
-  if (initiatives == null){
-    return null;
-  }
-  // search for url
-  for (var initi in initiatives){
-    var url = await getUrl(initi, dirName);
+  initiatives = wordToInitiatives(word, patterns2Letters, infinitives2);
+  print("2 inits are $initiatives");
+  if (initiatives != null){
+    String url = await checkForUrl(initiatives, dirName);
     if (url != null){
-      print("found url for $initi : $url");
       return url;
     }
-    print("no url for $initi");
   }
+  String url = await checkGenderCase(word, dirName);
+  if (url != null){
+    return url;
+  }
+
+  // search for url
+  // for (var initi in initiatives){
+  //   var url = await getUrl(initi, dirName);
+  //   if (url != null){
+  //     print("found url for $initi : $url");
+  //     return url;
+  //   }
+  //   print("no url for $initi");
+  // }
 
   // no url for this verb
   return null;
@@ -113,7 +173,7 @@ String handleRootH(String root){
   return root;
 }
 
-List<String> wordToInitiatives(String word, List<String> patterns){
+List<String> wordToInitiatives(String word, List<String> patterns, List<String> infinitives){
   List<String> wordInitiative = [];
   // verbs.forEach((verb) {
   //   print("now at verb $verb");
@@ -129,7 +189,7 @@ List<String> wordToInitiatives(String word, List<String> patterns){
   print("word data = $wordData");
   if (wordData != null){
     print("wordData not null!!");
-    var handleMatch = handleVerbMatch(wordData.b, wordData.a, word); // is a verb
+    var handleMatch = handleVerbMatch(wordData.b, wordData.a, word, infinitives); // is a verb
     return handleMatch;
     }
   return null;
@@ -170,8 +230,7 @@ Pair<String, int> getVerbPattern(String word, List<String> patterns){
 }
 
 
-
-List<String> handleVerbMatch(int index, String pattern, String word){
+List<String> handleVerbMatch(int index, String pattern, String word, List<String> infinitives){
   print("search root...");
   String root = getRoot(index, pattern, word);
   print("root be4 process is $root");
@@ -283,6 +342,10 @@ List<String> patterns = [
   "...{1,2}תן", // אהבתן
   "...{1,2}תם", // אהבתם
   "מ...{1,2}", // מפעל
+  "נ...{1,2}", // נפעל
+  "נ..ו.{1,2}", // נתפוס
+  "י..ו.{1,2}", // יתפוס
+  "א..ו.{1,2}", // אתפוס
   "...{1,2}", // אהב
 ];
 
@@ -368,16 +431,7 @@ List<String> pluralVerbs = [
   "", // תפעלו
 ];
 
-// to be continued
 
-void checkGenderCase(String word){
-  // checks if its male/female word - גרפיקאי->גרפיקאית
-
-}
-
-void checkPluralCase(String word){
-  // checks if plural/singular case - גרוש->גרושים
-}
 
 
 // List<String> patterns = [
@@ -456,65 +510,55 @@ List<String> infinitives = [ // שם פועל
   "להת...+", // להתפעל
 ];
 
-// List<String> infinitives = [ // שם פועל
-//   "${hebrewChars["ל"]}..${hebrewChars["ו"]}.+", // לפעול
-//   "${hebrewChars["ל"]}${hebrewChars["ה"]}...+", // להעלם
-//   "${hebrewChars["ל"]}...+", // לחשוב/לחשב
-//   "${hebrewChars["ל"]}..${hebrewChars["ו"]}.+", // לחשוב/לחשב
-//   "${hebrewChars["ל"]}${hebrewChars["ה"]}..${hebrewChars["י"]}.+", // להפעיל
-//   "${hebrewChars["ל"]}${hebrewChars["ה"]}${hebrewChars["ת"]}...+}", // להתפעל
-// ];
-
-Map<String, int> verbs1 = {
-  "ברר": 6,
-  "אהב": 0,
-  "בגד": 0 ,
-  "בדק": 0 ,
-  "בא": 0,
-  // "בלע": ,
-  // "ברח": [],
-  // "אסף": [],
-  // "בקר": [],
-  // "אכל": [],
-  // "גהץ": [],
-  // "אחל": [],
-  // "אפה": [],
-  // "בטל": [],
-  // "בקש": [],
-  // "ארגן": [],
-  // "זרק": ["לזרוק"],
-  // "שכנע": ["לשכנע"],
-  // "שמע": ["לשמוע"],
+List<String> infinitives2 = [ // שם פועל
+  "ל.ו.", // לפעול
+  "לה.י.", // להפעיל
+  "ל..", // לחשוב/לחשב
+];
 
 
 
-};
+// to be continued
 
-Map<String, List<String>> verbs2 = {
-  "ברר": ["לברור"],
-  "אהב":[] ,
-  "בגד": [] ,
-  "בדק": [] ,
-  "בא": [],
-  "בלע": [],
-  "ברח": [],
-  "אסף": [],
-  "בקר": [],
-  "אכל": [],
-  "גהץ": [],
-  "אחל": [],
-  "אפה": [],
-  "בטל": [],
-  "בקש": [],
-  "ארגן": [],
-  "זרק": ["לזרוק"],
-  "שכנע": ["לשכנע"],
-  "שמע": ["לשמוע"],
+// if plural male/female
 
+// if single and if male - convert to female + plurals
+// if single and if female - convert to male + plurals
 
+Future<String> findUrlForList(List<String> list, String dirName) async{
+  for (var word in list){
+    var url = await getUrl(word, dirName);
+    if (url != null){
+      print("findUrlList found url for $word: $url");
+      return url;
+    }
+  }
+  return null;
+}
 
-};
+Future<String> checkGenderCase(String word, String dirName) async{
+  // checks if its male/female word - גרפיקאי->גרפיקאית
+  List<String> singularVersions = [];
+  if (word.endsWith("ים") || word.endsWith("ות")){ // גרושים/גרושות, פועלים/פועלות
+    String singular = word.substring(0,word.length-2);
+    singularVersions = [singular, singular + "ה", singular + "ית", singular + "ת", singular + "י"];
+    print("singular (1) == $singularVersions");
+  }
+  else if (word.endsWith("ה") ||  word.endsWith("ת")){
+    String singular = word.substring(0,word.length-1);
+    singularVersions = [singular, singular + "ות", singular + "ים", singular + "ו"];
+    print("singular (2) == $singularVersions");
+  } else if(word.endsWith("י")){
+    String singular = word;
+    singularVersions = [singular + "ות", singular + "ם", singular + "ת"];
+    print("singular (3) == $singularVersions");
+  }
+  if (singularVersions.isNotEmpty){
+    var url = findUrlForList(singularVersions, dirName);
+    if (url != null){
+      return url;
+    }
+  }
+  return null;
+}
 
-
-
-RegExp regExp = RegExp("source");
