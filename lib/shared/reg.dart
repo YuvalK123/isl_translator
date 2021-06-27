@@ -505,7 +505,7 @@ Future<String> checkGenderCase(String word, String dirName) async{
   }
   else if (word.endsWith("ה") ||  word.endsWith("ת")){
     String singular = word.substring(0,word.length-1);
-    singularVersions = [singular, singular + "ות", singular + "ים"];
+    singularVersions = [singular, singular + "ות", singular + "ים", singular + "ו"];
     print("singular (2) == $singularVersions");
   } else if(word.endsWith("י")){
     String singular = word;
