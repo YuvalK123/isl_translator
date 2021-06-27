@@ -70,7 +70,7 @@ class ProfileImage{
 
     if(isImageExist == false)
     {
-      storageReference = FirebaseStorage.instance.ref().child('users_profile_pic/user.png');
+      storageReference = FirebaseStorage.instance.ref("assets").child('user.png');
       try {
         // gets the video's url
         imageUrl = await storageReference.getDownloadURL();

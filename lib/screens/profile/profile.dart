@@ -46,6 +46,7 @@ class MapScreenState extends State<ProfilePage>
   final newPassController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   String passErr = "";
+  ProfileImage _profileImage = ProfileImage(uid: FirebaseAuth.instance.currentUser.uid);
 
   // for select pic
   File _image;
@@ -59,7 +60,7 @@ class MapScreenState extends State<ProfilePage>
     // TODO: implement initState
     super.initState();
     loadUser();
-    initImgUrl();
+    // initImgUrl();
 
   }
 
@@ -155,7 +156,7 @@ class MapScreenState extends State<ProfilePage>
                                         decoration: new BoxDecoration(
                                           shape: BoxShape.circle,
                                           image: new DecorationImage(
-                                              image: imageFile != null ? FileImage(imageFile) : NetworkImage(imageUrl),
+                                              image: _profileImage.img,
                                               fit: BoxFit.fitHeight
                                             //fit: BoxFit.cover,
                                           ),
@@ -172,44 +173,12 @@ class MapScreenState extends State<ProfilePage>
                                           radius: 25.0,
                                           child: new IconButton(
                                             icon: new Icon(Icons.camera_alt,),
-                                            onPressed: () {
+                                            onPressed: () async{
                                               print("pressed icon");
-                                              chooseFile();
-                                              // imagePicker.showDialog(context),
-                                              // child: new Center(
-                                              // child: _image == null
-                                              // ? new Stack(
-                                              // children: <Widget>[
-                                              //
-                                              // new Center(
-                                              // child: new CircleAvatar(
-                                              // radius: 80.0,
-                                              // backgroundColor: const Color(0xFF778899),
-                                              // ),
-                                              // ),
-                                              // new Center(
-                                              // child: new Image.asset("assets/photo_camera.png"),
-                                              // ),
-                                              //
-                                              // ],
-                                              // )
-                                              //     : new Container(
-                                              // height: 160.0,
-                                              // width: 160.0,
-                                              // decoration: new BoxDecoration(
-                                              // color: const Color(0xff7c94b6),
-                                              // image: new DecorationImage(
-                                              // image: new ExactAssetImage(_image.path),
-                                              // fit: BoxFit.cover,
-                                              // ),
-                                              // border:
-                                              // Border.all(color: Colors.red, width: 5.0),
-                                              // borderRadius:
-                                              // new BorderRadius.all(const Radius.circular(80.0)),
-                                              // ),
-                                              // ),
-                                              // ),
+                                              await _profileImage.chooseFile();
+                                              setState(() {
 
+                                              });
                                             },
                                           )
                                           // child: new Icon(
