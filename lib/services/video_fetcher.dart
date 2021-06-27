@@ -107,7 +107,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
 
   Future<List<String>> proccessWord(String word, String dirName) async{
-    var nonPre = await getNonPrepositional(word);
+    String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
+    var nonPre = await getNonPrepositional(word, dirName);
     List<String> urls = [];
     if (nonPre != null){
       urls.add(nonPre);
@@ -115,7 +116,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     }
     print("check for verb...");
     final stopWatch = Stopwatch()..start();
-    var verb = await checkIfVerb(word);
+    var verb = await checkIfVerb(word,dirName);
     print("elapsed: ${stopWatch.elapsed} is verb??? $verb");
     if (verb != null){
       urls.add(verb);
@@ -126,10 +127,11 @@ class VideoFetcher { // extends State<VideoFetcher> {
     List<String> lettersUrls = [];
     for(int j=0; j < letters.length; j++){
       Reference ref = FirebaseStorage.instance
-          .ref("$dirName").child("${letters[j]}.mp4");
+          .ref("$dirName").child("${letters[j]}.$exec");
       // .child("animation_openpose/" + letters[j] + ".mp4");
       print ("ref = $ref");
       var url = await ref.getDownloadURL();
+
       print("got url at $url. adding to $urls");
       urls.add(url);
       print("letter added ==> " + letters[j]);
@@ -147,6 +149,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
   static Future<String> getUrl(String word,String dirName) async{
     String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
+    print("Exec == > " + exec);
     Reference ref = FirebaseStorage.instance
         .ref()
         .child("$dirName" + word + "$exec");
@@ -246,7 +249,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         if(value.videoType == VideoType.LIVE)
         {
           vidType= true;
-          this.dirName = "sign_language_videos/";
+          this.dirName = "live_videos/";
         }
       });
       break;
@@ -374,7 +377,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       _stopController(index);
       //_nextVideo();
       // await _controller(index)?.pause();
-      return;
+      //return;
     }
     if(index == this._videoFetcher.urls.length - 1) {
       return;

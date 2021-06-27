@@ -14,11 +14,11 @@ Map<String, String> endings = {
 
 };
 
-Future<String> getNonPrepositional(String word) async{
+Future<String> getNonPrepositional(String word, String dirName) async{
   if (!prepositionalLetters.contains(word[0])){
     return null;
   }
-  return await getUrl(word.substring(1));
+  return await getUrl(word.substring(1), dirName);
 }
 
 
@@ -55,10 +55,12 @@ Map<String, String> hebrewChars = {
   "ת" : "U+05EA",
 };
 
-Future<String> getUrl(String word) async{
+Future<String> getUrl(String word, String dirName) async{
+  String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
+  print("Exec == > " + dirName);
   Reference ref = FirebaseStorage.instance
       .ref()
-      .child("animation_openpose/" + word + ".mp4");
+      .child("$dirName" + word + "$exec");
   try {
     // gets the video's url
     var url = await ref.getDownloadURL();
@@ -69,7 +71,7 @@ Future<String> getUrl(String word) async{
   }
 }
 
-Future<String> checkIfVerb(String word) async{
+Future<String> checkIfVerb(String word, String dirName) async{
   List<String> initiatives = wordToInitiatives(word);
   print("inits are $initiatives");
   if (initiatives == null){
@@ -77,7 +79,7 @@ Future<String> checkIfVerb(String word) async{
   }
   // search for url
   for (var initi in initiatives){
-    var url = await getUrl(initi);
+    var url = await getUrl(initi,dirName);
     if (url != null){
       print("found url for $initi : $url");
       return url;
