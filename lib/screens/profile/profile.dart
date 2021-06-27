@@ -324,11 +324,13 @@ class MapScreenState extends State<ProfilePage>
                                     left: 0, right: 0, top: 4.0),
                                 child: Center(
                                   child: Row(
+                                    // crossAxisAlignment: CrossAxisAlignment.stretch,
                                     children: [
                                       Expanded(
                                         child:Align(
                                           alignment: Alignment.centerRight,
                                           child: RadioListTile(
+                                            dense: true,
                                             title: Text('נקבה',textDirection: TextDirection.rtl,),
                                             value: Gender.FEMALE,
                                             groupValue: _character,
@@ -347,6 +349,7 @@ class MapScreenState extends State<ProfilePage>
                                           alignment: Alignment.centerLeft,
                                           child:RadioListTile(
                                             title: Text('זכר',textDirection: TextDirection.rtl,),
+                                            dense: true,
                                             value: Gender.MALE,
                                             groupValue: _character,
                                             onChanged: (Gender value) {
@@ -365,6 +368,7 @@ class MapScreenState extends State<ProfilePage>
                                           child:RadioListTile(
                                             title: Text('אחר',textDirection: TextDirection.rtl,),
                                             value: Gender.OTHER,
+                                            dense: true,
                                             groupValue: _character,
                                             onChanged: (Gender value) {
                                               setState(() {
