@@ -113,6 +113,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
 
 
+  // List<String> specialChars = ["*","-","_","'","\"","\\","/","=","+",",",".","?","!"];
 
   Future<List<String>> proccessWord(String word) async{
     var nonPre = await getNonPrepositional(word);
@@ -133,6 +134,9 @@ class VideoFetcher { // extends State<VideoFetcher> {
     var letters = splitToLetters(word);
     List<String> lettersUrls = [];
     for(int j=0; j < letters.length; j++){
+      if (!hebrewChars.containsKey(letters[j])){
+        continue;
+      }
       Reference ref = FirebaseStorage.instance
           .ref("animation_openpose").child("${letters[j]}.mp4");
       // .child("animation_openpose/" + letters[j] + ".mp4");
