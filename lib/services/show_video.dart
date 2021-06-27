@@ -50,7 +50,15 @@ List<String> splitSentence(String sentence) {
   }
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
-  List sentenceList = newSentence.split(" "); //split the sentence to words
+  newSentence = newSentence.replaceAll("?", "");
+  newSentence = newSentence.replaceAll(",", "");
+  newSentence = newSentence.replaceAll("-", "");
+  newSentence = newSentence.replaceAll("/", "");
+  newSentence = newSentence.replaceAll("\\", "");
+  newSentence = newSentence.replaceAll(".", "");
+  newSentence = newSentence.replaceAll("*", "");
+  List<String> sentenceList = newSentence.split(" "); //split the sentence to words
+
   // List<String> saveTerms = [
   //   'יום הזיכרון',
   //   'ארבעת המינים',

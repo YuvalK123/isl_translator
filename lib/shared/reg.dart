@@ -107,7 +107,7 @@ Future<String> checkIfVerb(String word) async{
 
 String handleRootH(String root){
   if (root.endsWith("ה") || root.endsWith("י")){
-    return root.substring(0, root.length-2) + "ת";
+    return root.substring(0, root.length-1) + "ת";
   }
   return root;
 }
