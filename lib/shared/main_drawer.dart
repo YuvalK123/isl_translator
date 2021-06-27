@@ -18,10 +18,11 @@ enum pageButton{
 class MainDrawer extends StatelessWidget {
 
   final pageButton currPage;
-  final AuthService _auth = AuthService();
+  final AuthService auth = AuthService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final ProfileImage _profileImage = ProfileImage(uid: FirebaseAuth.instance.currentUser.uid);
   final userService = DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid);
-  String email = FirebaseAuth.instance.currentUser.email;
+  final String email = FirebaseAuth.instance.currentUser.email ?? "";
   MainDrawer({this.currPage = pageButton.TRANSLATION}){
     // this.img = null;
     // this.imageUrl = null;
@@ -46,12 +47,16 @@ class MainDrawer extends StatelessWidget {
                 color: Colors.cyan[900],
                 child: Center(
                   child:StreamBuilder<UserModel>(
-                    stream: userService.users,
+                    stream: userService?.users,
+                    initialData: null,
                     builder: (context, snapshot) {
-                      String username;
-                      if (snapshot.hasError || !snapshot.hasData){
+                      String username = "";
+                      print("snapshot is ${snapshot.data}");
+                      if (snapshot == null || snapshot.hasError ||
+                          !snapshot.hasData || this._auth.currentUser.isAnonymous){
+                        print("err/no data");
                         username = "Anon user";
-                      }else{
+                      } else{
                         UserModel userModel = snapshot.data;
                         print("mainDrawer userModel == $userModel");
                         username = userModel.username;
@@ -142,7 +147,7 @@ class MainDrawer extends StatelessWidget {
                   title: "התנתק/י",
                   onTap: () async {
                     // Navigator.of(context).pop();
-                    await _auth.signOut();
+                    await auth.signOut();
                   },
                   icon: Icon(Icons.logout),
                 isCurrPage: false,
