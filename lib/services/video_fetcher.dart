@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io' as io;
 
 import 'package:cached_video_player/cached_video_player.dart';
@@ -12,11 +13,12 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'package:mutex/mutex.dart';
+
+import 'add_feedback.dart';
+
 import 'package:isl_translator/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isl_translator/services/database.dart';
-
-import 'add_feedback.dart';
 
 // class VideoFetcher extends StatefulWidget {
 //   @override
@@ -29,11 +31,19 @@ class VideoFetcher { // extends State<VideoFetcher> {
   bool doneLoading = false;
   List<String> urls = [];
   final String sentence;
+  Map<int, String> indexToUrl = Map<int,String>();
+
+  bool get isFirstLoaded {
+    return indexToUrl.containsKey(0);
+  }
 
   VideoFetcher({this.sentence});
   // VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("0"), myUrls: [],);
 
 
+  void downloadThenDo(){
+
+  }
 
   static Future<List<String>> getDowloadLinks(List<Reference> refs) =>
       Future.wait(refs.map((ref) {
@@ -106,8 +116,11 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
 
-  Future<List<String>> proccessWord(String word, String dirName) async{
-    String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
+
+  // List<String> specialChars = ["*","-","_","'","\"","\\","/","=","+",",",".","?","!"];
+
+  Future<List<String>> proccessWord(String word,String dirName) async{
+    String exec = dirName == "animation_openpose/" ? "mp4" : "mkv";
     var nonPre = await getNonPrepositional(word, dirName);
     List<String> urls = [];
     if (nonPre != null){
@@ -116,7 +129,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     }
     print("check for verb...");
     final stopWatch = Stopwatch()..start();
-    var verb = await checkIfVerb(word,dirName);
+    var verb = await checkIfVerb(word, dirName);
     print("elapsed: ${stopWatch.elapsed} is verb??? $verb");
     if (verb != null){
       urls.add(verb);
@@ -126,16 +139,20 @@ class VideoFetcher { // extends State<VideoFetcher> {
     var letters = splitToLetters(word);
     List<String> lettersUrls = [];
     for(int j=0; j < letters.length; j++){
+      if (!hebrewChars.containsKey(letters[j])){
+        continue;
+      }
+      print("working on ${letters[j]}.$exec");
       Reference ref = FirebaseStorage.instance
           .ref("$dirName").child("${letters[j]}.$exec");
       // .child("animation_openpose/" + letters[j] + ".mp4");
       print ("ref = $ref");
       var url = await ref.getDownloadURL();
-
-      print("got url at $url. adding to $urls");
+      print("got url at $url for letter ${letters[j]}. adding to $urls");
       urls.add(url);
       print("letter added ==> " + letters[j]);
     }
+
     return urls;
     // print("letters urls are = $lettersUrls");
     // for(int l=0; l < lettersUrls.length; l++){
@@ -147,9 +164,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
 
-  static Future<String> getUrl(String word,String dirName) async{
+  static Future<String> getUrl(String word, String dirName) async{
     String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
-    print("Exec == > " + exec);
     Reference ref = FirebaseStorage.instance
         .ref()
         .child("$dirName" + word + "$exec");
@@ -164,18 +180,31 @@ class VideoFetcher { // extends State<VideoFetcher> {
     int i = 0, j = 0;
     for(i=0; i < splitSentenceList.length; i++)
     {
+      if (i > 2){
+        this.doneLoading = true;
+      }
+      print("yoyo ($i)");
       try {
         // gets the video's url
-        String url = await getUrl(splitSentenceList[i],dirName);
+        String url = await getUrl(splitSentenceList[i], dirName);
+        indexToUrl[j++] = url;
         urls.add(url);
-      } catch (err) {
-        var urlsList = await proccessWord(splitSentenceList[i],dirName);
+      } on io.SocketException catch (err) {
+        print(err);
+        print("no internet connection");
+        // CupertinoAlertDialog(title: "No internet Connection");
+      } catch (err){
+        var urlsList = await proccessWord(splitSentenceList[i], dirName);
         print("urls list for ${splitSentenceList[i]} is $urlsList}");
         for (var url in urlsList){
+          indexToUrl[j++] = url;
           urls.add(url);
         }
       }
     }
+    // Future.wait(refs.map((ref) {
+    //   ref.getDownloadURL();
+    // }).toList());
     this.urls = urls;
     this.doneLoading = true;
     return urls;
@@ -233,8 +262,9 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   @override
   void initState() {
-    this._videoFetcher = VideoFetcher(sentence: widget.sentence);
     super.initState();
+    this._videoFetcher = VideoFetcher(sentence: widget.sentence);
+    // this._videoFetcher.getUrls();
     toBeNamed();
   }
 
@@ -260,9 +290,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     await loadUser(); // load user for getting the dirName
     print("current dir name --> " + dirName);
     await this._videoFetcher.getUrls(dirName);
-    print(_videoFetcher.urls);
-
-    if (_videoFetcher.urls.length > 0) {
+    print("indexToUrl is ${_videoFetcher.indexToUrl}");
+    if (_videoFetcher.indexToUrl.isNotEmpty) {
       _initController(0).then((_) {
         setState(() {
           this.aspectRatio = _controller(0).value.aspectRatio;
@@ -271,12 +300,13 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         });
 
         _playController(0);
-      });
+      })..onError((error, stackTrace) {print("error on loading at 0 $error");});
+      if (_videoFetcher.indexToUrl.keys.length > 1) {
+        _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
+      }
     }
 
-    if (_videoFetcher.urls.length > 1) {
-      _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
-    }
+
   }
 
 
@@ -310,22 +340,24 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   }
 
   VideoPlayerController _controller(int index) {
-    print("index == $index");
-    if (this._videoFetcher.urls.length > index){
-      return _controllers[this._videoFetcher.urls[index] + index.toString()];
+    print("index == $index, ${this._videoFetcher.indexToUrl} ${this._videoFetcher.indexToUrl[index]}");
+    // if (this._videoFetcher.urls.length > index){
+    if(this._videoFetcher.indexToUrl.containsKey(index)){
+      return _controllers[this._videoFetcher.indexToUrl[index] + index.toString()];
     }
     return null;
   }
 
   Future<void> _initController(int index) async {
     var myUrls = this._videoFetcher.urls;
+    var urlss = this._videoFetcher.indexToUrl;
     print("init $index");
-    isInit[myUrls[index] + index.toString()] = false;
+    isInit[urlss[index] + index.toString()] = false;
     VideoPlayerOptions options = VideoPlayerOptions(mixWithOthers: true);
-    var controller = VideoPlayerController.network(myUrls[index]);
-    _controllers[myUrls[index] + index.toString()] = controller;
+    var controller = VideoPlayerController.network(urlss[index]);
+    _controllers[urlss[index] + index.toString()] = controller;
     await controller.initialize();
-    isInit[myUrls[index] + index.toString()] = true;
+    isInit[urlss[index] + index.toString()] = true;
     print("finished $index init");
   }
 
@@ -398,6 +430,10 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       flipLock(false);
     } else {
       _initController(index + 1).whenComplete(() => /*_lock = false*/flipLock(false));
+      // if(index < widget.myUrls.length - 3)
+      //   {
+      //     _initController(index + 2).whenComplete(() => _lock = false);
+      //   }
     }
   }
 
@@ -414,8 +450,20 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     if (widget.sentence == null) {
       return Container();
     }
+
     print("isready = ${this._isReady}, loading? ${this._videoFetcher.doneLoading}");
-    return !this._isReady && !this._videoFetcher.doneLoading ? Loading() : Scaffold(
+    print("is Loaded $index?? ${this._videoFetcher.indexToUrl.containsKey(index)}");
+    // if (!this._videoFetcher.indexToUrl.containsKey(index)){
+    //   return Loading();
+    // } else{
+    //   setState(() {
+    //     print("setting stateush");
+    //   });
+    // }
+    if (this._videoFetcher.doneLoading){
+      print("hazzah 123");
+    }
+    return !this._videoFetcher.doneLoading ? Loading() : Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: <Widget>[
@@ -439,7 +487,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                               Radius.circular(7.0),
                             )
                         ),
-                        child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
+                        child: VideoPlayer(_controller(index))),
+                      // child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
                     ),
 
                   ),
@@ -447,14 +496,14 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
               ),
             ),
             SingleChildScrollView(
-                child: Container(
-                  child: Center(
-                    child:
-                    FlatButton(onPressed: () => showFeedback(context, widget.sentence), // this will trigger the feedback modal
-                      child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
-                    ),
+              child: Container(
+                child: Center(
+                  child:
+                  FlatButton(onPressed: () => showFeedback(context, widget.sentence), // this will trigger the feedback modal
+                    child: Text('איך היה התרגום? לחצ/י כאן להוספת משוב', textDirection: TextDirection.rtl,),
                   ),
                 ),
+              ),
             ),
           ],
         ),
@@ -462,4 +511,3 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     );
   }
 }
-
