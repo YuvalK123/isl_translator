@@ -51,10 +51,13 @@ class MainDrawer extends StatelessWidget {
                       String username;
                       if (snapshot.hasError || !snapshot.hasData){
                         username = "Anon user";
+                      }else{
+                        UserModel userModel = snapshot.data;
+                        print("snapshot.data == " + snapshot.data.toString());
+                        print("mainDrawer userModel == $userModel");
+                        username = userModel.username;
                       }
-                      UserModel userModel = snapshot.data;
-                      print("mainDrawer userModel == $userModel");
-                      username = userModel.username;
+
                       return Row(
 
                         children: [
