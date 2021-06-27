@@ -31,6 +31,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
   bool doneLoading = false;
   List<String> urls = [];
   final String sentence;
+  bool isValidSentence = false;
   Map<int, String> indexToUrl = Map<int,String>();
 
   bool get isFirstLoaded {
@@ -173,8 +174,12 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
   Future<List> getUrls(String dirName) async {
-    if (this.sentence == null) return null;
     List<String> splitSentenceList = splitSentence(sentence); // split the sentence
+    if (splitSentenceList == null) {
+
+      return null;
+    }
+    this.isValidSentence = true;
     print("splitSentenceList $splitSentenceList");
     List<String> urls = [];
     int i = 0, j = 0;
@@ -447,7 +452,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   @override
   Widget build(BuildContext context) {
     print("sentence2 is ${widget.sentence}");
-    if (widget.sentence == null) {
+    if (widget.sentence == null || !this._videoFetcher.isValidSentence) {
       return Container();
     }
 
