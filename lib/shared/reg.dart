@@ -87,7 +87,7 @@ Future<String> checkIfVerb(String word, String dirName) async{
   }
   // 2 letters
 
-  initiatives = wordToInitiatives(word,patterns2Letters);
+  initiatives = wordToInitiatives(word, patterns2Letters);
   print("inits are $initiatives");
   if (initiatives == null){
     return null;
@@ -117,10 +117,6 @@ List<String> wordToInitiatives(String word, List<String> patterns){
   List<String> wordInitiative = [];
   // verbs.forEach((verb) {
   //   print("now at verb $verb");
-  //   if (verb[verb.length - 1] == "ה"){
-  //     // TODO: from h to y
-  //     // רצה -> רציתי
-  //   }
   //   if (verb[0] == "א"){
   //     // TODO: remove a if past tense
   //   }

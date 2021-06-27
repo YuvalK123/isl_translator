@@ -717,7 +717,10 @@ class MapScreenState extends State<ProfilePage>
     final auth = FirebaseAuth.instance;
     final user = auth.currentUser;
     print(user.email);
-    await user.updateEmail(newEmail).then((value) => null).catchError((error) => print(error));
+    await user.updateEmail(newEmail).then((value) {
+      print("changed mail... ");
+      user.sendEmailVerification();
+    }).catchError((error) => print(error));
   }
 
   /// Get from gallery

@@ -20,6 +20,8 @@ class MainDrawer extends StatelessWidget {
   final pageButton currPage;
   final AuthService _auth = AuthService();
   final ProfileImage _profileImage = ProfileImage(uid: FirebaseAuth.instance.currentUser.uid);
+  final userService = DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid);
+  String email = FirebaseAuth.instance.currentUser.email;
   MainDrawer({this.currPage = pageButton.TRANSLATION}){
     // this.img = null;
     // this.imageUrl = null;
@@ -33,8 +35,6 @@ class MainDrawer extends StatelessWidget {
   Widget build(BuildContext context) {
     // future user image
     String imgUrl = 'https://static.toiimg.com/photo/msid-67586673/67586673.jpg';
-    final user = Provider.of<UserModel>(context);
-    print("user: ${user.toString()}");
     // final DatabaseUserService userService = DatabaseUserService(uid: user.uid);
     return Drawer(
       child: SingleChildScrollView(
@@ -45,44 +45,56 @@ class MainDrawer extends StatelessWidget {
                 padding: EdgeInsets.all(20.0),
                 color: Colors.cyan[900],
                 child: Center(
-                  child:Row(
+                  child:StreamBuilder<UserModel>(
+                    stream: userService.users,
+                    builder: (context, snapshot) {
+                      String username;
+                      if (snapshot.hasError || !snapshot.hasData){
+                        username = "Anon user";
+                      }
+                      UserModel userModel = snapshot.data;
+                      print("mainDrawer userModel == $userModel");
+                      username = userModel.username;
+                      return Row(
 
-                    children: [
-                      Spacer(),
-                      Column(
-                        children: <Widget> [
-                          SizedBox(height: 15.0,),
-                          Text("שם משתמש",
-                            style: TextStyle(
-                              fontSize: 22,
-                              color: Colors.white,
-                            ),
+                        children: [
+                          Spacer(),
+                          Column(
+                            children: <Widget> [
+                              SizedBox(height: 15.0,),
+                              Text(username,
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              SizedBox(height: 10.0,),
+                              Text(this.email,
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
                           ),
-                          SizedBox(height: 10.0,),
-                          Text('mail@gmail.com',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Colors.white,
+                          Spacer(),
+                          Container(
+                            width: 100.0,
+                            height: 70.0,
+                            margin: EdgeInsets.only(top: 30.0, bottom: 10.0, left: 0.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: this._profileImage.img,
+                                  // image: NetworkImage(imgUrl),
+                                  fit: BoxFit.fitHeight
+                              ),
                             ),
                           ),
                         ],
-                      ),
-                      Spacer(),
-                      Container(
-                        width: 100.0,
-                        height: 70.0,
-                        margin: EdgeInsets.only(top: 30.0, bottom: 10.0, left: 0.0),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          image: DecorationImage(
-                            image: this._profileImage.img,
-                              // image: NetworkImage(imgUrl),
-                              fit: BoxFit.fitHeight
-                          ),
-                        ),
-                      ),
-                    ],
-                ),
+                );
+                    }
+                  ),
                 ),
               ),
               DrawerButton(
@@ -103,26 +115,27 @@ class MainDrawer extends StatelessWidget {
               icon: Icon(Icons.book),
               isCurrPage: this.currPage == pageButton.DICT,
             ),
-              StreamBuilder<UserModel>(
-                initialData: null,
-                stream: DatabaseUserService(uid: user.uid).users ?? null,
-                builder: (context, snapshot) {
-                  if(snapshot.hasError) {
-                    print("snapshot error in profile: ${snapshot.error}");
-                    return Container(width: 0.0,height: 0.0,);
-                  }
-                  if (!snapshot.hasData){
-                    print("snapshot dont has data ${snapshot.hasData}");
-                    return Container(width: 0.0,height: 0.0,);
-                  }
-                  return DrawerButton(
+              FirebaseAuth.instance.currentUser.isAnonymous ? Container() :
+              // StreamBuilder<UserModel>(
+              //   initialData: null,
+              //   stream: DatabaseUserService(uid: user.uid).users ?? null,
+              //   builder: (context, snapshot) {
+              //     if(snapshot.hasError) {
+              //       print("snapshot error in profile: ${snapshot.error}");
+              //       return Container(width: 0.0,height: 0.0,);
+              //     }
+              //     if (!snapshot.hasData){
+              //       print("snapshot dont has data ${snapshot.hasData}");
+              //       return Container(width: 0.0,height: 0.0,);
+              //     }
+              DrawerButton(
                     title: "איזור אישי",
                     onTap:  () => pushPage(context, ProfilePage()),
                     icon: Icon(Icons.person),
                     isCurrPage: this.currPage == pageButton.PROFILE,
-                  );
-                }
-              ),
+                  ),
+              //   }
+              // ),
 
               DrawerButton(
                   title: "התנתק/י",
