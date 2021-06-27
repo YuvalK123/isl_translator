@@ -71,8 +71,8 @@ List<String> splitSentence(String sentence) {
   // futureTerms.then((result) => saveTerms=  result)
   //     .catchError((e) => print('error'));
   print("hello save terms ==> " + saveTerms.toString());
-  List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
-
+  //List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
+  List<String> terms = [];
   //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
   List<String> splitSentence = [];
 

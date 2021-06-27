@@ -444,84 +444,86 @@ class MapScreenState extends State<ProfilePage>
                                           builder: (BuildContext context) {
                                             return StatefulBuilder(
                                                 builder: (context, setState){
-                                            return AlertDialog(
-                                              content: Stack(
-                                                overflow: Overflow.visible,
-                                                children: <Widget>[
-                                                  Positioned(
-                                                    right: -40.0,
-                                                    top: -40.0,
-                                                    child: InkResponse(
-                                                      onTap: () {
-                                                        Navigator.of(context).pop();
-                                                        // setState(() {
-                                                        //   wrongOldPass = false;
-                                                        // });
-                                                      },
-                                                      child: CircleAvatar(
-                                                        child: Icon(Icons.close),
-                                                        backgroundColor: Colors.red,
+                                            return SingleChildScrollView(
+                                              child: AlertDialog(
+                                                content: Stack(
+                                                  overflow: Overflow.visible,
+                                                  children: <Widget>[
+                                                    Positioned(
+                                                      right: -40.0,
+                                                      top: -40.0,
+                                                      child: InkResponse(
+                                                        onTap: () {
+                                                          Navigator.of(context).pop();
+                                                          // setState(() {
+                                                          //   wrongOldPass = false;
+                                                          // });
+                                                        },
+                                                        child: CircleAvatar(
+                                                          child: Icon(Icons.close),
+                                                          backgroundColor: Colors.red,
+                                                        ),
                                                       ),
                                                     ),
-                                                  ),
-                                                  Form(
-                                                    key: _formKey,
-                                                    child: Column(
-                                                      mainAxisSize: MainAxisSize.min,
-                                                      children: <Widget>[
-                                                        Padding(
-                                                          padding: EdgeInsets.all(8.0),
-                                                          child: Text("סיסמה ישנה"),
-                                                        ),
-                                                        Padding(
-                                                          padding: EdgeInsets.all(8.0),
-                                                          child: new TextField(
-                                                          textDirection: TextDirection.rtl,
-                                                          controller: oldPassController,
-                                                          decoration: const InputDecoration(
-                                                              hintText: "הכנס/י סיסמה ישנה"),
-                                                          textAlign: TextAlign.right,
-                                                        ),
-                                                        ),
-                                                        Padding(
-                                                          padding: EdgeInsets.all(8.0),
-                                                          child: Text("סיסמה חדשה"),
-                                                        ),
-                                                        Padding(
-                                                          padding: EdgeInsets.all(8.0),
-                                                          child:  new TextField(
+                                                    Form(
+                                                      key: _formKey,
+                                                      child: Column(
+                                                        mainAxisSize: MainAxisSize.min,
+                                                        children: <Widget>[
+                                                          Padding(
+                                                            padding: EdgeInsets.all(8.0),
+                                                            child: Text("סיסמה ישנה"),
+                                                          ),
+                                                          Padding(
+                                                            padding: EdgeInsets.all(8.0),
+                                                            child: new TextField(
                                                             textDirection: TextDirection.rtl,
-                                                            controller: newPassController,
+                                                            controller: oldPassController,
                                                             decoration: const InputDecoration(
-                                                                hintText: "הכנס/י סיסמה חדשה"),
+                                                                hintText: "הכנס/י סיסמה ישנה"),
                                                             textAlign: TextAlign.right,
                                                           ),
-                                                        ),
-                                                        Padding(
-                                                          padding: const EdgeInsets.all(8.0),
-                                                          child: RaisedButton(
-                                                            child: Text("החלפ/י"),
-                                                            onPressed: () async{
-                                                              if (_formKey.currentState.validate()) {
-                                                                _formKey.currentState.save();
-                                                              }
-                                                              String code = await changePass(newPassController.text);
-                                                              setState(() {
-                                                                this.passErr = code;
-                                                              });
-                                                            },
                                                           ),
-                                                        ),
-                                                        Padding(
-                                                          padding: EdgeInsets.all(8.0),
-                                                          child: this.passErr == "הסיסמה הוחלפה בהצלחה!" ?
-                                                          Text(this.passErr,style: TextStyle(color: Colors.green),) :
-                                                          Text(this.passErr,style: TextStyle(color: Colors.red),),
-                                                        ),
-                                                      ],
+                                                          Padding(
+                                                            padding: EdgeInsets.all(8.0),
+                                                            child: Text("סיסמה חדשה"),
+                                                          ),
+                                                          Padding(
+                                                            padding: EdgeInsets.all(8.0),
+                                                            child:  new TextField(
+                                                              textDirection: TextDirection.rtl,
+                                                              controller: newPassController,
+                                                              decoration: const InputDecoration(
+                                                                  hintText: "הכנס/י סיסמה חדשה"),
+                                                              textAlign: TextAlign.right,
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: const EdgeInsets.all(8.0),
+                                                            child: RaisedButton(
+                                                              child: Text("החלפ/י"),
+                                                              onPressed: () async{
+                                                                if (_formKey.currentState.validate()) {
+                                                                  _formKey.currentState.save();
+                                                                }
+                                                                String code = await changePass(newPassController.text);
+                                                                setState(() {
+                                                                  this.passErr = code;
+                                                                });
+                                                              },
+                                                            ),
+                                                          ),
+                                                          Padding(
+                                                            padding: EdgeInsets.all(8.0),
+                                                            child: this.passErr == "הסיסמה הוחלפה בהצלחה!" ?
+                                                            Text(this.passErr,style: TextStyle(color: Colors.green),) :
+                                                            Text(this.passErr,style: TextStyle(color: Colors.red),),
+                                                          ),
+                                                        ],
+                                                      ),
                                                     ),
-                                                  ),
-                                                ],
+                                                  ],
+                                                ),
                                               ),
                                             );
                                           });
