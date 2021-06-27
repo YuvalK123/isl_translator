@@ -11,19 +11,19 @@ List<String> endingRelative = ["","","","","",""];
 
 Map<String, String> endings = {
   "ת": "ה",
-
 };
 
-Future<String> getNonPrepositional(String word, String dirName) async{
+
+
+Future<String> getNonPrepositional(String word) async{
   if (!prepositionalLetters.contains(word[0])){
     return null;
   }
-  return await getUrl(word.substring(1), dirName);
+  return await getUrl(word.substring(1));
 }
 
 
 String nonAsciiChar = "[^\x00-\x7F]";
-// String reg = "הת$nonAsciiChar$nonAsciiChar$nonAsciiChar";
 
 Map<String, String> hebrewChars = {
   "א" : "U+05D0",
@@ -55,12 +55,10 @@ Map<String, String> hebrewChars = {
   "ת" : "U+05EA",
 };
 
-Future<String> getUrl(String word, String dirName) async{
-  String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
-  print("Exec == > " + dirName);
+Future<String> getUrl(String word) async{
   Reference ref = FirebaseStorage.instance
       .ref()
-      .child("$dirName" + word + "$exec");
+      .child("animation_openpose/" + word + ".mp4");
   try {
     // gets the video's url
     var url = await ref.getDownloadURL();
@@ -71,26 +69,50 @@ Future<String> getUrl(String word, String dirName) async{
   }
 }
 
-Future<String> checkIfVerb(String word, String dirName) async{
-  List<String> initiatives = wordToInitiatives(word);
+Future<String> checkIfVerb(String word) async{
+  List<String> initiatives = wordToInitiatives(word, patterns);
   print("inits are $initiatives");
   if (initiatives == null){
     return null;
   }
   // search for url
   for (var initi in initiatives){
-    var url = await getUrl(initi,dirName);
+    var url = await getUrl(initi);
     if (url != null){
       print("found url for $initi : $url");
       return url;
     }
     print("no url for $initi");
   }
+  // 2 letters
+
+  initiatives = wordToInitiatives(word,patterns2Letters);
+  print("inits are $initiatives");
+  if (initiatives == null){
+    return null;
+  }
+  // search for url
+  for (var initi in initiatives){
+    var url = await getUrl(initi);
+    if (url != null){
+      print("found url for $initi : $url");
+      return url;
+    }
+    print("no url for $initi");
+  }
+
   // no url for this verb
   return null;
 }
 
-List<String> wordToInitiatives(String word){
+String handleRootH(String root){
+  if (root.endsWith("ה") || root.endsWith("י")){
+    return root.substring(0, root.length-2) + "ת";
+  }
+  return root;
+}
+
+List<String> wordToInitiatives(String word, List<String> patterns){
   List<String> wordInitiative = [];
   // verbs.forEach((verb) {
   //   print("now at verb $verb");
@@ -106,7 +128,7 @@ List<String> wordToInitiatives(String word){
   //     return handleVerbMatch(wordData.b, wordData.a, word); // is a verb
   //   }
   // });
-  var wordData = getVerbPattern(word); // here we check if in verb pattern
+  var wordData = getVerbPattern(word, patterns); // here we check if in verb pattern
   print("word data = $wordData");
   if (wordData != null){
     print("wordData not null!!");
@@ -116,7 +138,9 @@ List<String> wordToInitiatives(String word){
   return null;
 }
 
-Pair<String, int> getVerbPattern(String word){
+
+
+Pair<String, int> getVerbPattern(String word, List<String> patterns){
   // return pair of pattern/ pattern index
   // print("patterns length is ${patterns.length}");
   // print("patterns = $patterns");
@@ -148,13 +172,16 @@ Pair<String, int> getVerbPattern(String word){
   return null;
 }
 
+
+
 List<String> handleVerbMatch(int index, String pattern, String word){
   print("search root...");
   String root = getRoot(index, pattern, word);
-  print("root is $root");
+  print("root be4 process is $root");
+  root = handleRootH(root);
+  print("root after process is $root");
   List<String> wordInitiatives = [];
   for (var infinitive in infinitives){ // get list of infinitives
-    print("in for infinitive");
     int rootIndex = 0;
     print("infinitive is $infinitive, root is $root");
     String infin = "";
@@ -170,14 +197,6 @@ List<String> handleVerbMatch(int index, String pattern, String word){
       } else if (letter != "+"){ // is not a verb letter
           infin += letter;
       }
-      // } else if (letter == "{" && rootIndex < root.length){
-      //   for (int j = rootIndex; j < root.length; j++){
-      //     infin += root[j];
-      //   }
-      // } else if (letter != "{" || letter != "1" || letter != "2" ||
-      //     letter != "," || letter != "}"){ // is not a verb letter
-      //   infin += letter;
-      // }
     }
     infin = handleFinalLetter(infin);
     wordInitiatives.add(infin);
@@ -270,11 +289,99 @@ List<String> patterns = [
   "...{1,2}", // אהב
 ];
 
+// רץ
+// קם
+
+List<String> patterns2Letters = [
+  "..תי", // רצתי
+  "נ.ו.", //נרוץ
+  "י.ו.", //ירוץ
+  "ת.ו.", //תרוץ
+  // "..ו.{1,2}", //אהוב
+  "..נו", //רצנו
+  "..ת", // רצת
+  "..ו", // רצו
+  "..תן", // רצתן
+  "..תם", // רצתם
+  // "מ...{1,2}", // מפעל
+  "..", // רץ
+];
+
+Map<int, String> indexToInfti = {
+  1 : "ללכת",
+  2: "לרוץ",
+  3 : "לקום",
+  4: "לתת",
+
+};
+
+Map<String, int> shortRootsVerbs = {
+  "הלך" : 1,
+  "הלכה" : 1,
+  "ילך" : 1,
+  "תלך" : 1,
+  "הלכו" : 1,
+  "ילכו" : 1,
+  "הולכים" : 1,
+  "נלכנה" : 1,
+  "הלכתי" : 1,
+  "הלכנו" : 1,
+  "הלכתם" : 1,
+  "הלכתן" : 1,
+  "אתהלך" : 1,
+  "הולך" : 1,
+  "הולכת" : 1,
+
+  "רץ" : 2,
+  "רצה" : 2,
+  "ירוץ" : 2,
+  "תרוץ" : 2,
+  "רצו" : 2,
+  "ירוצו" : 2,
+  "רצים" : 2,
+  "נרוץ" : 2,
+  "רצתי" : 2,
+  "רצנו" : 2,
+  "רצתם" : 2,
+  "רצתן" : 2,
+  "ארוץ" : 2,
+
+  "קם" : 3,
+  "קמה" : 3,
+  "יקום" : 3,
+  "קמו" : 3,
+  "קמות" : 3,
+  "קמים" : 3,
+  "יקומו" : 3,
+  "תקומו" : 3,
+
+  "נתן" : 4,
+  "יתן" : 4,
+  "תתן" : 4,
+  "נתנו" : 4,
+  "יתנו" : 4,
+  "נותנים" : 4,
+  "נותנות" : 4,
+  "תתנו" : 4,
+};
+
 List<String> pluralVerbs = [
   "", // נפעול
   "", // נפעול
   "", // תפעלו
 ];
+
+// to be continued
+
+void checkGenderCase(String word){
+  // checks if its male/female word - גרפיקאי->גרפיקאית
+
+}
+
+void checkPluralCase(String word){
+  // checks if plural/singular case - גרוש->גרושים
+}
+
 
 // List<String> patterns = [
 //   "...+${hebrewChars["ת"]}${hebrewChars["י"]}", // אהבתי

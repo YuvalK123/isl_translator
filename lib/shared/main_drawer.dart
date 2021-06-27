@@ -19,8 +19,7 @@ class MainDrawer extends StatelessWidget {
 
   final pageButton currPage;
   final AuthService _auth = AuthService();
-  final ProfileImage _profileImage = ProfileImage();
-  // final _auth = FirebaseAuth.instance;
+  final ProfileImage _profileImage = ProfileImage(uid: FirebaseAuth.instance.currentUser.uid);
   MainDrawer({this.currPage = pageButton.TRANSLATION}){
     // this.img = null;
     // this.imageUrl = null;
@@ -76,7 +75,8 @@ class MainDrawer extends StatelessWidget {
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           image: DecorationImage(
-                              image: NetworkImage(imgUrl),
+                            image: this._profileImage.img,
+                              // image: NetworkImage(imgUrl),
                               fit: BoxFit.fitHeight
                           ),
                         ),
@@ -103,13 +103,27 @@ class MainDrawer extends StatelessWidget {
               icon: Icon(Icons.book),
               isCurrPage: this.currPage == pageButton.DICT,
             ),
-              FirebaseAuth.instance.currentUser.isAnonymous ? Container() :
-              DrawerButton(
+              StreamBuilder<UserModel>(
+                initialData: null,
+                stream: DatabaseUserService(uid: user.uid).users ?? null,
+                builder: (context, snapshot) {
+                  if(snapshot.hasError) {
+                    print("snapshot error in profile: ${snapshot.error}");
+                    return Container(width: 0.0,height: 0.0,);
+                  }
+                  if (!snapshot.hasData){
+                    print("snapshot dont has data ${snapshot.hasData}");
+                    return Container(width: 0.0,height: 0.0,);
+                  }
+                  return DrawerButton(
                     title: "איזור אישי",
                     onTap:  () => pushPage(context, ProfilePage()),
                     icon: Icon(Icons.person),
                     isCurrPage: this.currPage == pageButton.PROFILE,
-                  ),
+                  );
+                }
+              ),
+
               DrawerButton(
                   title: "התנתק/י",
                   onTap: () async {
@@ -126,7 +140,7 @@ class MainDrawer extends StatelessWidget {
   }
   
   void pushPage(BuildContext context, Widget page){
-    Navigator.of(context).push(
+    Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => page,
         )

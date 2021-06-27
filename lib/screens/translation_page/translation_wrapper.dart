@@ -83,6 +83,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
       ),
     );
   }
+
 }
 
 
