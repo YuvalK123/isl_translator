@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -34,30 +35,42 @@ class MapScreenState extends State<ProfilePage>
   String username;
   Gender gender;
   bool vidType = false;
-
+  FirebaseAuth _auth = FirebaseAuth.instance;
+  bool wrongOldPass = false;
   Gender _character = Gender.FEMALE;
   UserModel currUserModel;
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
-
+  final oldPassController = TextEditingController();
+  final newPassController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  String passErr = "";
 
   // for select pic
   File _image;
   final picker = ImagePicker();
-
-
   /// Variables
-  // var imageUrl;
+  var imageUrl;
   File imageFile;
-  ProfileImage _profileImage = ProfileImage(false);
   String _uploadedFileURL;
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     loadUser();
-    // imageUrl = ProfileImage.getImageUrl();
+    initImgUrl();
+
+  }
+
+  void initImgUrl() async{
+    var img = await ProfileImage.getImageUrl();
+    if(mounted){
+      setState(() {
+        this.imageUrl =img;
+      });
+    }
+
   }
 
   void loadUser() async{
@@ -67,9 +80,16 @@ class MapScreenState extends State<ProfilePage>
       setState(() {
         this.currUserModel = value;
         _character = value.genderModel;
+        print(_character);
+        print("videp type == > " + value.videoType.toString());
+        if(value.videoType == VideoType.LIVE)
+          {
+            vidType= true;
+          }
       });
     }
     print("done, $_character");
+    print("done, $vidType");
   }
 
   @override
@@ -134,9 +154,8 @@ class MapScreenState extends State<ProfilePage>
                                         height: 140.0,
                                         decoration: new BoxDecoration(
                                           shape: BoxShape.circle,
-                                          image: !this._profileImage.hasImg ? null : new DecorationImage(
-                                              image: this._profileImage.img,
-                                              // image: imageFile != null ? FileImage(imageFile) : NetworkImage(imageUrl),
+                                          image: new DecorationImage(
+                                              image: imageFile != null ? FileImage(imageFile) : NetworkImage(imageUrl),
                                               fit: BoxFit.fitHeight
                                             //fit: BoxFit.cover,
                                           ),
@@ -153,13 +172,9 @@ class MapScreenState extends State<ProfilePage>
                                           radius: 25.0,
                                           child: new IconButton(
                                             icon: new Icon(Icons.camera_alt,),
-                                            onPressed: () async{
+                                            onPressed: () {
                                               print("pressed icon");
-                                              var profileImg = ProfileImage(true);
-                                              await profileImg.chooseFile();
-                                              setState(() {
-                                                this._profileImage = profileImg;
-                                              });
+                                              chooseFile();
                                               // imagePicker.showDialog(context),
                                               // child: new Center(
                                               // child: _image == null
@@ -257,7 +272,7 @@ class MapScreenState extends State<ProfilePage>
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
                                           new Text(
-                                            'שם משתמש',
+                                             'שם משתמש: ' + userModel.username,
                                             style: TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
@@ -277,7 +292,7 @@ class MapScreenState extends State<ProfilePage>
                                           textDirection: TextDirection.rtl,
                                           controller: nameController,
                                           decoration: InputDecoration(
-                                            hintText: "הכנס/י שם משתמש",
+                                            hintText: "החלפ/י שם משתמש",
                                           ),
                                           textAlign: TextAlign.right,
                                         ),
@@ -296,7 +311,7 @@ class MapScreenState extends State<ProfilePage>
                                         mainAxisSize: MainAxisSize.min,
                                         children: <Widget>[
                                           new Text(
-                                            'מייל',
+                                            _auth.currentUser.email + " :אימייל",
                                             style: TextStyle(
                                                 fontSize: 16.0,
                                                 fontWeight: FontWeight.bold),
@@ -316,7 +331,7 @@ class MapScreenState extends State<ProfilePage>
                                           textDirection: TextDirection.rtl,
                                           controller: emailController,
                                           decoration: const InputDecoration(
-                                              hintText: "הכנס/י מייל"),
+                                              hintText: "החלפ/י מייל"),
                                           textAlign: TextAlign.right,
                                         ),
                                       ),
@@ -347,63 +362,63 @@ class MapScreenState extends State<ProfilePage>
                                 padding: EdgeInsets.only(
                                     left: 0, right: 0, top: 4.0),
                                 child: Center(
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child:Align(
-                                            alignment: Alignment.centerRight,
-                                            child: RadioListTile(
-                                              title: Text('נקבה',textDirection: TextDirection.rtl,),
-                                              value: Gender.FEMALE,
-                                              groupValue: _character,
-                                              onChanged: (Gender value) {
-                                                setState(() {
-                                                  _character = value;
-                                                });
-                                              },
-                                              //onChanged: (newVal) {userModel.genderModel = newVal;},
-                                              controlAffinity: ListTileControlAffinity.trailing,
-                                            ),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child:Align(
+                                          alignment: Alignment.centerRight,
+                                          child: RadioListTile(
+                                            title: Text('נקבה',textDirection: TextDirection.rtl,),
+                                            value: Gender.FEMALE,
+                                            groupValue: _character,
+                                            onChanged: (Gender value) {
+                                              setState(() {
+                                                _character = value;
+                                              });
+                                            },
+                                            //onChanged: (newVal) {userModel.genderModel = newVal;},
+                                            controlAffinity: ListTileControlAffinity.trailing,
                                           ),
                                         ),
-                                        Expanded(
-                                          child:Align(
-                                            alignment: Alignment.centerLeft,
-                                            child:RadioListTile(
-                                              title: Text('זכר',textDirection: TextDirection.rtl,),
-                                              value: Gender.MALE,
-                                              groupValue: _character,
-                                              onChanged: (Gender value) {
-                                                setState(() {
-                                                  userModel.genderModel = value;
-                                                  _character = value;
-                                                });
-                                              },
-                                              controlAffinity: ListTileControlAffinity.trailing,
-                                            ),
+                                      ),
+                                      Expanded(
+                                        child:Align(
+                                          alignment: Alignment.centerLeft,
+                                          child:RadioListTile(
+                                            title: Text('זכר',textDirection: TextDirection.rtl,),
+                                            value: Gender.MALE,
+                                            groupValue: _character,
+                                            onChanged: (Gender value) {
+                                              setState(() {
+                                                userModel.genderModel = value;
+                                                _character = value;
+                                              });
+                                            },
+                                            controlAffinity: ListTileControlAffinity.trailing,
                                           ),
                                         ),
-                                        Expanded(
-                                          child:Align(
-                                            alignment: Alignment.center,
-                                            child:RadioListTile(
-                                              title: Text('אחר',textDirection: TextDirection.rtl,),
-                                              value: Gender.OTHER,
-                                              groupValue: _character,
-                                              onChanged: (Gender value) {
-                                                setState(() {
-                                                  _character = value;
-                                                });
-                                              },
-                                              controlAffinity: ListTileControlAffinity.trailing,
-                                            ),
+                                      ),
+                                      Expanded(
+                                        child:Align(
+                                          alignment: Alignment.center,
+                                          child:RadioListTile(
+                                            title: Text('אחר',textDirection: TextDirection.rtl,),
+                                            value: Gender.OTHER,
+                                            groupValue: _character,
+                                            onChanged: (Gender value) {
+                                              setState(() {
+                                                _character = value;
+                                              });
+                                            },
+                                            controlAffinity: ListTileControlAffinity.trailing,
                                           ),
                                         ),
+                                      ),
 
-                                      ],
-                                    ),
+                                    ],
                                   ),
                                 ),
+                              ),
                               Padding(
                                   padding: EdgeInsets.only(
                                       left: 25.0, right: 25.0, top: 25.0),
@@ -433,8 +448,8 @@ class MapScreenState extends State<ProfilePage>
                                   Padding(
                                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
                                     child: FlutterSwitch(
-                                        activeColor: Colors.grey[300],
-                                        inactiveColor: Colors.grey[300],
+                                        activeColor: Colors.cyan[700],
+                                        inactiveColor: Colors.cyan[700],
                                         value: vidType,
                                         onToggle: (val) {
                                           setState(() {
@@ -448,7 +463,106 @@ class MapScreenState extends State<ProfilePage>
                                   Spacer(),
                                 ],
                               ),
+                              Padding(
+                                padding: EdgeInsets.only(
+                                    left: 25.0, right: 25.0, top: 25.0),
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  child: RaisedButton(
+                                    onPressed: () {
+                                      showDialog(
+                                          context: context,
+                                          builder: (BuildContext context) {
+                                            return StatefulBuilder(
+                                                builder: (context, setState){
+                                            return AlertDialog(
+                                              content: Stack(
+                                                overflow: Overflow.visible,
+                                                children: <Widget>[
+                                                  Positioned(
+                                                    right: -40.0,
+                                                    top: -40.0,
+                                                    child: InkResponse(
+                                                      onTap: () {
+                                                        Navigator.of(context).pop();
+                                                        // setState(() {
+                                                        //   wrongOldPass = false;
+                                                        // });
+                                                      },
+                                                      child: CircleAvatar(
+                                                        child: Icon(Icons.close),
+                                                        backgroundColor: Colors.red,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Form(
+                                                    key: _formKey,
+                                                    child: Column(
+                                                      mainAxisSize: MainAxisSize.min,
+                                                      children: <Widget>[
+                                                        Padding(
+                                                          padding: EdgeInsets.all(8.0),
+                                                          child: Text("סיסמה ישנה"),
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.all(8.0),
+                                                          child: new TextField(
+                                                          textDirection: TextDirection.rtl,
+                                                          controller: oldPassController,
+                                                          decoration: const InputDecoration(
+                                                              hintText: "הכנס/י סיסמה ישנה"),
+                                                          textAlign: TextAlign.right,
+                                                        ),
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.all(8.0),
+                                                          child: Text("סיסמה חדשה"),
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.all(8.0),
+                                                          child:  new TextField(
+                                                            textDirection: TextDirection.rtl,
+                                                            controller: newPassController,
+                                                            decoration: const InputDecoration(
+                                                                hintText: "הכנס/י סיסמה חדשה"),
+                                                            textAlign: TextAlign.right,
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding: const EdgeInsets.all(8.0),
+                                                          child: RaisedButton(
+                                                            child: Text("החלפ/י"),
+                                                            onPressed: () async{
+                                                              if (_formKey.currentState.validate()) {
+                                                                _formKey.currentState.save();
+                                                              }
+                                                              String code = await changePass(newPassController.text);
+                                                              setState(() {
+                                                                this.passErr = code;
+                                                              });
+                                                            },
+                                                          ),
+                                                        ),
+                                                        Padding(
+                                                          padding: EdgeInsets.all(8.0),
+                                                          child: this.passErr == "הסיסמה הוחלפה בהצלחה!" ?
+                                                          Text(this.passErr,style: TextStyle(color: Colors.green),) :
+                                                          Text(this.passErr,style: TextStyle(color: Colors.red),),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            );
+                                          });
+                                    });},
+                                    child: Text("לחצ/י כאן להחלפת סיסמה"),
+                                  ),
+                                ),
+                              ),
                               _getActionButtons(),
+
                             ],
                           ),
                         ),
@@ -560,8 +674,7 @@ class MapScreenState extends State<ProfilePage>
 
   void saveData() async{
     // get the user id
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
+    String id = _auth.currentUser.uid;
 
     // get the new data from the text field
     String newName = nameController.text;
@@ -593,14 +706,6 @@ class MapScreenState extends State<ProfilePage>
     print("new gender == > " + newGender);
 
     final newVidType = vidType == false ? VideoType.ANIMATION : VideoType.LIVE;
-    // if(vidType == false)
-    //   {
-    //     newVidType = "animation";
-    //   }
-    // else
-    //   {
-    //     newVidType = "video";
-    //   }
 
     //update data in data (name, gender) in firebase
     await DatabaseUserService(uid: id).updateUserData2(
@@ -610,22 +715,94 @@ class MapScreenState extends State<ProfilePage>
     );
 
     // upload profile picture to the firebase
-    // uploadFile();
+    if(imageFile != null)
+      {
+        uploadFile();
+      }
   }
 
-  void changePass(String newPassword) async{
+  Future<String> changePass(String newPassword) async{
     final auth = FirebaseAuth.instance;
     final user = auth.currentUser;
-    await user.updatePassword(newPassword).then((value) => null).catchError((error) => print(error));
+    try{
+      AuthCredential credential = EmailAuthProvider.credential(email: "israela.megira@gmail.com", password: oldPassController.text);
+      await _auth.currentUser.reauthenticateWithCredential(credential);
+      await user.updatePassword(newPassword).then((value) => null).catchError((error) => print(error));
+    } on FirebaseAuthException catch(e){
+      print("e is ${e.code}");
+      if (e.code == "wrong-password"){
+        print("pass wrong :(");
+        return "סיסמה ישנה שגויה";
+      }
+      setState(() {
+        this.passErr = e.code;
+      });
+      return e.code;
+    } catch (e){
+      return e.toString();
+    }
+    return "הסיסמה הוחלפה בהצלחה!";
   }
 
   void changeEmail(String newEmail) async{
     final auth = FirebaseAuth.instance;
     final user = auth.currentUser;
+    print(user.email);
     await user.updateEmail(newEmail).then((value) => null).catchError((error) => print(error));
   }
 
+  /// Get from gallery
+  _getFromGallery() async {
+    PickedFile pickedFile = await ImagePicker().getImage(
+      source: ImageSource.gallery,
+      maxWidth: 1800,
+      maxHeight: 1800,
+    );
+    print("pickedFile.path" + pickedFile.path);
+    File bla = File(pickedFile.path);
+    imageFile = bla;
+    setState(() {imageFile = bla;});    //_cropImage(pickedFile.path);
+  }
 
+  Future chooseFile() async {
+    await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
+      setState(() {
+        imageFile = image;
+      });
+    });
+  }
+
+  Future uploadFile2(File file) async {
+    FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    var storageRef = storage.ref().child('users_profile_pic/$id}');
+    print("file image: " + file.toString());
+    UploadTask uploadTask = storageRef.putFile(file);
+    await uploadTask.whenComplete(() => print('File Uploaded'));
+    //var completeTask = await uploadTask.onComplete;
+    storageRef.getDownloadURL().then((fileURL) {
+      setState(() {
+        _uploadedFileURL = fileURL;
+      });
+    });
+  }
+
+  Future uploadFile() async {
+    FirebaseAuth auth = FirebaseAuth.instance;
+    String id = auth.currentUser.uid;
+    var storageReference = FirebaseStorage.instance
+        .ref()
+        .child('users_profile_pic/${Path.basename(id)}');
+    UploadTask uploadTask = storageReference.putFile(imageFile);
+    await uploadTask.whenComplete(() => print('File Uploaded'));
+    print('File Uploaded');
+    storageReference.getDownloadURL().then((fileURL) {
+      setState(() {
+        _uploadedFileURL = fileURL;
+      });
+    });
+  }
 
 
 // FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");

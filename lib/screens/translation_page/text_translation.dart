@@ -284,7 +284,6 @@ class _TranslatePage extends State<TranslatePage> {
                   child: Text("תרגם"),
                   color: Colors.black12,
                 ),
-                IconButton(onPressed: LruCache.saveLetters, icon: Icon(Icons.download)),
                 Container(
 
                     child: AspectRatio(
