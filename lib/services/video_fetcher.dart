@@ -340,7 +340,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   }
 
   VideoPlayerController _controller(int index) {
-    print("index == $index, ${this._videoFetcher.indexToUrl} ${this._videoFetcher.indexToUrl[index]}");
+    // print("index == $index, ${this._videoFetcher.indexToUrl} ${this._videoFetcher.indexToUrl[index]}");
     // if (this._videoFetcher.urls.length > index){
     if(this._videoFetcher.indexToUrl.containsKey(index)){
       return _controllers[this._videoFetcher.indexToUrl[index] + index.toString()];
