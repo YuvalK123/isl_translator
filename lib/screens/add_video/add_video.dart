@@ -1,12 +1,13 @@
+import 'dart:async';
+import 'package:http/http.dart';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
+import 'package:flutter_spinbox/material.dart';
+import 'package:isl_translator/screens/add_video/add_expression_page.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
-import '../../shared/main_drawer.dart';
-
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-
 
 class AddVideoPage extends StatefulWidget {
   AddVideoPage({Key key, this.title}) : super(key: key);
@@ -21,7 +22,10 @@ class _AddVideoPageState extends State<AddVideoPage> {
   CameraController controller;
   List cameras;
   int selectedCameraIndex;
-  String imgPath;
+  int recordingDelay = 5;
+  int recordingTime = 3;
+  Timer timer;
+  int counter = 0;
 
   @override
   void initState() {
@@ -105,15 +109,15 @@ class _AddVideoPageState extends State<AddVideoPage> {
                 onPressed: () {
                   onCapturePressed(context);
                 },
-              )
+              ),
             ],
           ),
         )
     );
   }
 
-  Widget cameraToggleRowWidget() {
-    if (cameras == null || cameras.isEmpty) {
+  Widget cameraToggleRowWidget(){
+    if (cameras == null || cameras.isEmpty){
       return Spacer();
     }
 
@@ -124,21 +128,83 @@ class _AddVideoPageState extends State<AddVideoPage> {
       child: Align(
         alignment: Alignment.centerLeft,
         child: FlatButton.icon(
-            onPressed: onSwitchCamera,
+          onPressed: onSwitchCamera,
 
-            icon: Icon(
-              getCameraLensIcon(lensDirection),
+          icon: Icon(
+            getCameraLensIcon(lensDirection),
+            color: Colors.white,
+            size: 24,
+          ),
+          label: Text(
+            '${lensDirection.toString().substring(lensDirection.toString().indexOf('.') + 1).toUpperCase()}',
+            style: TextStyle(
               color: Colors.white,
-              size: 24,
+              fontWeight: FontWeight.w500,
             ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget timing(BuildContext context){
+    return Expanded(
+      child: Align(
+        child: FlatButton.icon(
+            onPressed: () {
+              int delay = recordingDelay;
+              int time = recordingTime;
+              return showDialog(
+                  context: context,
+                  builder: (context){
+                    return AlertDialog(
+                      title: Text('תזמון'),
+                      content: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
+                          Text('השהיה'),
+                          SpinBox(
+                            max: 15,
+                            min: 0,
+                            value: recordingDelay.toDouble(),
+                            onChanged: (value) => delay = value.toInt(),
+                          ),
+                          Text('זמן צילום'),
+                          SpinBox(
+                            max: 15,
+                            min: 0,
+                            value: recordingTime.toDouble(),
+                            onChanged: (value) => time = value.toInt(),
+                          ),
+                        ],
+                      ),
+                      actions: <Widget>[
+                        MaterialButton(
+                          child: Icon(Icons.check),
+                            onPressed: () {
+                            recordingDelay = delay;
+                            print(recordingDelay);
+                            recordingTime = time;
+                            Navigator.of(context).pop();
+                            }
+                        )
+                    ],
+                  );
+                });
+          },
+          icon: Icon(
+            Icons.timer,
+            color: Colors.white,
+            size: 24,
+          ),
             label: Text(
-              '${lensDirection.toString().substring(
-                  lensDirection.toString().indexOf('.') + 1).toUpperCase()}',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.w500,
-              ),
-            )
+              'תזמון',
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
         ),
       ),
     );
@@ -147,8 +213,11 @@ class _AddVideoPageState extends State<AddVideoPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("add video"),),
-      endDrawer: MainDrawer(currPage: pageButton.ADDVID,),
+      appBar: AppBar(
+        title: Text('הוסף וידאו', textDirection: TextDirection.rtl),
+        backgroundColor: Colors.deepPurple[300],
+        actions: [],
+      ),
       body: Container(
         child: SafeArea(
           child: Column(
@@ -156,7 +225,22 @@ class _AddVideoPageState extends State<AddVideoPage> {
             children: <Widget>[
               Expanded(
                 flex: 1,
-                child: cameraPreviewWidget(),
+                child: Stack(
+                  fit: StackFit.expand,
+                  children: <Widget>[
+                    cameraPreviewWidget(),
+                    Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        (counter > 0) ? '$counter' : '',
+                        style: TextStyle(
+                          fontSize: 40,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               Align(
                 alignment: Alignment.bottomCenter,
@@ -170,7 +254,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
                     children: <Widget>[
                       cameraToggleRowWidget(),
                       cameraControlWidget(context),
-                      Spacer()
+                      timing(context),
+                      // Spacer()
                     ],
                   ),
                 ),
@@ -187,19 +272,32 @@ class _AddVideoPageState extends State<AddVideoPage> {
     print(errorText);
   }
 
+  void countDown(context) {
+    counter = recordingDelay + 1;
+
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+      setState(() {
+        if (counter > 0) {
+          counter--;
+        } else {
+          timer.cancel();
+        }
+      });
+    });
+  }
+
   void onCapturePressed(context) async {
+    countDown(context);
+    await Future.delayed(Duration(seconds: recordingDelay + 1));
     try {
-      final path = join((await getTemporaryDirectory()).path,
-          '${DateTime.now()}.mp4');
-
       await controller.startVideoRecording();
+      await Future.delayed(Duration(seconds: recordingTime));
+      XFile videoFile = await controller.stopVideoRecording();
 
-      // Navigator.push(
-      //     context,
-      //     MaterialPageRoute(
-      //         builder: (context) => AddVideoPage(imgPath: path)
-      //     )
-      // );
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => AddExpression(videoPath: videoFile.path)));
     } catch (e) {
       showCameraException(e);
     }
@@ -225,4 +323,5 @@ class _AddVideoPageState extends State<AddVideoPage> {
         return Icons.device_unknown;
     }
   }
+
 }
