@@ -620,6 +620,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                             index = 0;
                             _initController(0).then((_) {
                               setState(() {
+                                isPause = false;
                                 this.aspectRatio = _controller(0).value.aspectRatio;
                                 this._isReady = true;
                                 this.borderColor = Colors.black;

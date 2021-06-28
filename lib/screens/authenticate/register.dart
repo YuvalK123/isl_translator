@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/authenticate/Verify_screen.dart';
 import 'package:isl_translator/services/auth.dart';
+import 'package:isl_translator/services/database.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
@@ -26,20 +28,22 @@ class _RegisterState extends State<Register> {
   String email = '';
   String password = '';
   String error = '';
+  String userName = '';
 
   @override
   Widget build(BuildContext context) {
     return loading ? Loading() : Scaffold(
-      backgroundColor: Colors.brown[100],
+      //backgroundColor: Colors.brown[100],
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
-        elevation: 0.0,
-        title: Text('Register to ISL-Translator'),
+        backgroundColor: Colors.cyan[800],        elevation: 0.0,
+        title: Container(
+            alignment: Alignment.centerRight,
+            child: Text('הרשמה')),
         actions: <Widget> [
           FlatButton.icon(
               onPressed: widget.toggleView,
               icon: Icon(Icons.person),
-              label: Text("Sign in")
+              label: Text("התחבר/י")
           )
         ],
       ),
@@ -53,9 +57,35 @@ class _RegisterState extends State<Register> {
             child: Column(
               children: <Widget> [
                 SizedBox(height: 20.0,),
+                Row(
+                  children: [
+                    Image.asset("assets/images/register.png", width: 100, height: 100,),
+                    SizedBox(width: 10.0,),
+                    Container(
+                        alignment: Alignment.topRight,
+                        child: Text("הרשמה", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
+                  ],
+                ),
+                SizedBox(height: 40.0,),
                 TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Email'),
-                  validator: (val) => val.isEmpty ? 'Enter an email' : null,
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  decoration: textInputDecoration.copyWith(hintText: 'שם משתמש'),
+                  validator: (val) => val.isEmpty ? 'הכנס/י שם משתמש' : null,
+                  onChanged: (val) { // email
+                    setState(() {
+                    // TODO: save username
+                      userName = val;
+                    });
+                  },
+                ),
+                SizedBox(height: 20.0,),
+                //Image.asset("assets/images/register.png", width: 100, height: 100,),
+                TextFormField(
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  decoration: textInputDecoration.copyWith(hintText: 'אימייל'),
+                  validator: (val) => val.isEmpty ? 'הכנס/י אימייל' : null,
                   onChanged: (val) { // email
                     setState(() {
                       email = val;
@@ -64,9 +94,11 @@ class _RegisterState extends State<Register> {
                 ),
                 SizedBox(height: 20.0,),
                 TextFormField( // password
-                  decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  decoration: textInputDecoration.copyWith(hintText: 'סיסמה'),
                   validator: (val) =>
-                  val.length < 1 ? 'Enter a password 1+ chars long' : null,
+                  val.length < 6 ? 'הכנס/י סיסמה בעלת 6 תווים ומעלה' : null,
                   onChanged: (val) {
                     setState(() {
                       password = val;
@@ -76,8 +108,8 @@ class _RegisterState extends State<Register> {
                 ),
                 SizedBox(height: 20.0,),
                 RaisedButton(
-                  color: Colors.pink[400],
-                  child: Text("Register",
+                  color: Colors.grey[400],
+                  child: Text("הרשמ/י",
                       style: TextStyle(color: Colors.white)
                   ),
                   onPressed: () async {
@@ -102,6 +134,11 @@ class _RegisterState extends State<Register> {
                           error = 'Please supply a valid email';
                         } );
                       }else{
+                        DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid).updateUserData2(
+                          username: userName,
+                          gender: "o",
+                          videoType: VideoType.ANIMATION,
+                        );
                         setState(() {
                           this.verify = true;
                         });
