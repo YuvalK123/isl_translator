@@ -28,8 +28,8 @@ List<String> infinitivess = [
   "להכין", "להשקיף", "לראות", "לפייס", "להזמין", "להצטרף", "להרביץ",
   "לנצל", "לשמוע", "לך", "לברוא", "לסבול", "לרכז", "להצליח", "לקשט",
   "לפסול",  "לשכנע", "לשים לב", "לברך", "להתפלל",
-  "לידה", "לולב", "להמיר",  "ללמוד",  "לשתות", "לנגוס", "ללגום",
-  "למזוג",  "לאחל", "ללמד",
+   "להמיר",  "ללמוד",  "לשתות", "לנגוס", "ללגום",
+  "למזוג",  "לאחל", "ללמד", "ללכת", "לצאת", "ללכת ברגל",
   "לתקוע בשופר", "לדבר", "לסרוג", "לצלול", "לקחת", "לשכוח", "לחתור", "לבקש", "להיזהר",
   "לשאול", "לקנות", "להילחם", "להסתכל סביב", "להתפטר", "לנאום", "לקפל", "לפטר", "לבדוק", "לשטוף", "להיכנע",
   "להמריא", "לתת", "להשתעל", "לנמנם", "לנחם", "לסמוך", "לחשוד", "לברוח", "להפריד", "לטפס", "לנו",
@@ -41,7 +41,7 @@ List<String> infinitivess = [
   "לעבוד", "לנגב",  "להצטער", "להתקשר", "לירות", "לחתוך", "ללעוג", "לשחק", "להודיע", "להיבהל", "לא יודע",
   "למכור", "לקבל", "ללבוש", "לצייר", "להחליק", "לצעוק", "להקים", "להתבייש", "לשמור", "להרוג", "להשתתף", "לעזור",
   "לנסות", "לחטוף", "להתחשב",
-  "להיעלב", "לחלות", "לפגוש", "להריח", "לחזור", "לשים", "לא יכול", "לבחור", "להוסיף", "לגזור", "לעמוד", "לנחות",
+  "להיעלב", "לחלות", "לפגוש", "להריח", "לחזור", "לשים", "לבחור", "להוסיף", "לגזור", "לעמוד", "לנחות",
   "לעצור", "להקשיב", "להתחייב", "להתלבט", "לכם", "לעקוץ", "לכתוב", "לזכור", "לנסוע", "לרצות", "לא מבין", "לא מכיר", "להחזיק",
   "להכיר", "לרדוף", "לפזר", "לקפוץ", "לנחש", "להרגיש", "להיפגע", "לחבב", "להבין", "להביא", "לאפות", "לקבוע", "להתעמל"
 ];
@@ -372,6 +372,7 @@ Map<int, String> indexToInfti = {
   2: "לרוץ",
   3 : "לקום",
   4: "לתת",
+  5: "לשים",
 
 };
 
@@ -423,6 +424,15 @@ Map<String, int> shortRootsVerbs = {
   "נותנים" : 4,
   "נותנות" : 4,
   "תתנו" : 4,
+
+  "שם" : 5,
+  "תשים" : 5,
+  "ישים" : 5,
+  "ישימו" : 5,
+  "שמה" : 5,
+  "שמים" : 5,
+  "שמות" : 5,
+  "תתנו" : 5,
 };
 
 List<String> pluralVerbs = [
@@ -525,7 +535,7 @@ List<String> infinitives2 = [ // שם פועל
 // if single and if male - convert to female + plurals
 // if single and if female - convert to male + plurals
 
-Future<String> findUrlForList(List<String> list, String dirName) async{
+Future<String> findUrlInList(List<String> list, String dirName) async{
   for (var word in list){
     var url = await getUrl(word, dirName);
     if (url != null){
@@ -552,9 +562,14 @@ Future<String> checkGenderCase(String word, String dirName) async{
     String singular = word;
     singularVersions = [singular + "ות", singular + "ם", singular + "ת"];
     print("singular (3) == $singularVersions");
+  }else{
+    String singular = word;
+    singularVersions = [singular + "ות", singular + "ים", singular + "ה",
+      singular + "ת", singular + "ית"];
+    print("singular (4) == $singularVersions");
   }
   if (singularVersions.isNotEmpty){
-    var url = findUrlForList(singularVersions, dirName);
+    var url = findUrlInList(singularVersions, dirName);
     if (url != null){
       return url;
     }
