@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
@@ -29,11 +30,13 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return loading ? Loading() : Scaffold(
-      backgroundColor: Colors.brown[100],
+      //backgroundColor: Colors.white60,
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
+        backgroundColor: Colors.cyan[800],
         elevation: 0.0,
-        title: Text('Sign in to ISL-Translator'),
+        title: Container(
+            alignment: Alignment.centerRight,
+            child: Text('תרגום שפת הסימנים')),
         actions: <Widget> [
           FlatButton.icon(
               onPressed: widget.toggleView,
@@ -52,8 +55,16 @@ class _SignInState extends State<SignIn> {
             child: Column(
               children: <Widget> [
                 SizedBox(height: 20.0,),
+                Container(
+                  alignment: Alignment.topRight,
+                    child: Text("!ברוכים הבאים", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
+                SizedBox(height: 20.0,),
+                Image.asset("assets/images/colorful_hand.jfif", width: 200, height: 200,),
+                SizedBox(height: 20.0,),
                 TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Email'),
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  decoration: textInputDecoration.copyWith(hintText: 'אימייל'),
                   validator: (val) => val.isEmpty ? 'Enter an email' : null,
                   onChanged: (val) { // email
                     setState(() => email = val);
@@ -61,16 +72,19 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: 20.0,),
                 TextFormField(
-                  decoration: textInputDecoration.copyWith(hintText: 'Password'),
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  decoration: textInputDecoration.copyWith(hintText: 'סיסמה'),
                   validator: (val) =>
                   val.length < 6 ? 'Enter a password 6+ chars long' : null,
                   onChanged: (val) => setState(() => password = val) ,
                   obscureText: true,
                 ),
                 SizedBox(height: 20.0,),
+
                 RaisedButton(
-                  color: Colors.pink[400],
-                  child: Text("Sign in",
+                  color: Colors.grey[400],
+                  child: Text("התחבר/י",
                       style: TextStyle(color: Colors.white)
                   ),
                   onPressed: () async {
@@ -100,8 +114,8 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: 20.0,),
                 RaisedButton(
-                  color: Colors.pink[400],
-                  child: Text("Sign in anonymously",
+                  color: Colors.grey[400],
+                  child: Text("התחבר/י באופן אנונימי",
                       style: TextStyle(color: Colors.white)),
                     onPressed: () async {
                     dynamic result = await _authService.signInAnon();

@@ -271,6 +271,24 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     this._videoFetcher = VideoFetcher(sentence: widget.sentence);
     // this._videoFetcher.getUrls();
     toBeNamed();
+    // trymeyo();
+  }
+
+  void trymeyo() async{
+    // io.sleep(const Duration(seconds: 2));
+    print("meow1");
+    if(widget.sentence == null){
+      return;
+    }
+    print("meow2");
+    while(!this._videoFetcher.doneLoading){
+      print("waiting...");
+      io.sleep(const Duration(seconds: 1));
+    }
+    print("sett!!!!!");
+    setState(() {
+
+    });
   }
 
   // need to move the function to another class
@@ -467,6 +485,9 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     // }
     if (this._videoFetcher.doneLoading){
       print("hazzah 123");
+    }
+    if (this._videoFetcher.doneLoading){
+      print("done loading!!!!");
     }
     return !this._videoFetcher.doneLoading ? Loading() : Scaffold(
       body: SingleChildScrollView(
