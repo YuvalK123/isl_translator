@@ -122,18 +122,19 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
   Future<List<String>> proccessWord(String word,String dirName) async{
     String exec = dirName == "animation_openpose/" ? "mp4" : "mkv";
-    var nonPre = await getNonPrepositional(word, dirName);
     List<String> urls = [];
-    if (nonPre != null){
-      urls.add(nonPre);
-      return urls;
-    }
     print("check for verb...");
     final stopWatch = Stopwatch()..start();
     var verb = await checkIfVerb(word, dirName);
     print("elapsed: ${stopWatch.elapsed} is verb??? $verb");
     if (verb != null){
       urls.add(verb);
+      return urls;
+    }
+    var nonPre = await getNonPrepositional(word, dirName);
+
+    if (nonPre != null){
+      urls.add(nonPre);
       return urls;
     }
     // Video doesn't exist - so split the work to letters
@@ -362,6 +363,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     isInit[urlss[index] + index.toString()] = false;
     VideoPlayerOptions options = VideoPlayerOptions(mixWithOthers: true);
     var controller = VideoPlayerController.network(urlss[index]);
+    controller.setVolume(0.0);
     _controllers[urlss[index] + index.toString()] = controller;
     await controller.initialize();
     isInit[urlss[index] + index.toString()] = true;

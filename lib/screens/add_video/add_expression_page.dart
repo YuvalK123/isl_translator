@@ -40,7 +40,7 @@ class _AddExpression extends State<AddExpression> {
             Container(
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              child: controller.value.initialized
+              child: controller.value.isInitialized
                   ? AspectRatio(
                       aspectRatio: controller.value.aspectRatio,
                       child: VideoPlayer(controller),
