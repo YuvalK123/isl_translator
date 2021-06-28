@@ -262,6 +262,9 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   FirebaseAuth _auth = FirebaseAuth.instance;
   var urlss;
   bool isReplay = false;
+  bool isPause = false;
+  bool isPlay = false;
+
   @override
   void initState() {
     print("init state");
@@ -565,10 +568,16 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                       child: Center(
                         child:
                         IconButton(
-                          icon: const Icon(Icons.play_arrow),
+                          icon: isPause ? const Icon(Icons.play_arrow,color: Colors.green,) : const Icon(Icons.play_arrow, color: Colors.grey,),
                           onPressed: () {
                             print("play");
-                            _controller(index).play();
+                            if(isPause)
+                              {
+                                _controller(index).play();
+                                setState(() {
+                                  isPause = false;
+                                });
+                              }
                           },
                         ),
                       ),
@@ -582,9 +591,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                       child: Center(
                         child:
                         IconButton(
-                          icon: const Icon(Icons.pause),
+                          icon: isPause ? const Icon(Icons.pause, color: Colors.grey,) : const Icon(Icons.pause, color: Colors.red),
                           onPressed: () {
                             print("pause");
+                            setState(() {
+                              isPause = true;
+                            });
                             _controller(index).pause();
                           },
                         ),
@@ -599,7 +611,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                       child: Center(
                         child:
                         IconButton(
-                          icon: const Icon(Icons.replay),
+                          icon: const Icon(Icons.replay, color:Colors.blue),
                           onPressed: () {
                             print("replay");
                             index = 0;
