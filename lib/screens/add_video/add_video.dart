@@ -275,20 +275,25 @@ class _AddVideoPageState extends State<AddVideoPage> {
   Future<void> countDown(context) async {
     counter = recordingDelay + 1;
 
-    timer = Timer.periodic(Duration(seconds: 1), (timer) {
+    timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       setState(() {
         if (counter > 0) {
           counter--;
         } else {
+          print("canceling");
           timer.cancel();
         }
       });
     });
-
   }
 
   Future<void> onCapturePressed(context) async {
-    Future.sync(() => countDown(context));
+    countDown(context);
+    Future.delayed(Duration(seconds: recordingDelay), (){
+      print("done delay");
+    });
+    print("oh yayayaya");
+
     // countDown(context);
     // await Future.delayed(Duration(seconds: recordingDelay + 1));
     try {

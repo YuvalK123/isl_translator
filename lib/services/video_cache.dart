@@ -10,9 +10,13 @@ List<String> lettersList = ["א","ב","ג","ד","ה","ו","ז","ח","ט",
                          "י","כ","ך","ל","מ","ם","נ","ן","ס",
                           "ע","פ","ף","צ","ץ","ק","ר","ש","ת"];
 
+bool hasLettersLocal = false;
+
+
 class LruCache{
   final LruMap<String,String> map = LruMap();
   DiskLruCache _cache;
+
 
   DiskLruCache get cache {
     return _cache;
@@ -24,14 +28,15 @@ class LruCache{
 
   static Future<void> saveLetters(String dirName) async{
     print("save letters");
-    return;
-    // for (var letter in lettersList){
-    //   print("on $letter.mp4");
-    //   // String url = await VideoFetcher.getUrl("$letter",dirName);
-    //   print("downloaded letter url $url");
-    //   VideoFetcher().saveFile(url, "$letter.mp4");
-    //   print("saved!!");
-    // }
+    // return;
+    for (var letter in lettersList){
+      print("on $dirName/$letter.mp4");
+      String url = await VideoFetcher.getUrl("$letter",dirName);
+      print("downloaded letter url $url");
+      await VideoFetcher().saveFile(url, "$letter.mp4");
+      print("saved!!");
+    }
+    hasLettersLocal = true;
   }
 
   LruCache(){

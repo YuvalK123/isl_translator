@@ -33,6 +33,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
   final String sentence;
   bool isValidSentence = false;
   Map<int, String> indexToUrl = Map<int,String>();
+  static String lettersCachePath;
 
   bool get isFirstLoaded {
     return indexToUrl.containsKey(0);
@@ -54,36 +55,49 @@ class VideoFetcher { // extends State<VideoFetcher> {
     return PermissionStatus.granted.isGranted;
   }
 
+  Future<String> createLettersCachePath() async{
+    io.Directory directory = await getExternalStorageDirectory();
+    print("path is ${directory.path}");
+    String newPath = "";
+    List<String> folders = directory.path.split("/");
+    for (int i = 1; i < folders.length; i++){
+      String folder = folders[i];
+      print("folder == $folder");
+      // newPath += "/" + folder;
+      if (folder != "android"){
+        newPath += "/"+folder;
+      }else{
+        break;
+      }
+    }
+    newPath = newPath + "/Cache";
+    lettersCachePath = newPath;
+    return newPath;
+  }
+
   Future<bool> saveFile(String url, String fileName) async{
     io.Directory directory;
     Dio dio = Dio();
+    print("path for letters be4 is $lettersCachePath");
     try {
       print("android");
       if (io.Platform.isAndroid){
         print("downloading for android");
-        if (await _requestPermission(Permission.storage)){
+        if (await _requestPermission(Permission.storage) ||
+            (lettersCachePath == null || lettersCachePath == "")){
           print("got permission");
-          directory = await getExternalStorageDirectory();
-          print("path is ${directory.path}");
-          String newPath = "";
-          List<String> folders = directory.path.split("/");
-          for (int i = 1; i < folders.length; i++){
-            String folder = folders[i];
-            print("folder == $folder");
-            newPath += "/" + folder;
-            if (folder != "android"){
-              newPath += "/"+folder;
-            }else{
-              break;
-            }
-          }
-          newPath = newPath + "/Cache";
+          String newPath = await createLettersCachePath();
           print("newPath is $newPath");
           directory = io.Directory(newPath);
         }
-      }else{
-        // apple
+      }else if ((lettersCachePath != null && lettersCachePath != "")){
+        directory = io.Directory(lettersCachePath);
 
+      }else{
+        // apple, and not loaded
+      }
+      if (lettersCachePath == ""){
+        return false;
       }
       print("tmp is ${await getTemporaryDirectory()}");
       print("directory is ${io.Directory}");
@@ -97,9 +111,13 @@ class VideoFetcher { // extends State<VideoFetcher> {
         String fullName = directory.path + "/$fileName";
         print("full name is $fullName");
         io.File saveFile = io.File(fullName);
+        if (await saveFile.exists()){
+          return true;
+        }
         print("saved! now downloading");
         await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
         print("downloaded!!");
+        return true;
       }
       else{
         print("doesnt exist");
@@ -134,10 +152,21 @@ class VideoFetcher { // extends State<VideoFetcher> {
     }
     // Video doesn't exist - so split the work to letters
     var letters = splitToLetters(word);
-    List<String> lettersUrls = [];
+    List<String> lettersUrls = [], cachedUrls = [];
+    if (lettersCachePath == null || lettersCachePath == ""){
+      await createLettersCachePath();
+    }
     for(int j=0; j < letters.length; j++){
-      if (!hebrewChars.containsKey(letters[j])){
+      var letter = letters[j];
+      if (!hebrewChars.containsKey(letter)){
         continue;
+      }
+      print("cache is $lettersCachePath");
+      if (lettersCachePath != null && lettersCachePath != ""){
+        io.File saveFile = io.File("$lettersCachePath/$letter.mp4");
+        if (await saveFile.exists()){
+          cachedUrls.add("#/$letter.mp4");
+        }
       }
       print("working on ${letters[j]}.$exec");
       Reference ref = FirebaseStorage.instance
@@ -150,7 +179,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
       print("letter added ==> " + letters[j]);
     }
 
-    return urls;
+    return cachedUrls.isEmpty ? urls : cachedUrls;
     // print("letters urls are = $lettersUrls");
     // for(int l=0; l < lettersUrls.length; l++){
     //   print("adding" + lettersUrls[l]);
@@ -163,6 +192,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
   static Future<String> getUrl(String word, String dirName) async{
     String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
+    print("fetching ${"$dirName" + word + "$exec"}");
     Reference ref = FirebaseStorage.instance
         .ref()
         .child("$dirName" + word + "$exec");
@@ -374,10 +404,23 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   Future<void> _initController(int index) async {
     var myUrls = this._videoFetcher.urls;
     urlss = this._videoFetcher.indexToUrl;
+    String url = urlss[index];
+    VideoPlayerController controller;
+    if (url.startsWith("#")){
+      if(VideoFetcher.lettersCachePath == null){
+        String newPath = await this._videoFetcher.createLettersCachePath();
+      }
+      url = url.replaceFirst("#", VideoFetcher.lettersCachePath);
+      print("loading from file $url");
+      controller = VideoPlayerController.file(io.File(url));
+    }
+    else{
+      VideoPlayerOptions options = VideoPlayerOptions(mixWithOthers: true);
+      controller = VideoPlayerController.network(urlss[index]);
+    }
     print("init $index");
     isInit[urlss[index] + index.toString()] = false;
-    VideoPlayerOptions options = VideoPlayerOptions(mixWithOthers: true);
-    var controller = VideoPlayerController.network(urlss[index]);
+
     controller.setVolume(0.0);
     _controllers[urlss[index] + index.toString()] = controller;
     await controller.initialize();

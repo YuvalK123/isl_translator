@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/models/drawer_button.dart';
+import 'package:isl_translator/screens/testDir/file_save_test.dart';
 import '../models/profile_image.dart';
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/add_video/add_video.dart';
@@ -108,6 +109,12 @@ class MainDrawer extends StatelessWidget {
                 onTap: () => pushPage(context, TranslationWrapper()),
                 icon: Icon(Icons.translate),
                 isCurrPage: this.currPage == pageButton.TRANSLATION,
+              ),
+              DrawerButton(
+                title: "דף טומטום",
+                onTap: () => pushPage(context, DummyPage()),
+                icon: Icon(Icons.download_done_outlined),
+                isCurrPage: false,
               ),
               DrawerButton(
                   title: "הוסף וידיאו",
