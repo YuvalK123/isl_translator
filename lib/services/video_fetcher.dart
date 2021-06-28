@@ -41,11 +41,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
   VideoFetcher({this.sentence});
   // VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("0"), myUrls: [],);
 
-
-  void downloadThenDo(){
-
-  }
-
   static Future<List<String>> getDowloadLinks(List<Reference> refs) =>
       Future.wait(refs.map((ref) {
         ref.getDownloadURL();
@@ -265,7 +260,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   String dirName = "animation_openpose/";
   UserModel currUserModel;
   FirebaseAuth _auth = FirebaseAuth.instance;
-
+  var urlss;
+  bool isReplay = false;
   @override
   void initState() {
     super.initState();
@@ -376,7 +372,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   Future<void> _initController(int index) async {
     var myUrls = this._videoFetcher.urls;
-    var urlss = this._videoFetcher.indexToUrl;
+    urlss = this._videoFetcher.indexToUrl;
     print("init $index");
     isInit[urlss[index] + index.toString()] = false;
     VideoPlayerOptions options = VideoPlayerOptions(mixWithOthers: true);
@@ -411,7 +407,11 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     //   _controller(index).addListener(checkIfVideoFinished);
     //
     // }
-    //_controller(index).addListener(checkIfVideoFinished);
+    _controller(index).addListener(checkIfVideoFinished);
+    // if(index == _urls.length-1)
+    //   {
+    //     _controller(index).addListener(checkIfVideoFinished);
+    //   }
     if (mounted){
       setState(() {
         this._isReady = true;
@@ -464,6 +464,27 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     }
   }
 
+  void checkIfVideoFinished() {
+      if (_controller(index) == null ||
+          _controller(index).value == null ||
+          _controller(index).value.position == null ||
+          _controller(index).value.duration == null) return;
+      if (_controller(index).value.position.inSeconds ==
+          _controller(index).value.duration.inSeconds)
+      {
+        _controller(index).removeListener(() => checkIfVideoFinished());
+        //_controller.dispose();
+        //_controller(index) = null;
+        //_nextVideo();
+        print("index for finish === >> " + index.toString());
+        if(index == urlss.length -1){
+          //add replay button
+          print("finish all videos!!!");
+          return;
+        }
+        //playHi(sentence, index+1);
+      }
+    }
 
   @override
   void dispose(){
@@ -511,7 +532,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                             border: Border.all(
                               color: this.borderColor,
                               width: 4.0,
-
                             ),
                             borderRadius: BorderRadius.all(
                               Radius.circular(7.0),
@@ -527,6 +547,58 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
             ),
             SingleChildScrollView(
               child: Container(
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 5)
+                ),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Center(
+                      child:
+                      IconButton(
+                        icon: const Icon(Icons.play_arrow),
+                        onPressed: () {
+                          print("play");
+                          _controller(index).play();
+                        },
+                      ),
+                    ),
+                    Center(
+                      child:
+                      IconButton(
+                        icon: const Icon(Icons.pause),
+                        onPressed: () {
+                          print("pause");
+                          _controller(index).pause();
+                        },
+                      ),
+                    ),
+                    Center(
+                      child:
+                      IconButton(
+                        icon: const Icon(Icons.replay),
+                        onPressed: () {
+                          print("replay");
+                          //_removeController(index);
+                          // _stopController(index);
+                          // index = 0;
+                          // _playController(index);
+                          index = 0;
+                          initState();
+                          //_controller(index).play();
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(height: 20,),
+            SingleChildScrollView(
+              child: Container(
+                alignment: Alignment.bottomCenter,
                 child: Center(
                   child:
                   FlatButton(onPressed: () => showFeedback(context, widget.sentence), // this will trigger the feedback modal

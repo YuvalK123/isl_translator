@@ -106,8 +106,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
                 child: Icon(
                   Icons.camera,
                 ),
-                onPressed: () {
-                  onCapturePressed(context);
+                onPressed: () async{
+                  await onCapturePressed(context);
                 },
               ),
             ],
@@ -272,7 +272,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     print(errorText);
   }
 
-  void countDown(context) {
+  Future<void> countDown(context) async {
     counter = recordingDelay + 1;
 
     timer = Timer.periodic(Duration(seconds: 1), (timer) {
@@ -284,11 +284,13 @@ class _AddVideoPageState extends State<AddVideoPage> {
         }
       });
     });
+
   }
 
-  void onCapturePressed(context) async {
-    countDown(context);
-    await Future.delayed(Duration(seconds: recordingDelay + 1));
+  Future<void> onCapturePressed(context) async {
+    Future.sync(() => countDown(context));
+    // countDown(context);
+    // await Future.delayed(Duration(seconds: recordingDelay + 1));
     try {
       await controller.startVideoRecording();
       await Future.delayed(Duration(seconds: recordingTime));
