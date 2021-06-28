@@ -4,8 +4,9 @@ class DrawerButton extends StatelessWidget {
   final String title;
   final Function onTap;
   final Icon icon;
+  final bool isCurrPage;
 
-  DrawerButton({this.title, this.onTap, this.icon});
+  DrawerButton({this.title, this.onTap, this.icon, this.isCurrPage = false});
   @override
   Widget build(BuildContext context) {
     return ListTile(
@@ -14,16 +15,20 @@ class DrawerButton extends StatelessWidget {
         this.title,
         style: TextStyle(
           fontSize: 18,
+          color: this.isCurrPage? Colors.white : Colors.black,
         ),
         textAlign: TextAlign.right,
       ),
+      selectedTileColor: Colors.grey[400],
       trailing: Wrap(
         spacing: 12,
         children: <Widget>[
           this.icon,
         ],
       ),
-      onTap: this.onTap,
+      selected: this.isCurrPage,
+      focusColor: Colors.white,
+      onTap: !this.isCurrPage ? this.onTap : (){},
       hoverColor: Colors.grey[300],
     );
   }

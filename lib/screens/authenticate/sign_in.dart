@@ -1,4 +1,7 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/services/auth.dart';
+import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
@@ -15,10 +18,10 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
-  final AuthService _auth = AuthService();
+  final AuthService _authService = AuthService();
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
-
+  FirebaseAuth _auth = FirebaseAuth.instance;
   String email = '';
   String password = '';
   String error = '';
@@ -27,11 +30,13 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return loading ? Loading() : Scaffold(
-      backgroundColor: Colors.brown[100],
+      //backgroundColor: Colors.white60,
       appBar: AppBar(
-        backgroundColor: Colors.brown[400],
+        backgroundColor: Colors.cyan[800],
         elevation: 0.0,
-        title: Text('Sign in to ISL-Translator'),
+        title: Container(
+            alignment: Alignment.centerRight,
+            child: Text('תרגום שפת הסימנים')),
         actions: <Widget> [
           FlatButton.icon(
               onPressed: widget.toggleView,
@@ -40,71 +45,98 @@ class _SignInState extends State<SignIn> {
           )
         ],
       ),
-      body: Container(
-        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-        // ignore: deprecated_member_use
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: <Widget> [
-              SizedBox(height: 20.0,),
-              TextFormField(
-                decoration: textInputDecoration.copyWith(hintText: 'Email'),
-                validator: (val) => val.isEmpty ? 'Enter an email' : null,
-                onChanged: (val) { // email
-                  setState(() => email = val);
-                },
-              ),
-              SizedBox(height: 20.0,),
-              TextFormField(
-                decoration: textInputDecoration.copyWith(hintText: 'Password'),
-                validator: (val) =>
-                val.length < 6 ? 'Enter a password 6+ chars long' : null,
-                onChanged: (val) => setState(() => password = val) ,
-                obscureText: true,
-              ),
-              SizedBox(height: 20.0,),
-              RaisedButton(
-                color: Colors.pink[400],
-                child: Text("Sign in",
-                    style: TextStyle(color: Colors.white)
+      body: SingleChildScrollView(
+        reverse: true,
+        child: Container(
+          padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
+          // ignore: deprecated_member_use
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: <Widget> [
+                SizedBox(height: 20.0,),
+                Container(
+                  alignment: Alignment.topRight,
+                    child: Text("!ברוכים הבאים", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
+                SizedBox(height: 20.0,),
+                Image.asset("assets/images/colorful_hand.jfif", width: 200, height: 200,),
+                SizedBox(height: 20.0,),
+                TextFormField(
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  decoration: textInputDecoration.copyWith(hintText: 'אימייל'),
+                  validator: (val) => val.isEmpty ? 'Enter an email' : null,
+                  onChanged: (val) { // email
+                    setState(() => email = val);
+                  },
                 ),
-                onPressed: () async {
-                  // true - valid form. false - invalid form
-                  if (_formKey.currentState.validate()){
-                    setState(() => loading = true);
-                    dynamic result = await _auth.
-                    signInUserWithEmailAndPassword(email, password);
+                SizedBox(height: 20.0,),
+                TextFormField(
+                  textDirection: TextDirection.rtl,
+                  textAlign: TextAlign.right,
+                  decoration: textInputDecoration.copyWith(hintText: 'סיסמה'),
+                  validator: (val) =>
+                  val.length < 6 ? 'Enter a password 6+ chars long' : null,
+                  onChanged: (val) => setState(() => password = val) ,
+                  obscureText: true,
+                ),
+                SizedBox(height: 20.0,),
+
+                RaisedButton(
+                  color: Colors.grey[400],
+                  child: Text("התחבר/י",
+                      style: TextStyle(color: Colors.white)
+                  ),
+                  onPressed: () async {
+                    // true - valid form. false - invalid form
+                    if (_formKey.currentState.validate()){
+
+
+                      dynamic result = await _authService.
+                      signInUserWithEmailAndPassword(email, password);
+                      print("result sign in $result");
+                      if (result.runtimeType == String){
+                        setState(() {
+                          loading = false;
+                          error = '${result.toString()}\nCould not sign in';
+                        });
+                      }
+                      if (_auth.currentUser.emailVerified){
+                        // get all terms
+
+                        setState(() => loading = true
+                        );
+                        // futureTerms.then((result) => saveTerms=  result)
+                        // .catchError((e) => print('error in find terms'));
+                      }
+                    }
+                  },
+                ),
+                SizedBox(height: 20.0,),
+                RaisedButton(
+                  color: Colors.grey[400],
+                  child: Text("התחבר/י באופן אנונימי",
+                      style: TextStyle(color: Colors.white)),
+                    onPressed: () async {
+                    dynamic result = await _authService.signInAnon();
                     if (result == null){
                       setState(() {
                         loading = false;
                         error = 'Could not sign in';
                       });
                     }
-                  }
-                },
-              ),
-              SizedBox(height: 20.0,),
-              RaisedButton(
-                color: Colors.pink[400],
-                child: Text("Sign in anonymously",
-                    style: TextStyle(color: Colors.white)),
-                  onPressed: () async {
-                  dynamic result = await _auth.signInAnon();
-                  if (result == null){
-                    setState(() {
-                      loading = false;
-                      error = 'Could not sign in';
-                    });
-                  }
-                  }
-              ),
-              SizedBox(height: 12.0,),
-              Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),)
-            ],
+                    }
+                ),
+                SizedBox(height: 12.0,),
+                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),)
+              ],
+            ),
           ),
         ),
       ),
     );
   }
+
+
+
 }

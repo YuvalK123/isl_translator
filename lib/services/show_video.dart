@@ -1,7 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:isl_translator/shared/reg.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+
+List<String> saveTerms;
 
 /* Split the word to letters */
 List<String> splitToLetters(String word) {
@@ -38,29 +41,47 @@ Future<List<String>> findTermsDB() async {
       }
     }
   });
-  print(terms);
   return terms;
 }
 
 /* Split the sentence to word/term and return a list of the split sentence*/
 List<String> splitSentence(String sentence) {
+  if (sentence == null){
+    return null;
+  }
+  List<String> hebrewLetters = hebrewChars.keys.toList();
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
-  List sentenceList = newSentence.split(" "); //split the sentence to words
-  List<String> saveTerms = [
-    'יום הזיכרון',
-    'ארבעת המינים',
-    'כרטיס ברכה'
-  ]; // list of terms(need to create one)
+  print("^[${hebrewLetters.toString()}]'");
+  var vals = hebrewLetters.toString().substring(1,hebrewLetters.toString().length - 1).replaceAll(",", "");
+  newSentence = newSentence.replaceAll(RegExp('[^$vals]'), "");
+  print("fixed sentence is $newSentence");
+  if (newSentence.isEmpty){
+    return null;
+  }
+  // newSentence = newSentence.replaceAll("?", "");
+  // newSentence = newSentence.replaceAll(",", "");
+  // newSentence = newSentence.replaceAll("-", "");
+  // newSentence = newSentence.replaceAll("/", "");
+  // newSentence = newSentence.replaceAll("\\", "");
+  // newSentence = newSentence.replaceAll(".", "");
+  // newSentence = newSentence.replaceAll("*", "");
+  List<String> sentenceList = newSentence.split(" "); //split the sentence to words
 
-  // get all terms
-  /*Future<List<String>> futureTerms = findTermsDB();
-  print('futureTerms');
-  futureTerms.then((result) => print("bla" + result.toString()))
-      .catchError((e) => print('error'));*/
+  // List<String> saveTerms = [
+  //   'יום הזיכרון',
+  //   'ארבעת המינים',
+  //   'כרטיס ברכה'
+  // ]; // list of terms(need to create one)
 
-  List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
-
+  // // get all terms
+  // Future<List<String>> futureTerms = findTermsDB();
+  // print('futureTerms');
+  // futureTerms.then((result) => saveTerms=  result)
+  //     .catchError((e) => print('error'));
+  print("hello save terms ==> " + saveTerms.toString());
+  //List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
+  List<String> terms = [];
   //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
   List<String> splitSentence = [];
 
