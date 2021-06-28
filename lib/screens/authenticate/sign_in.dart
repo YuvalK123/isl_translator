@@ -36,12 +36,12 @@ class _SignInState extends State<SignIn> {
         elevation: 0.0,
         title: Container(
             alignment: Alignment.centerRight,
-            child: Text('תרגום שפת הסימנים')),
+            child: Text('התחברות')),
         actions: <Widget> [
           FlatButton.icon(
               onPressed: widget.toggleView,
               icon: Icon(Icons.person),
-              label: Text("Register")
+              label: Text("הרשמ/י")
           )
         ],
       ),
@@ -55,11 +55,22 @@ class _SignInState extends State<SignIn> {
             child: Column(
               children: <Widget> [
                 SizedBox(height: 20.0,),
+                Row(
+                  children: [
+                    Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
+                    SizedBox(width: 10.0,),
+                    Container(
+                      alignment: Alignment.topRight,
+                        child: Text("!שלום", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
+                    SizedBox(width: 10.0,),
+                    Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
+                  ],
+                ),
+                SizedBox(height: 40.0,),
                 Container(
-                  alignment: Alignment.topRight,
-                    child: Text("!ברוכים הבאים", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
-                SizedBox(height: 20.0,),
-                Image.asset("assets/images/colorful_hand.jfif", width: 200, height: 200,),
+                    alignment: Alignment.topRight,
+                    child: Text("התחבר/י למשתמש שלך", style: TextStyle(fontWeight: FontWeight.bold, fontSize:20,fontStyle: FontStyle.italic),)),
+                //Image.asset("assets/images/colorful_hand.jfif", width: 100, height: 100,),
                 SizedBox(height: 20.0,),
                 TextFormField(
                   textDirection: TextDirection.rtl,
@@ -82,53 +93,62 @@ class _SignInState extends State<SignIn> {
                 ),
                 SizedBox(height: 20.0,),
 
-                RaisedButton(
-                  color: Colors.grey[400],
-                  child: Text("התחבר/י",
-                      style: TextStyle(color: Colors.white)
-                  ),
-                  onPressed: () async {
-                    // true - valid form. false - invalid form
-                    if (_formKey.currentState.validate()){
+                Row(
+                  children: [
+                    RaisedButton(
+                        color: Colors.grey[400],
+                        child: Text("התחבר/י באופן אנונימי",
+                            style: TextStyle(color: Colors.white)),
+                        onPressed: () async {
+                          dynamic result = await _authService.signInAnon();
+                          if (result == null){
+                            setState(() {
+                              loading = false;
+                              error = 'Could not sign in';
+                            });
+                          }else{
+                            List<String> futureTerms = await findTermsDB();
+                            saveTerms = futureTerms;
+                          }
+                        }
+                    ),
+                    SizedBox(width: 20.0,),
+                    RaisedButton(
+                      color: Colors.grey[400],
+                      child: Text("התחבר/י",
+                          style: TextStyle(color: Colors.white)
+                      ),
+                      onPressed: () async {
+                        // true - valid form. false - invalid form
+                        if (_formKey.currentState.validate()){
 
 
-                      dynamic result = await _authService.
-                      signInUserWithEmailAndPassword(email, password);
-                      print("result sign in $result");
-                      if (result.runtimeType == String){
-                        setState(() {
-                          loading = false;
-                          error = '${result.toString()}\nCould not sign in';
-                        });
-                      }
-                      if (_auth.currentUser.emailVerified){
-                        // get all terms
-
-                        setState(() => loading = true
-                        );
-                        // futureTerms.then((result) => saveTerms=  result)
-                        // .catchError((e) => print('error in find terms'));
-                      }
-                    }
-                  },
+                          dynamic result = await _authService.
+                          signInUserWithEmailAndPassword(email, password);
+                          print("result sign in $result");
+                          if (result.runtimeType == String){
+                            setState(() {
+                              loading = false;
+                              error = '${result.toString()}\nCould not sign in';
+                            });
+                          }
+                          if (_auth.currentUser.emailVerified){
+                            // get all terms
+                            List<String> futureTerms = await findTermsDB();
+                            saveTerms = futureTerms;
+                            setState(() => loading = true
+                            );
+                            // futureTerms.then((result) => saveTerms=  result)
+                            // .catchError((e) => print('error in find terms'));
+                          }
+                        }
+                      },
+                    ),
+                  ],
                 ),
-                SizedBox(height: 20.0,),
-                RaisedButton(
-                  color: Colors.grey[400],
-                  child: Text("התחבר/י באופן אנונימי",
-                      style: TextStyle(color: Colors.white)),
-                    onPressed: () async {
-                    dynamic result = await _authService.signInAnon();
-                    if (result == null){
-                      setState(() {
-                        loading = false;
-                        error = 'Could not sign in';
-                      });
-                    }
-                    }
-                ),
+
                 SizedBox(height: 12.0,),
-                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),)
+                Text(error, style: TextStyle(color: Colors.blue, fontSize: 14.0),)
               ],
             ),
           ),

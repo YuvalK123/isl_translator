@@ -12,6 +12,7 @@ class ProfileImage{
   ImageProvider _img;
   // bool loaded = false;
   File _imageFile;
+  bool _isLocal = true;
   // NetworkImage _networkImage;
   // FileImage _fileImage;
   String _uploadedFileURL;
@@ -28,6 +29,7 @@ class ProfileImage{
 
   ProfileImage({this.uid}){
     setImage();
+
   }
 
   // void _setImageUrl() async{
@@ -46,12 +48,12 @@ class ProfileImage{
     //   this._networkImage = NetworkImage(this.imageUrl);
     // }
     this.imageUrl = await getImageUrl();
-    this._img = NetworkImage(this.imageUrl);
+    // this._img = NetworkImage(this.imageUrl);
+    this._img = this._isLocal ? Image.asset(imageUrl): NetworkImage(this.imageUrl);
 
   }
 
-
-  static Future<String> getImageUrl() async{
+  Future<String> getImageUrl() async{
     var isImageExist = true;
     String imageUrl;
     FirebaseAuth auth = FirebaseAuth.instance;
@@ -61,6 +63,7 @@ class ProfileImage{
     try {
       // gets the video's url
       imageUrl = await storageReference.getDownloadURL();
+      _isLocal = false;
       print("got it!");
     } catch (err) {
       print("don't exist");
@@ -74,6 +77,7 @@ class ProfileImage{
       try {
         // gets the video's url
         imageUrl = await storageReference.getDownloadURL();
+
       } catch (err) {
         print("don't exist");
       }
