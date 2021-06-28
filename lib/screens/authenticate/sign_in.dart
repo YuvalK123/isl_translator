@@ -106,6 +106,9 @@ class _SignInState extends State<SignIn> {
                               loading = false;
                               error = 'Could not sign in';
                             });
+                          }else{
+                            List<String> futureTerms = await findTermsDB();
+                            saveTerms = futureTerms;
                           }
                         }
                     ),
@@ -131,7 +134,8 @@ class _SignInState extends State<SignIn> {
                           }
                           if (_auth.currentUser.emailVerified){
                             // get all terms
-
+                            List<String> futureTerms = await findTermsDB();
+                            saveTerms = futureTerms;
                             setState(() => loading = true
                             );
                             // futureTerms.then((result) => saveTerms=  result)

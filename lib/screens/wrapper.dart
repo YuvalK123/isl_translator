@@ -25,7 +25,7 @@ class Wrapper extends StatelessWidget {
     // }
     if (user != null && (_auth.currentUser.emailVerified || _auth.currentUser.isAnonymous)){
       //saveTermsForShow();
-      print("good!");
+      print("good save terms!!!!");
       return TranslationWrapper();
     }
     return Authenticate();

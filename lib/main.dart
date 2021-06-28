@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/auth.dart';
@@ -9,6 +10,14 @@ import 'package:isl_translator/services/show_video.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  final user = FirebaseAuth.instance.currentUser;
+  if (user != null && user.uid != null){
+    print("user is $user ${user.uid}");
+    List<String> futureTerms = await findTermsDB();
+    saveTerms = futureTerms;
+  }else{
+    print("fail");
+  }
   // get all terms
   // List<String> futureTerms = await findTermsDB();
   // saveTerms = futureTerms;

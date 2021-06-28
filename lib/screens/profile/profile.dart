@@ -57,7 +57,7 @@ class MapScreenState extends State<ProfilePage>
   }
 
   void initImgUrl() async{
-    var img = await ProfileImage.getImageUrl();
+    var img = await this._profileImage.getImageUrl();
     if(mounted){
       setState(() {
         this.imageUrl =img;
