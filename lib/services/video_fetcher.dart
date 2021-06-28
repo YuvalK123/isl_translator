@@ -264,6 +264,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   bool isReplay = false;
   @override
   void initState() {
+    print("init state");
     super.initState();
     this._videoFetcher = VideoFetcher(sentence: widget.sentence);
     // this._videoFetcher.getUrls();
@@ -545,50 +546,88 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                 ),
               ),
             ),
+            SizedBox(height: 20,),
             SingleChildScrollView(
               child: Container(
                 alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    border: Border.all(color: Colors.black, width: 5)
-                ),
+                // decoration: BoxDecoration(
+                //     border: Border.all(color: Colors.black, width: 5)
+                // ),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Center(
-                      child:
-                      IconButton(
-                        icon: const Icon(Icons.play_arrow),
-                        onPressed: () {
-                          print("play");
-                          _controller(index).play();
-                        },
+                    Container(
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.black, width: 2,),
+                          borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      child: Center(
+                        child:
+                        IconButton(
+                          icon: const Icon(Icons.play_arrow),
+                          onPressed: () {
+                            print("play");
+                            _controller(index).play();
+                          },
+                        ),
                       ),
                     ),
-                    Center(
-                      child:
-                      IconButton(
-                        icon: const Icon(Icons.pause),
-                        onPressed: () {
-                          print("pause");
-                          _controller(index).pause();
-                        },
+                    SizedBox(width: 5,),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 2,),
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      child: Center(
+                        child:
+                        IconButton(
+                          icon: const Icon(Icons.pause),
+                          onPressed: () {
+                            print("pause");
+                            _controller(index).pause();
+                          },
+                        ),
                       ),
                     ),
-                    Center(
-                      child:
-                      IconButton(
-                        icon: const Icon(Icons.replay),
-                        onPressed: () {
-                          print("replay");
-                          //_removeController(index);
-                          // _stopController(index);
-                          // index = 0;
-                          // _playController(index);
-                          index = 0;
-                          initState();
-                          //_controller(index).play();
-                        },
+                    SizedBox(width: 5,),
+                    Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.black, width: 2,),
+                        borderRadius: BorderRadius.circular(30.0),
+                      ),
+                      child: Center(
+                        child:
+                        IconButton(
+                          icon: const Icon(Icons.replay),
+                          onPressed: () {
+                            print("replay");
+                            index = 0;
+                            _initController(0).then((_) {
+                              setState(() {
+                                this.aspectRatio = _controller(0).value.aspectRatio;
+                                this._isReady = true;
+                                this.borderColor = Colors.black;
+                              });
+
+                              _playController(0);
+                            })..onError((error, stackTrace) {print("error on loading at 0 $error");});
+                            if (_videoFetcher.indexToUrl.keys.length > 1) {
+                              _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
+                            }
+                            //toBeNamed();
+                            //_removeController(index);
+                            // _stopController(index);
+                            // index = 0;
+                            // _playController(index);
+                            // setState(() {
+                            //   index = 0;
+                            //   initState();
+                            // });
+
+                            //_controller(index).play();
+                          },
+                        ),
                       ),
                     ),
                   ],
