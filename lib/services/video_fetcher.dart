@@ -348,15 +348,20 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     await this._videoFetcher.getUrls(dirName);
     print("indexToUrl is ${_videoFetcher.indexToUrl}");
     if (_videoFetcher.indexToUrl.isNotEmpty) {
-      _initController(0).then((_) {
+      await _initController(0);
+      if (mounted){
         setState(() {
-          this.aspectRatio = _controller(0).value.aspectRatio;
-          this._isReady = true;
-          this.borderColor = Colors.black;
-        });
-
-        _playController(0);
-      })..onError((error, stackTrace) {print("error on loading at 0 $error");});
+              this.aspectRatio = _controller(0).value.aspectRatio;
+              this._isReady = true;
+              this.borderColor = Colors.black;
+            });
+      }
+      _playController(0);
+      // _initController(0).then((_) {
+      //
+      //
+      //   _playController(0);
+      // })..onError((error, stackTrace) {print("error on loading at 0 $error");});
       if (_videoFetcher.indexToUrl.keys.length > 1) {
         _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
       }
