@@ -594,10 +594,13 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                           icon: isPause ? const Icon(Icons.pause, color: Colors.grey,) : const Icon(Icons.pause, color: Colors.red),
                           onPressed: () {
                             print("pause");
-                            setState(() {
-                              isPause = true;
-                            });
-                            _controller(index).pause();
+                            if(!isPause)
+                              {
+                                setState(() {
+                                  isPause = true;
+                                });
+                                _controller(index).pause();
+                              }
                           },
                         ),
                       ),
