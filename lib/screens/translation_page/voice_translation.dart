@@ -379,7 +379,6 @@ class _RecordPage extends State<RecordPage> {
         );
       }
     }
-
   }
 
   // Future<void> meow() async{

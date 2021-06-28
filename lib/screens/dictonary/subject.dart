@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:isl_translator/services/video_cache.dart';
+import 'package:isl_translator/services/video_fetcher.dart';
 
 import 'package:video_player/video_player.dart';
 class Subject extends StatefulWidget {
@@ -18,10 +20,26 @@ class _SubjectState extends State<Subject> {
   List<String> myUrls;
   int ind = 1;
   String subjectName;
+  String sentence;
+  VideoPlayer2 _videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: null,);
+
   @override
   void initState() {
     super.initState();
     subjectName = widget.name;
+  }
+
+  Future<void> playVideos() async {
+    //String sentence = myController.text;
+    if (sentence == "") {
+      sentence = null;
+    }
+    print("sentence is == $sentence");
+    if (mounted) {
+      setState(() {
+        this._videoFetcher = VideoPlayer2(key: UniqueKey(), sentence: sentence,);
+      });
+    }
   }
 
   List<Card> _buildGridCards(BuildContext context) {
@@ -160,46 +178,52 @@ class _SubjectState extends State<Subject> {
                 child: Material(
                   type: MaterialType.transparency,
                   child: InkWell(
-                      onTap: () async {
-                        String sentence = product.onTap; // got the sentence from the user
-                        List<String> splitSentenceList =
-                        splitSentence(sentence); // split the sentence
-                        String url;
-                        List<String> letters;
-                        print(splitSentenceList);
-                        List<String> urls = [];
-                        for(int i=0; i < splitSentenceList.length; i++)
-                        {
-                          Reference ref = FirebaseStorage.instance
-                              .ref()
-                              .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
-                          try {
-                            // gets the video's url
-                            url = await ref.getDownloadURL();
-                            urls.add(url);
-                          } catch (err) {
-                            // Video doesn't exist - so split the work to letters
-                            letters = splitToLetters(splitSentenceList[i]);
-                            for(int j=0; j < letters.length; j++){
-                              Reference ref = FirebaseStorage.instance
-                                  .ref()
-                                  .child("animation_openpose/" + letters[j] + ".mp4");
-                              url = await ref.getDownloadURL();
-                              urls.add(url);
-                            }
-                          }
-                        }
-                        myUrls = urls;
-                        print("hello this is the urls ==> " + urls.toString());
-                        setState(() {
-                          this.videoPlayerDemo = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
-                          this.ind++;
-                        });
+                      onTap: (){
+                        sentence = product.onTap;
+                        playVideos();
                         showDialog(
                           context: context,
                           builder: (BuildContext context) => _buildPopupDialog(context),
                         );
-                      }
+                      }// got the sentence from the user
+                        // List<String> splitSentenceList =
+                        // splitSentence(sentence); // split the sentence
+                        // String url;
+                        // List<String> letters;
+                        // print(splitSentenceList);
+                        // List<String> urls = [];
+                        // for(int i=0; i < splitSentenceList.length; i++)
+                        // {
+                        //   Reference ref = FirebaseStorage.instance
+                        //       .ref()
+                        //       .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
+                        //   try {
+                        //     // gets the video's url
+                        //     url = await ref.getDownloadURL();
+                        //     urls.add(url);
+                        //   } catch (err) {
+                        //     // Video doesn't exist - so split the work to letters
+                        //     letters = splitToLetters(splitSentenceList[i]);
+                        //     for(int j=0; j < letters.length; j++){
+                        //       Reference ref = FirebaseStorage.instance
+                        //           .ref()
+                        //           .child("animation_openpose/" + letters[j] + ".mp4");
+                        //       url = await ref.getDownloadURL();
+                        //       urls.add(url);
+                        //     }
+                        //   }
+                        // }
+                        // myUrls = urls;
+                        // print("hello this is the urls ==> " + urls.toString());
+                        // setState(() {
+                        //   this.videoPlayerDemo = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
+                        //   this.ind++;
+                        // });
+                        // showDialog(
+                        //   context: context,
+                        //   builder: (BuildContext context) => _buildPopupDialog(context),
+                        // );
+                      //}
                   ),
                 ),
               ),
@@ -224,7 +248,8 @@ class _SubjectState extends State<Subject> {
             Container(
             child: AspectRatio(
                 aspectRatio: 1.0,
-                child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
+                child: _videoFetcher
+               // child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
             ),
             ),
             FlatButton(
