@@ -33,10 +33,14 @@ class MainDrawer extends StatelessWidget {
 
 
 
+
+
   @override
   Widget build(BuildContext context) {
     // future user image
     String imgUrl = 'https://static.toiimg.com/photo/msid-67586673/67586673.jpg';
+    this._profileImage.setState = (context as Element).markNeedsBuild;
+    this._profileImage.setImage();
     // final DatabaseUserService userService = DatabaseUserService(uid: user.uid);
     return Drawer(
       child: SingleChildScrollView(
@@ -85,18 +89,30 @@ class MainDrawer extends StatelessWidget {
                             ],
                           ),
                           Spacer(),
-                          Container(
-                            width: 100.0,
-                            height: 70.0,
-                            margin: EdgeInsets.only(top: 30.0, bottom: 10.0, left: 0.0),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: this._profileImage.img,
-                                  // image: NetworkImage(imgUrl),
-                                  fit: BoxFit.fitHeight
-                              ),
-                            ),
+                          FutureBuilder<ImageProvider>(
+                            future: this._profileImage.img,
+                            builder: (context, snapshot) {
+                              ImageProvider img;
+                              if (snapshot.hasError || !snapshot.hasData){
+                                img = this._profileImage.localAnonImg;
+                              } else{
+                                img = snapshot.data;
+                              }
+                              return Container(
+                                width: 100.0,
+                                height: 70.0,
+                                margin: EdgeInsets.only(top: 30.0, bottom: 10.0, left: 0.0),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  image: DecorationImage(
+                                    image: img,
+                                    // image: this._profileImage.img,
+                                      // image: NetworkImage(imgUrl),
+                                      fit: BoxFit.fitHeight
+                                  ),
+                                ),
+                              );
+                            }
                           ),
                         ],
                 );

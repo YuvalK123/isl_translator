@@ -1,4 +1,5 @@
 
+import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/cupertino.dart';
@@ -17,17 +18,36 @@ class ProfileImage{
   // FileImage _fileImage;
   String _uploadedFileURL;
   String uid;
+  Function setState;
+  AssetImage _localAnonImg = AssetImage("assets/user.png");
 
 
 //   bool get hasImg {
 //     return _fileImage != null || _networkImage != null;
 // }
 
-  ImageProvider get img{
-    return this._img != null ? _img : AssetImage("assets/user.png");
+  Future<ImageProvider> get img async{
+    if (this._img == null){
+      Completer completer = Completer();
+      await setImage();
+      completer.complete(this._img);
+      return completer.future;
+    }
+    return this._img;
+    // return this._img != null ? _img : AssetImage("assets/user.png");
   }
 
-  ProfileImage({this.uid}){
+  AssetImage get localAnonImg{
+    return _localAnonImg;
+  }
+
+
+
+  set setStatee(Function value) {
+    this.setState = value;
+  }
+
+  ProfileImage({this.uid, this.setState}){
     setImage();
 
   }
@@ -50,6 +70,7 @@ class ProfileImage{
     this.imageUrl = await getImageUrl();
     // this._img = NetworkImage(this.imageUrl);
     this._img = this._isLocal ? Image.asset(imageUrl): NetworkImage(this.imageUrl);
+    // if (this.setState != null) this.setState();
 
   }
 

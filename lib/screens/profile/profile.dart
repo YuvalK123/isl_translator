@@ -51,6 +51,7 @@ class MapScreenState extends State<ProfilePage>
   void initState() {
     // TODO: implement initState
     super.initState();
+    this._profileImage.setState = setState;
     loadUser();
     // initImgUrl();
 
@@ -141,18 +142,29 @@ class MapScreenState extends State<ProfilePage>
                                   crossAxisAlignment: CrossAxisAlignment.center,
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-                                    new Container(
-                                        alignment: Alignment.topRight,
-                                        width: 140.0,
-                                        height: 140.0,
-                                        decoration: new BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          image: new DecorationImage(
-                                              image: _profileImage.img,
-                                              fit: BoxFit.fitHeight
-                                            //fit: BoxFit.cover,
-                                          ),
-                                        )),
+                                    FutureBuilder<ImageProvider>(
+                                      future: this._profileImage.img,
+                                      builder: (context, snapshot) {
+                                        ImageProvider img;
+                                        if (snapshot.hasError || !snapshot.hasData){
+                                          img = this._profileImage.localAnonImg;
+                                        } else{
+                                          img = snapshot.data;
+                                        }
+                                        return new Container(
+                                            alignment: Alignment.topRight,
+                                            width: 140.0,
+                                            height: 140.0,
+                                            decoration: new BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              image: new DecorationImage(
+                                                  image: img,
+                                                  fit: BoxFit.fitHeight
+                                                //fit: BoxFit.cover,
+                                              ),
+                                            ));
+                                      }
+                                    ),
                                   ],
                                 ),
                                 Padding(

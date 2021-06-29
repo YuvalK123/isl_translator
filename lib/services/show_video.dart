@@ -33,6 +33,7 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
 /* Find all the terms in DB - maybe to do it only once and save it? */
 Future<List<String>> findTermsDB() async {
   List<String> terms = [];
+  // if (FirebaseStorage.instance.app.)
   final result = await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
     for (int i=0; i< result.items.length; i++){
       String videoName = (result.items)[i].toString().substring(55,(result.items)[i].toString().length -5);
@@ -59,20 +60,7 @@ List<String> splitSentence(String sentence) {
   if (newSentence.isEmpty){
     return null;
   }
-  // newSentence = newSentence.replaceAll("?", "");
-  // newSentence = newSentence.replaceAll(",", "");
-  // newSentence = newSentence.replaceAll("-", "");
-  // newSentence = newSentence.replaceAll("/", "");
-  // newSentence = newSentence.replaceAll("\\", "");
-  // newSentence = newSentence.replaceAll(".", "");
-  // newSentence = newSentence.replaceAll("*", "");
   List<String> sentenceList = newSentence.split(" "); //split the sentence to words
-
-  // List<String> saveTerms = [
-  //   'יום הזיכרון',
-  //   'ארבעת המינים',
-  //   'כרטיס ברכה'
-  // ]; // list of terms(need to create one)
 
   // // get all terms
   // Future<List<String>> futureTerms = findTermsDB();

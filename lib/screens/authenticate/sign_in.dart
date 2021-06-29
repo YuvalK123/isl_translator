@@ -5,6 +5,7 @@ import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
+import 'dart:isolate';
 
 class SignIn extends StatefulWidget {
 
@@ -55,16 +56,19 @@ class _SignInState extends State<SignIn> {
             child: Column(
               children: <Widget> [
                 SizedBox(height: 20.0,),
-                Row(
-                  children: [
-                    Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
-                    SizedBox(width: 10.0,),
-                    Container(
-                      alignment: Alignment.topRight,
-                        child: Text("!שלום", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
-                    SizedBox(width: 10.0,),
-                    Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Row(
+                    children: [
+                      Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
+                      SizedBox(width: 10.0,),
+                      Container(
+                        alignment: Alignment.topRight,
+                          child: Text("!שלום", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
+                      SizedBox(width: 10.0,),
+                      Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
+                    ],
+                  ),
                 ),
                 SizedBox(height: 40.0,),
                 Container(
@@ -107,6 +111,8 @@ class _SignInState extends State<SignIn> {
                               error = 'Could not sign in';
                             });
                           }else{
+                            print("spawning from login1!");
+                            // Isolate.spawn(saveTermsFunc, "");
                             List<String> futureTerms = await findTermsDB();
                             saveTerms = futureTerms;
                           }
@@ -136,6 +142,8 @@ class _SignInState extends State<SignIn> {
                             // get all terms
                             List<String> futureTerms = await findTermsDB();
                             saveTerms = futureTerms;
+                            // print("spawning from login2!");
+                            // Isolate.spawn(saveTermsFunc, "");
                             setState(() => loading = true
                             );
                             // futureTerms.then((result) => saveTerms=  result)
@@ -158,5 +166,11 @@ class _SignInState extends State<SignIn> {
   }
 
 
+  // void saveTermsFunc(String msg) async{
+  //   print("loading terms from sign in....");
+  //   List<String> futureTerms = await findTermsDB();
+  //   saveTerms = futureTerms;
+  //   print("done loading... from sign in");
+  // }
 
 }
