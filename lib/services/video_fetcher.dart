@@ -132,7 +132,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
 
   // List<String> specialChars = ["*","-","_","'","\"","\\","/","=","+",",",".","?","!"];
-
   Future<List<String>> proccessWord(String word,String dirName) async{
     String exec = dirName == "animation_openpose/" ? "mp4" : "mkv";
     List<String> urls = [];
@@ -200,7 +199,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
   Future<List> getUrls(String dirName) async {
-    List<String> splitSentenceList = splitSentence(sentence); // split the sentence
+    List<String> splitSentenceList = await splitSentence(sentence); // split the sentence
     if (splitSentenceList == null) {
 
       return null;

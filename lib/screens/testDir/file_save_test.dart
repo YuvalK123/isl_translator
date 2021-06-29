@@ -16,7 +16,7 @@ class _DummyPageState extends State<DummyPage> {
             Text("dummy page"),
             ElevatedButton(
                 onPressed: () => LruCache.saveLetters("live_videos/"),
-                child: Icon(Icons.download),
+                child: Icon(Icons.file_download),
             )
           ],
         ),
