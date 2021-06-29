@@ -114,8 +114,8 @@ class _SignInState extends State<SignIn> {
                             }else{
                               print("spawning from login1!");
                               // Isolate.spawn(saveTermsFunc, "");
-                              List<String> futureTerms = await findTermsDB();
-                              saveTerms = futureTerms;
+                              // List<String> futureTerms = await findTermsDB();
+                              // saveTerms = futureTerms;
                             }
                           }
                       ),
@@ -147,8 +147,8 @@ class _SignInState extends State<SignIn> {
                                 setState(() => loading = true);
                               }
                               // get all terms
-                              List<String> futureTerms = await findTermsDB();
-                              saveTerms = futureTerms;
+                              // List<String> futureTerms = await findTermsDB();
+                              // saveTerms = futureTerms;
                               // print("spawning from login2!");
                               // Isolate.spawn(saveTermsFunc, "");
 

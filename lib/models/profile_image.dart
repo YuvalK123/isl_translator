@@ -12,7 +12,7 @@ class ProfileImage{
   String imageUrl;
   ImageProvider _img;
   // bool loaded = false;
-  File _imageFile;
+  File imageFile;
   bool _isLocal = true;
   // NetworkImage _networkImage;
   // FileImage _fileImage;
@@ -117,12 +117,14 @@ class ProfileImage{
     );
     print("pickedFile.path" + pickedFile.path);
     File bla = File(pickedFile.path);
-    _imageFile = bla;    //_cropImage(pickedFile.path);
+    imageFile = bla;    //_cropImage(pickedFile.path);
   }
 
   Future chooseFile() async {
     await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
-      _imageFile = image;
+      print("_imageFile _imageFile" );
+      imageFile = image;
+      this._img = Image.file(image).image;
     });
   }
 
@@ -142,11 +144,12 @@ class ProfileImage{
   }
 
   Future uploadFile() async {
+    print("upload file!!!! ${this.imageFile}");
     FirebaseAuth auth = FirebaseAuth.instance;
     var storageReference = FirebaseStorage.instance
         .ref()
         .child('users_profile_pic/${Path.basename(this.uid)}');
-    UploadTask uploadTask = storageReference.putFile(_imageFile);
+    UploadTask uploadTask = storageReference.putFile(imageFile);
     await uploadTask.whenComplete(() => print('File Uploaded'));
     print('File Uploaded');
     storageReference.getDownloadURL().then((fileURL) {
