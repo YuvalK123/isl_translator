@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'package:dio/dio.dart';
 import 'package:disk_lru_cache/disk_lru_cache.dart';
 import 'dart:convert';
 
@@ -16,6 +17,9 @@ bool hasLettersLocal = false;
 class LruCache{
   final LruMap<String,String> map = LruMap();
   DiskLruCache _cache;
+  Map<String,String> firebaseDirNames = {"live":"live_videos/", "animation":"animation_openpose/"};
+  Map<String,String> cacheFolders = {"live":"Cache/live", "animation": "Cache/animation"};
+  Map<String,String> cacheLettersFolders = {"live":"Cache/live/letters", "animation":"Cache/animation/letters"};
 
 
   DiskLruCache get cache {
@@ -26,17 +30,56 @@ class LruCache{
     return Directory.current.path;
   }
 
-  static Future<void> saveLetters(String dirName) async{
-    print("save letters");
+  static Future<void> saveLetters(String firebaseDirName, String cacheFolder) async{
+    print("saving letters in $cacheFolder");
     // return;
     for (var letter in lettersList){
-      print("on $dirName/$letter.mp4");
-      String url = await VideoFetcher.getUrl("$letter",dirName);
-      print("downloaded letter url $url");
-      await VideoFetcher().saveFile(url, "$letter.mp4");
-      print("saved!!");
+      try{
+        print("on $firebaseDirName/$letter.mp4");
+        String url = await VideoFetcher.getUrl("$letter",firebaseDirName);
+        print("downloaded letter url $url");
+        await VideoFetcher().saveFile(url, "$letter.mp4", cacheFolder);
+        print("saved!!");
+      } catch(e){
+        print("e for letter $letter is $e");
+      }
+
     }
     hasLettersLocal = true;
+  }
+
+  Future<void> saveVideosFromUrls(bool isAnimation, Map<String,String> urls) async{
+    isAnimation = isAnimation == null ? true : isAnimation;
+    String cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+    String firebaseDirName = !isAnimation ? firebaseDirNames["live"] : firebaseDirNames["animation"];
+    print("save videos. isAnimation = $isAnimation, cacheFolder = $cacheFolder, firbaseDir = $firebaseDirName");
+    try{
+
+      urls.forEach((String word, String url) async{
+        // if (await isFileExist(word, isAnimation)) {
+          // print("on $firebaseDirName/$word.mp4");
+          // String url = await VideoFetcher.getUrl(word, firebaseDirName);
+          print("downloaded letter url $url");
+          await VideoFetcher().saveFile(url, "$word.mp4", cacheFolder);
+          print("saved $word!!");
+        // }
+      });
+
+    } catch(e){
+      print("e for words $urls is $e");
+    }
+
+
+  }
+
+  Future<bool> isFileExist(String word, bool isAnimation) async{
+    bool isLetter = word.length == 1;
+    String cacheFolder;
+    if (isLetter){
+      cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
+    }else{
+      cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+    }
   }
 
   LruCache(){

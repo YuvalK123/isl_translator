@@ -60,13 +60,13 @@ class _SignInState extends State<SignIn> {
                   padding: const EdgeInsets.all(16.0),
                   child: Row(
                     children: [
-                      Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
+                      Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
                       SizedBox(width: 10.0,),
                       Container(
                         alignment: Alignment.topRight,
                           child: Text("!שלום", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
                       SizedBox(width: 10.0,),
-                      Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,),
+                      Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
                     ],
                   ),
                 ),
@@ -99,58 +99,72 @@ class _SignInState extends State<SignIn> {
 
                 Row(
                   children: [
-                    RaisedButton(
-                        color: Colors.grey[400],
-                        child: Text("התחבר/י באופן אנונימי",
-                            style: TextStyle(color: Colors.white)),
-                        onPressed: () async {
-                          dynamic result = await _authService.signInAnon();
-                          if (result == null){
-                            setState(() {
-                              loading = false;
-                              error = 'Could not sign in';
-                            });
-                          }else{
-                            print("spawning from login1!");
-                            // Isolate.spawn(saveTermsFunc, "");
-                            List<String> futureTerms = await findTermsDB();
-                            saveTerms = futureTerms;
+                    Expanded(
+                      child: RaisedButton(
+                          color: Colors.amber[700],
+                          child: Text("התחבר/י באופן אנונימי", textAlign: TextAlign.center,
+                              style: TextStyle(color: Colors.white)),
+                          onPressed: () async {
+                            dynamic result = await _authService.signInAnon();
+                            if (result == null){
+                              setState(() {
+                                loading = false;
+                                error = 'Could not sign in';
+                              });
+                            }else{
+                              print("spawning from login1!");
+                              // Isolate.spawn(saveTermsFunc, "");
+                              List<String> futureTerms = await findTermsDB();
+                              saveTerms = futureTerms;
+                            }
                           }
-                        }
+                      ),
                     ),
                     SizedBox(width: 20.0,),
-                    RaisedButton(
-                      color: Colors.grey[400],
-                      child: Text("התחבר/י",
-                          style: TextStyle(color: Colors.white)
+                    Expanded(
+                      child: RaisedButton(
+                        color: Colors.green[400],
+                        child: Text("התחבר/י",
+                            style: TextStyle(color: Colors.white)
+                        ),
+                        onPressed: () async {
+                          // true - valid form. false - invalid form
+                          if (_formKey.currentState.validate()){
+
+
+                            dynamic result = await _authService.
+                            signInUserWithEmailAndPassword(email, password);
+                            print("result sign in $result");
+                            if (result.runtimeType == String){
+                              setState(() {
+                                loading = false;
+                                error = 'Could not sign in\n${result.toString()}';
+                              });
+                              return;
+                            }
+                            if (_auth.currentUser.emailVerified){
+                              if (mounted){
+                                setState(() => loading = true);
+                              }
+                              // get all terms
+                              List<String> futureTerms = await findTermsDB();
+                              saveTerms = futureTerms;
+                              // print("spawning from login2!");
+                              // Isolate.spawn(saveTermsFunc, "");
+
+
+                              // futureTerms.then((result) => saveTerms=  result)
+                              // .catchError((e) => print('error in find terms'));
+                            }else{
+                              print("user signin is ${_auth.currentUser}");
+                              setState(() {
+                                loading = false;
+                                error = 'Email not verified!';
+                              });
+                            }
+                          }
+                        },
                       ),
-                      onPressed: () async {
-                        // true - valid form. false - invalid form
-                        if (_formKey.currentState.validate()){
-
-
-                          dynamic result = await _authService.
-                          signInUserWithEmailAndPassword(email, password);
-                          print("result sign in $result");
-                          if (result.runtimeType == String){
-                            setState(() {
-                              loading = false;
-                              error = '${result.toString()}\nCould not sign in';
-                            });
-                          }
-                          if (_auth.currentUser.emailVerified){
-                            // get all terms
-                            List<String> futureTerms = await findTermsDB();
-                            saveTerms = futureTerms;
-                            // print("spawning from login2!");
-                            // Isolate.spawn(saveTermsFunc, "");
-                            setState(() => loading = true
-                            );
-                            // futureTerms.then((result) => saveTerms=  result)
-                            // .catchError((e) => print('error in find terms'));
-                          }
-                        }
-                      },
                     ),
                   ],
                 ),

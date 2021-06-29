@@ -15,16 +15,16 @@ void main() async {
   final recievePort = ReceivePort();
   if (user != null && user.uid != null){
     // print("spawning from main!");
-    final isolate = await Isolate.spawn(saveTermsFunc,recievePort.sendPort);
-    recievePort.listen((message) {
-      if (message is SendPort){
-
-      }
-      if (message is List<String>){
-        saveTerms = message;
-      }
-    });
-    isolate.kill();
+    // final isolate = await Isolate.spawn(saveTermsFunc,recievePort.sendPort);
+    // recievePort.listen((message) {
+    //   if (message is SendPort){
+    //
+    //   }
+    //   if (message is List<String>){
+    //     saveTerms = message;
+    //   }
+    // });
+    // isolate.kill();
     // print("user is $user ${user.uid}");
     List<String> futureTerms = await findTermsDB();
     saveTerms = futureTerms;
