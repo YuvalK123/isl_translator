@@ -1,25 +1,37 @@
 import 'dart:io';
+import 'package:camera/camera.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:isl_translator/screens/add_video/uploading_page.dart';
+import 'package:isl_translator/screens/home/homescreen.dart';
+import 'package:isl_translator/shared/loading.dart';
 import 'package:video_player/video_player.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class AddExpression extends StatefulWidget {
-  AddExpression({Key key, this.videoPath}) : super(key: key);
+  AddExpression({Key key, this.videoFile}) : super(key: key);
 
   // final String title;
-  final String videoPath;
+  final XFile videoFile;
 
   @override
   _AddExpression createState() => _AddExpression();
 }
 
 class _AddExpression extends State<AddExpression> {
+  final _auth = FirebaseAuth.instance;
   VideoPlayerController controller;
+  String uid;
+  String expression = '';
 
   @override
   void initState() {
     super.initState();
-    controller = VideoPlayerController.file(File(widget.videoPath))
+    this.uid = _auth.currentUser.uid;
+    controller = VideoPlayerController.file(File(widget.videoFile.path))
       ..initialize().then((_) {
         setState(() {});
       });
@@ -30,7 +42,7 @@ class _AddExpression extends State<AddExpression> {
     return Scaffold(
       appBar: AppBar(
         title: Text('תצוגה מקדימה', textDirection: TextDirection.rtl),
-        backgroundColor: Colors.deepPurple[300],
+        backgroundColor: Colors.cyan[800],
       ),
       body: Container(
         width: MediaQuery.of(context).size.width,
@@ -75,21 +87,28 @@ class _AddExpression extends State<AddExpression> {
                 width: MediaQuery.of(context).size.width,
                 padding: EdgeInsets.symmetric(vertical: 5, horizontal: 8),
                 child: TextFormField(
+                  onFieldSubmitted: (value) async {
+                    expression = value;
+                    Navigator.push(context, MaterialPageRoute(
+                      builder: (context) => UploadingVideos(
+                        videoFile: widget.videoFile,
+                        expression: expression,
+                      )
+                    ));
+                    // await uploadVideo(widget.videoFile);
+                    // print('video uploaded');
+                    // await notifyServer(uid, expression);
+                    // Navigator.push(context, MaterialPageRoute(
+                    //   builder: (context) => HomeScreen()
+                    // ));
+                  },
+                  textAlign: TextAlign.right,
                   style: TextStyle(
                     color: Colors.white,
                   ),
                   decoration: InputDecoration(
                       border: InputBorder.none,
                       hintText: 'הכנס ביטוי',
-                      suffixIcon: CircleAvatar(
-                        radius: 27,
-                        backgroundColor: Colors.black12,
-
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.white,
-                        ),
-                      ),
                       hintStyle: TextStyle(
                           color: Colors.white,
                       ),
@@ -103,4 +122,23 @@ class _AddExpression extends State<AddExpression> {
     );
   }
 
+  Future<void> uploadVideo(videoFile) async {
+    Reference ref = FirebaseStorage.instance.ref();
+    Reference videoRef = ref.child('live_videos').child(uid).child('$expression.mp4');
+    print('uploading video');
+    await videoRef.putFile(File(videoFile.path));
+
+  }
+
+  Future<void> notifyServer(uid ,fileName) async {
+    String url = 'https://8e7938336584.ngrok.io';
+    Map<String, String> data = {
+      'uid': uid,
+      'filename': fileName,
+    };
+
+    final response = await http.post(url, body: json.encode(data));
+    print(response.body);
+
+  }
 }
