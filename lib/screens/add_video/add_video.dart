@@ -1,13 +1,10 @@
 import 'dart:async';
-import 'package:http/http.dart';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_spinbox/material.dart';
 import 'package:isl_translator/screens/add_video/add_expression_page.dart';
-import 'package:isl_translator/screens/add_video/add_video.dart';
 import 'package:isl_translator/shared/main_drawer.dart';
 
 class AddVideoPage extends StatefulWidget {
@@ -308,7 +305,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
       XFile videoFile = await controller.stopVideoRecording();
       this.isRecording = false;
 
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => AddExpression(videoFile: videoFile)));

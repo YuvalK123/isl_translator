@@ -5,7 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:isl_translator/screens/home/homescreen.dart';
+import 'package:isl_translator/screens/add_video/check_animation_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -30,9 +30,6 @@ class _UploadingVideos extends State<UploadingVideos>{
     super.initState();
     uid = _auth.currentUser.uid;
     loadToStorage();
-    // Navigator.push(context, MaterialPageRoute(
-    //     builder: (context) => HomeScreen()
-    // ));
 
   }
 
@@ -58,9 +55,10 @@ class _UploadingVideos extends State<UploadingVideos>{
     setState(() => progressInfo = 'video uploaded. waiting for server response...');
     print('video uploaded');
     await notifyServer(uid, widget.expression);
-    setState(() => progressInfo = 'new expression added.');
-    Navigator.push(context, MaterialPageRoute(
-        builder: (context) => HomeScreen()
+    setState(() => progressInfo = 'new expression added. downloading animation...');
+    String animationPath = await getAnimationUrl(uid, widget.expression);
+    Navigator.pushReplacement(context, MaterialPageRoute(
+        builder: (context) => CheckAnimation(animationPath: animationPath)
     ));
 
   }
@@ -75,7 +73,7 @@ class _UploadingVideos extends State<UploadingVideos>{
   }
 
   Future<void> notifyServer(uid ,expression) async {
-    String url = 'https://abefa34da627.ngrok.io';
+    String url = 'https://da285009ca1f.ngrok.io';
     Map<String, String> data = {
       'uid': uid,
       'expression': expression,
@@ -85,5 +83,12 @@ class _UploadingVideos extends State<UploadingVideos>{
     final response = await http.post(url, body: json.encode(data));
     print(response.body);
 
+  }
+
+  Future<String> getAnimationUrl(uid, expression) async{
+    String firebasePath = 'animation_openpose/$uid/$expression.mp4';
+    Reference ref = FirebaseStorage.instance.ref().child(firebasePath);
+    String animationPath = await ref.getDownloadURL();
+    return animationPath;
   }
 }
