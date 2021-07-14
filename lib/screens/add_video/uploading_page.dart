@@ -30,7 +30,6 @@ class _UploadingVideos extends State<UploadingVideos>{
     super.initState();
     uid = _auth.currentUser.uid;
     loadToStorage();
-    // Navigator.pop(context);
     // Navigator.push(context, MaterialPageRoute(
     //     builder: (context) => HomeScreen()
     // ));
@@ -53,35 +52,38 @@ class _UploadingVideos extends State<UploadingVideos>{
 
   }
 
-  void loadToStorage() async {
+  Future<void> loadToStorage() async {
     setState(() => progressInfo = 'loading video to firebase');
     await uploadVideo();
     setState(() => progressInfo = 'video uploaded. waiting for server response...');
     print('video uploaded');
     await notifyServer(uid, widget.expression);
     setState(() => progressInfo = 'new expression added.');
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) => HomeScreen()
+    ));
 
   }
 
 
   Future<void> uploadVideo() async {
     Reference ref = FirebaseStorage.instance.ref();
-    Reference videoRef = ref.child('live_videos').child(uid).child('${widget.expression}.mp4');
+    Reference videoRef = ref.child('live_videos').child(uid).child('${widget.expression}.mkv');
     print('uploading video');
     await videoRef.putFile(File(widget.videoFile.path));
 
   }
 
-  Future<String> notifyServer(uid ,fileName) async {
-    String url = 'https://8e7938336584.ngrok.io';
+  Future<void> notifyServer(uid ,expression) async {
+    String url = 'https://abefa34da627.ngrok.io';
     Map<String, String> data = {
       'uid': uid,
-      'filename': fileName,
+      'expression': expression,
+      'filename': '$expression.mkv'
     };
 
     final response = await http.post(url, body: json.encode(data));
     print(response.body);
-    return response.body;
 
   }
 }
