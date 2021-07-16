@@ -68,7 +68,8 @@ class _UploadingVideos extends State<UploadingVideos>{
     Reference ref = FirebaseStorage.instance.ref().child('addr.txt');
     Uint8List data = await ref.getData();
     String addr = utf8.decode(data);
-    return addr;
+    String httpsAddr = addr.replaceAll('http:', 'https:');
+    return httpsAddr;
   }
 
 
