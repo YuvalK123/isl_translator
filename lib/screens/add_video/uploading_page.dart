@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:camera/camera.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -63,6 +64,13 @@ class _UploadingVideos extends State<UploadingVideos>{
 
   }
 
+  Future<String> getServerAddr() async {
+    Reference ref = FirebaseStorage.instance.ref().child('addr.txt');
+    Uint8List data = await ref.getData();
+    String addr = utf8.decode(data);
+    return addr;
+  }
+
 
   Future<void> uploadVideo() async {
     Reference ref = FirebaseStorage.instance.ref();
@@ -73,7 +81,7 @@ class _UploadingVideos extends State<UploadingVideos>{
   }
 
   Future<void> notifyServer(uid ,expression) async {
-    String url = 'https://da285009ca1f.ngrok.io';
+    String url = await getServerAddr();
     Map<String, String> data = {
       'uid': uid,
       'expression': expression,
