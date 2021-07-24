@@ -1,4 +1,5 @@
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/services/show_video.dart';
 
@@ -108,8 +109,18 @@ Future<String> getUrl(String word,String dirName) async{
     var url = await ref.getDownloadURL();
     return url;
   } catch (err) { // no url
-    // print(err);
-    return null;
+    // check if exist in personal videos
+    var _auth = FirebaseAuth.instance;
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("$dirName" + _auth.currentUser.uid + "/" + word + "$exec");
+    try {
+      // gets the video's url
+      var url = await ref.getDownloadURL();
+      return url;
+    } catch (err2) {
+      return null;
+    }
   }
 }
 

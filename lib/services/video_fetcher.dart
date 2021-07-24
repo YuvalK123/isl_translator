@@ -179,7 +179,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
       return urls;
     }
     var nonPre = await getNonPrepositional(word, dirName);
-
     if (nonPre != null){
       urls.add(nonPre);
       return urls;
@@ -238,8 +237,18 @@ class VideoFetcher { // extends State<VideoFetcher> {
     return await ref.getDownloadURL();
   }
 
+  static Future<String> getPersonalUrl(String word, String firebaseDirName) async{
+    String exec = firebaseDirName == "animation_openpose/" ? ".mp4" : ".mkv";
+    var _auth = FirebaseAuth.instance;
+    // check if video exist in personal DB
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("$firebaseDirName" + _auth.currentUser.uid + "/"+ word + "$exec");
+    return await ref.getDownloadURL();
+  }
+
   Future<List> getUrls(String dirName, bool toSave) async {
-    List<String> splitSentenceList = splitSentence(sentence); // split the sentence
+    List<String> splitSentenceList = await splitSentence(sentence); // split the sentence
     if (splitSentenceList == null) {
 
       return null;
@@ -267,17 +276,27 @@ class VideoFetcher { // extends State<VideoFetcher> {
         print(err);
         print("no internet connection");
         // CupertinoAlertDialog(title: "No internet Connection");
-      } catch (err){
-        var urlsList = await proccessWord(splitSentenceList[i], dirName);
-        print("urls list for ${splitSentenceList[i]} is $urlsList}");
-        if(urlsList.length == 1 && urlsList[0].length != 1){
+      } catch (err) {
+        try {
+          // check if word exist in the personal videos
+          String url = await getPersonalUrl(word, dirName);
           this.indexToWord[k++] = word;
-          map[splitSentenceList[i]] = urlsList[0]; // if not letters. if letters/ its cached
-        }
-        for (var url in urlsList){
           indexToUrl[j++] = url;
+          map[splitSentenceList[i]] = url;
           urls.add(url);
-          k++;
+        } catch (err2) {
+          var urlsList = await proccessWord(splitSentenceList[i], dirName);
+          print("urls list for ${splitSentenceList[i]} is $urlsList}");
+          if (urlsList.length == 1 && urlsList[0].length != 1) {
+            this.indexToWord[k++] = word;
+            map[splitSentenceList[i]] =
+            urlsList[0]; // if not letters. if letters/ its cached
+          }
+          for (var url in urlsList) {
+            indexToUrl[j++] = url;
+            urls.add(url);
+            k++;
+          }
         }
       }
     }

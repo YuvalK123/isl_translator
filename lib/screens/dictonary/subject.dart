@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
-import 'package:isl_translator/services/show_video.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:isl_translator/services/video_cache.dart';
 import 'package:isl_translator/services/video_fetcher.dart';
 
-import 'package:video_player/video_player.dart';
+/*
+Subject class
+Each subject in the dict has a subject-dict of words that belong to this specific subject
+*/
 class Subject extends StatefulWidget {
   final String name;
   Subject(this.name);
@@ -29,6 +29,7 @@ class _SubjectState extends State<Subject> {
     subjectName = widget.name;
   }
 
+  // Play videos function
   Future<void> playVideos() async {
     //String sentence = myController.text;
     if (sentence == "") {
@@ -130,21 +131,6 @@ class _SubjectState extends State<Subject> {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    // child: AspectRatio(
-                    //   aspectRatio: 18 / 12,
-                    //   child: Container(
-                    //     alignment: Alignment.bottomCenter,
-                    //     //width: 100.0,
-                    //     //height: 50.0,
-                    //     //color: Colors.green[100],
-                    //     /*child: FittedBox(
-                    //     child: Image.asset("assets/images/" + product.name),
-                    //     fit: BoxFit.fill,
-                    //   )*/child:Image.asset(
-                    //       "assets/images/" + product.name
-                    //   ),
-                    //   ),
-                    // ),
                   ),
                   Expanded(
                     child: Padding(
@@ -185,45 +171,7 @@ class _SubjectState extends State<Subject> {
                           context: context,
                           builder: (BuildContext context) => _buildPopupDialog(context),
                         );
-                      }// got the sentence from the user
-                        // List<String> splitSentenceList =
-                        // splitSentence(sentence); // split the sentence
-                        // String url;
-                        // List<String> letters;
-                        // print(splitSentenceList);
-                        // List<String> urls = [];
-                        // for(int i=0; i < splitSentenceList.length; i++)
-                        // {
-                        //   Reference ref = FirebaseStorage.instance
-                        //       .ref()
-                        //       .child("animation_openpose/" + splitSentenceList[i] + ".mp4");
-                        //   try {
-                        //     // gets the video's url
-                        //     url = await ref.getDownloadURL();
-                        //     urls.add(url);
-                        //   } catch (err) {
-                        //     // Video doesn't exist - so split the work to letters
-                        //     letters = splitToLetters(splitSentenceList[i]);
-                        //     for(int j=0; j < letters.length; j++){
-                        //       Reference ref = FirebaseStorage.instance
-                        //           .ref()
-                        //           .child("animation_openpose/" + letters[j] + ".mp4");
-                        //       url = await ref.getDownloadURL();
-                        //       urls.add(url);
-                        //     }
-                        //   }
-                        // }
-                        // myUrls = urls;
-                        // print("hello this is the urls ==> " + urls.toString());
-                        // setState(() {
-                        //   this.videoPlayerDemo = VideoPlayerDemo(key: Key(this.ind.toString()),myUrls: urls,);
-                        //   this.ind++;
-                        // });
-                        // showDialog(
-                        //   context: context,
-                        //   builder: (BuildContext context) => _buildPopupDialog(context),
-                        // );
-                      //}
+                      }
                   ),
                 ),
               ),
@@ -265,39 +213,6 @@ class _SubjectState extends State<Subject> {
         ),
       ),
     );
-    /*return new AlertDialog(
-      title: const Text('דולפין', textAlign: TextAlign.right,),
-      //insetPadding: EdgeInsets.symmetric(vertical: 240),
-      insetPadding: EdgeInsets.zero,
-      contentPadding: EdgeInsets.zero,
-      clipBehavior: Clip.antiAliasWithSaveLayer,
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.all(Radius.circular(50.0))
-      ),
-      //contentPadding: EdgeInsets.all(0.0),
-      content: new Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-        Container(
-          child: AspectRatio(
-              aspectRatio: 1.0,
-              child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
-      ),
-          ),
-
-        ],
-      ),
-      actions: <Widget>[
-        new FlatButton(
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-          textColor: Theme.of(context).primaryColor,
-          child: const Text('סגור'),
-        ),
-      ],
-    );*/
   }
 
   @override
@@ -324,6 +239,13 @@ class _SubjectState extends State<Subject> {
   }
 }
 
+/*
+ButtonImage class
+Each button image contain:
+- name
+- text to display below to image
+- onTap variable that define which page to open when tapping
+*/
 class ButtonImage{
   String name;
   String text;

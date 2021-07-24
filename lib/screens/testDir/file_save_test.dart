@@ -24,7 +24,7 @@ class _DummyPageState extends State<DummyPage> {
               Text("dummy page"),
               ElevatedButton(
                   onPressed: cacheLetters,
-                  child: Icon(Icons.download),
+                  child: Icon(Icons.file_download),
               )
             ],
           ),

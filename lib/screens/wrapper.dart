@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/authenticate/authenticate.dart';
 
@@ -6,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
+import 'dart:isolate';
 
 
 bool hasLoaded = false;
@@ -25,6 +27,7 @@ class Wrapper extends StatelessWidget {
     // }
     if (user != null && (_auth.currentUser.emailVerified || _auth.currentUser.isAnonymous)){
       //saveTermsForShow();
+      // Worker();
       print("good save terms!!!!");
       return TranslationWrapper();
     }
@@ -39,5 +42,52 @@ class Wrapper extends StatelessWidget {
     // saveTerms = futureTerms;
     hasLoaded = true;
     print("finish saved terms");
+  }
+}
+
+class Worker {
+  SendPort _sendPort;
+  Isolate _isolate;
+  final _isolateReady = Completer<void>();
+
+  Worker() {
+    init();
+  }
+
+  Future<void> init() async {
+    final recievePort = ReceivePort();
+    recievePort.listen((dynamic message) {
+      if (message is SendPort) {
+        print("hi");
+        _isolateReady.complete();
+        return;
+      }
+      if (message is List<String>) {
+        print("Bye");
+        saveTerms = message;
+        _isolateReady.complete();
+        return;
+      }
+    });
+    final isolate = await Isolate.spawn(_isolateEntry, recievePort.sendPort);
+  }
+
+  Future<void> get isolateReady => _isolateReady.future;
+
+  void dispose() {
+    _isolate.kill();
+  }
+
+  static Future<void> _isolateEntry(dynamic message) async {
+    print("loading.......");
+    SendPort sendPort;
+    // recievePort is what im listening to
+    // sendPort is what we use to send to the recieve
+
+    // List<String> futureTerms = await findTermsDB();
+    // saveTerms = futureTerms;
+    sendPort = message;
+    //msg.send(saveTerms);
+    print("done saveTerms!");
   }
 }
