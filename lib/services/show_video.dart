@@ -39,7 +39,7 @@ Future<void> findTermsDB() async{
     for (int i=0; i< result.items.length; i++){
       String videoName = (result.items)[i].toString().substring(55,(result.items)[i].toString().length -5);
       if(videoName.split(" ").length > 1){
-        print("adding $videoName");
+        // print("adding $videoName");
         saveTerms.add(videoName);
       }
     }

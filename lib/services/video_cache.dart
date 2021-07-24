@@ -26,7 +26,7 @@ class LruCache{
     return _cache;
   }
 
-  String getPath() {
+  static String getPath() {
     return Directory.current.path;
   }
 
@@ -68,8 +68,6 @@ class LruCache{
     } catch(e){
       print("e for words $urls is $e");
     }
-
-
   }
 
   Future<bool> isFileExist(String word, bool isAnimation) async{

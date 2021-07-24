@@ -324,6 +324,8 @@ class VideoPlayer2 extends StatefulWidget {
   _VideoPlayer2State createState() => _VideoPlayer2State();
 }
 
+
+
 class _VideoPlayer2State extends State<VideoPlayer2> {
   int index = 0;
   double _position = 0;
