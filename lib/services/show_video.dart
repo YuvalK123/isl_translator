@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/reg.dart';
 import 'package:video_player/video_player.dart';
@@ -32,20 +31,20 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
 }
 
 /* Find all the terms in DB - maybe to do it only once and save it? */
-//Future<List<String>> findTermsDB(FirebaseStorage storage) async {
- Future<List<String>> findTermsDB() async {
+// Future<List<String>> findTermsDB() async {
+Future<void> findTermsDB() async{
   List<String> terms = [];
   // if (FirebaseStorage.instance.app.)
-   final result = await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
-  //final result = await storage.ref().child("animation_openpose/").listAll().then((result) {
+  return await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
     for (int i=0; i< result.items.length; i++){
       String videoName = (result.items)[i].toString().substring(55,(result.items)[i].toString().length -5);
       if(videoName.split(" ").length > 1){
-        terms.add(videoName);
+        print("adding $videoName");
+        saveTerms.add(videoName);
       }
     }
   });
-  return terms;
+  // return;
 }
 
 /* Split the sentence to word/term and return a list of the split sentence*/
@@ -71,7 +70,7 @@ List<String> splitSentence(String sentence) {
   // futureTerms.then((result) => saveTerms=  result)
   //     .catchError((e) => print('error'));
   print("hello save terms ==> " + saveTerms.toString());
-  List<String> terms =  searchTerm(newSentence, saveTerms); // terms in the sentence
+  List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
   //List<String> terms = [];
   //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
   List<String> splitSentence = [];

@@ -1,13 +1,11 @@
 import 'dart:async';
-import 'package:http/http.dart';
-
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter_spinbox/material.dart';
 import 'package:isl_translator/screens/add_video/add_expression_page.dart';
-import 'package:isl_translator/screens/add_video/add_video.dart';
+import 'package:isl_translator/shared/main_drawer.dart';
 
 class AddVideoPage extends StatefulWidget {
   AddVideoPage({Key key, this.title}) : super(key: key);
@@ -26,6 +24,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
   int recordingTime = 3;
   Timer timer;
   int counter = 0;
+  bool isRecording = false;
 
   @override
   void initState() {
@@ -102,15 +101,21 @@ class _AddVideoPageState extends State<AddVideoPage> {
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             mainAxisSize: MainAxisSize.max,
             children: <Widget>[
-              FloatingActionButton(
-                child: Icon(
-                  Icons.camera,
-                ),
-                onPressed: () async{
-                  await onCapturePressed(context);
-                },
-              ),
-            ],
+          InkWell(
+            child: Icon(
+              this.isRecording
+                  ? Icons.radio_button_on
+                  : Icons.panorama_fish_eye,
+              color: this.isRecording
+                  ? Colors.red
+                  : Colors.white,
+              size: 80,
+            ),
+            onTap: () {
+              onCapturePressed(context);
+            },
+          ),
+        ],
           ),
         )
     );
@@ -126,21 +131,21 @@ class _AddVideoPageState extends State<AddVideoPage> {
 
     return Expanded(
       child: Align(
-        alignment: Alignment.centerLeft,
+        alignment: Alignment.center,
         child: FlatButton.icon(
           onPressed: onSwitchCamera,
-
           icon: Icon(
             getCameraLensIcon(lensDirection),
             color: Colors.white,
             size: 24,
           ),
           label: Text(
-            '${lensDirection.toString().substring(lensDirection.toString().indexOf('.') + 1).toUpperCase()}',
-            style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.w500,
-            ),
+            '',
+            // '${lensDirection.toString().substring(lensDirection.toString().indexOf('.') + 1).toUpperCase()}',
+            // style: TextStyle(
+            //   color: Colors.white,
+            //   fontWeight: FontWeight.w500,
+            // ),
           ),
         ),
       ),
@@ -150,45 +155,46 @@ class _AddVideoPageState extends State<AddVideoPage> {
   Widget timing(BuildContext context){
     return Expanded(
       child: Align(
+        alignment: Alignment.center,
         child: FlatButton.icon(
-            onPressed: () {
-              int delay = recordingDelay;
-              int time = recordingTime;
-              return showDialog(
-                  context: context,
-                  builder: (context){
-                    return AlertDialog(
-                      title: Text('תזמון'),
-                      content: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        mainAxisSize: MainAxisSize.min,
-                        children: <Widget>[
-                          Text('השהיה'),
-                          SpinBox(
-                            max: 15,
-                            min: 0,
-                            value: recordingDelay.toDouble(),
-                            onChanged: (value) => delay = value.toInt(),
-                          ),
-                          Text('זמן צילום'),
-                          SpinBox(
-                            max: 15,
-                            min: 0,
-                            value: recordingTime.toDouble(),
-                            onChanged: (value) => time = value.toInt(),
-                          ),
-                        ],
-                      ),
-                      actions: <Widget>[
-                        MaterialButton(
+          onPressed: () {
+            int delay = recordingDelay;
+            int time = recordingTime;
+            return showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text('תזמון'),
+                    content: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Text('השהיה'),
+                        SpinBox(
+                          max: 15,
+                          min: 0,
+                          value: recordingDelay.toDouble(),
+                          onChanged: (value) => delay = value.toInt(),
+                        ),
+                        Text('זמן צילום'),
+                        SpinBox(
+                          max: 15,
+                          min: 0,
+                          value: recordingTime.toDouble(),
+                          onChanged: (value) => time = value.toInt(),
+                        ),
+                      ],
+                    ),
+                    actions: <Widget>[
+                      MaterialButton(
                           child: Icon(Icons.check),
-                            onPressed: () {
+                          onPressed: () {
                             recordingDelay = delay;
                             print(recordingDelay);
                             recordingTime = time;
                             Navigator.of(context).pop();
-                            }
-                        )
+                          }
+                      )
                     ],
                   );
                 });
@@ -198,8 +204,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
             color: Colors.white,
             size: 24,
           ),
-            label: Text(
-              'תזמון',
+          label: Text(
+            '',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.w500,
@@ -215,8 +221,11 @@ class _AddVideoPageState extends State<AddVideoPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('הוסף וידאו', textDirection: TextDirection.rtl),
-        backgroundColor: Colors.deepPurple[300],
+        backgroundColor: Colors.cyan[800],
         actions: [],
+      ),
+      endDrawer: MainDrawer(
+        currPage: pageButton.ADDVID,
       ),
       body: Container(
         child: SafeArea(
@@ -272,39 +281,34 @@ class _AddVideoPageState extends State<AddVideoPage> {
     print(errorText);
   }
 
-  Future<void> countDown(context) async {
+  void countDown(context) {
     counter = recordingDelay + 1;
 
-    timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+    timer = Timer.periodic(Duration(seconds: 1), (timer) {
       setState(() {
         if (counter > 0) {
           counter--;
         } else {
-          print("canceling");
           timer.cancel();
         }
       });
     });
   }
 
-  Future<void> onCapturePressed(context) async {
+  void onCapturePressed(context) async {
     countDown(context);
-    Future.delayed(Duration(seconds: recordingDelay), (){
-      print("done delay");
-    });
-    print("oh yayayaya");
-
-    // countDown(context);
-    // await Future.delayed(Duration(seconds: recordingDelay + 1));
+    await Future.delayed(Duration(seconds: recordingDelay + 1));
     try {
       await controller.startVideoRecording();
+      this.isRecording = true;
       await Future.delayed(Duration(seconds: recordingTime));
       XFile videoFile = await controller.stopVideoRecording();
+      this.isRecording = false;
 
-      Navigator.push(
+      Navigator.pushReplacement(
           context,
           MaterialPageRoute(
-              builder: (context) => AddExpression(videoPath: videoFile.path)));
+              builder: (context) => AddExpression(videoFile: videoFile)));
     } catch (e) {
       showCameraException(e);
     }

@@ -44,7 +44,7 @@ class MapScreenState extends State<ProfilePage>
   final picker = ImagePicker();
   /// Variables
   var imageUrl;
-  File imageFile;
+  // File imageFile;
   String _uploadedFileURL;
 
   @override
@@ -727,11 +727,12 @@ class MapScreenState extends State<ProfilePage>
     );
 
     // upload profile picture to the firebase
+    final imageFile = this._profileImage.imageFile;
     print("imageFile" + imageFile.toString());
     if(imageFile.toString() != "assets/user.png" && imageFile != null )
       {
         print("uploadFile");
-        uploadFile();
+        await this._profileImage.uploadFile();
       }
 
     setState(() {
@@ -779,26 +780,26 @@ class MapScreenState extends State<ProfilePage>
     }).catchError((error) => print(error));
   }
 
-  /// Get from gallery
-  _getFromGallery() async {
-    PickedFile pickedFile = await ImagePicker().getImage(
-      source: ImageSource.gallery,
-      maxWidth: 1800,
-      maxHeight: 1800,
-    );
-    print("pickedFile.path" + pickedFile.path);
-    File bla = File(pickedFile.path);
-    imageFile = bla;
-    setState(() {imageFile = bla;});    //_cropImage(pickedFile.path);
-  }
+  // /// Get from gallery
+  // _getFromGallery() async {
+  //   PickedFile pickedFile = await ImagePicker().getImage(
+  //     source: ImageSource.gallery,
+  //     maxWidth: 1800,
+  //     maxHeight: 1800,
+  //   );
+  //   print("pickedFile.path" + pickedFile.path);
+  //   File bla = File(pickedFile.path);
+  //   imageFile = bla;
+  //   setState(() {imageFile = bla;});    //_cropImage(pickedFile.path);
+  // }
 
-  Future chooseFile() async {
-    await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
-      setState(() {
-        imageFile = image;
-      });
-    });
-  }
+  // Future chooseFile() async {
+  //   await ImagePicker.pickImage(source: ImageSource.gallery).then((image) {
+  //     setState(() {
+  //       imageFile = image;
+  //     });
+  //   });
+  // }
 
   Future uploadFile2(File file) async {
     FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");
@@ -816,21 +817,21 @@ class MapScreenState extends State<ProfilePage>
     });
   }
 
-  Future uploadFile() async {
-    FirebaseAuth auth = FirebaseAuth.instance;
-    String id = auth.currentUser.uid;
-    var storageReference = FirebaseStorage.instance
-        .ref()
-        .child('users_profile_pic/${Path.basename(id)}');
-    UploadTask uploadTask = storageReference.putFile(imageFile);
-    await uploadTask.whenComplete(() => print('File Uploaded'));
-    print('File Uploaded');
-    storageReference.getDownloadURL().then((fileURL) {
-      setState(() {
-        _uploadedFileURL = fileURL;
-      });
-    });
-  }
+  // Future uploadFile() async {
+  //   FirebaseAuth auth = FirebaseAuth.instance;
+  //   String id = auth.currentUser.uid;
+  //   var storageReference = FirebaseStorage.instance
+  //       .ref()
+  //       .child('users_profile_pic/${Path.basename(id)}');
+  //   UploadTask uploadTask = storageReference.putFile(imageFile);
+  //   await uploadTask.whenComplete(() => print('File Uploaded'));
+  //   print('File Uploaded');
+  //   storageReference.getDownloadURL().then((fileURL) {
+  //     setState(() {
+  //       _uploadedFileURL = fileURL;
+  //     });
+  //   });
+  // }
 
 
 // FirebaseStorage storage = FirebaseStorage(storageBucket: "https://console.firebase.google.com/project/islcsproject/storage/islcsproject.appspot.com/files");

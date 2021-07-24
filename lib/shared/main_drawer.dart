@@ -132,7 +132,7 @@ class MainDrawer extends StatelessWidget {
                 icon: Icon(Icons.download_done_outlined),
                 isCurrPage: false,
               ),
-              DrawerButton(
+              FirebaseAuth.instance.currentUser.isAnonymous ? Container() : DrawerButton(
                   title: "הוסף וידיאו",
                   onTap: () => pushPage(context, AddVideoPage()),
                   icon: Icon(Icons.video_library),

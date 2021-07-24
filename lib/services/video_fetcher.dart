@@ -645,7 +645,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   @override
   Widget build(BuildContext context) {
     print("sentence2 is ${widget.sentence}");
-    if (widget.sentence == null || !this._videoFetcher.isValidSentence) {
+    if (widget.sentence == null) {
       return Container();
     }
 
