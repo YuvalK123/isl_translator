@@ -19,7 +19,7 @@ List<String> splitToLetters(String word) {
 }
 
 /* Search for terms in the sentence and return a list ot terms */
-Future<List<String>> searchTerm(String sentence, List<String> saveTerms) async{
+List<String> searchTerm(String sentence, List<String> saveTerms) {
   List<String> terms = [];
   for (var i = 0; i < saveTerms.length; i++) {
     var searchName = saveTerms[i].replaceAll(new RegExp(r'[\u200f]'), "");
@@ -32,12 +32,12 @@ Future<List<String>> searchTerm(String sentence, List<String> saveTerms) async{
 }
 
 /* Find all the terms in DB - maybe to do it only once and save it? */
-Future<List<String>> findTermsDB(FirebaseStorage storage) async {
-// Future<List<String>> findTermsDB() async {
+//Future<List<String>> findTermsDB(FirebaseStorage storage) async {
+ Future<List<String>> findTermsDB() async {
   List<String> terms = [];
   // if (FirebaseStorage.instance.app.)
-  // final result = await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
-  final result = await storage.ref().child("animation_openpose/").listAll().then((result) {
+   final result = await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
+  //final result = await storage.ref().child("animation_openpose/").listAll().then((result) {
     for (int i=0; i< result.items.length; i++){
       String videoName = (result.items)[i].toString().substring(55,(result.items)[i].toString().length -5);
       if(videoName.split(" ").length > 1){
@@ -49,7 +49,7 @@ Future<List<String>> findTermsDB(FirebaseStorage storage) async {
 }
 
 /* Split the sentence to word/term and return a list of the split sentence*/
-Future<List<String>> splitSentence(String sentence) async{
+List<String> splitSentence(String sentence) {
   if (sentence == null){
     return null;
   }
@@ -71,7 +71,7 @@ Future<List<String>> splitSentence(String sentence) async{
   // futureTerms.then((result) => saveTerms=  result)
   //     .catchError((e) => print('error'));
   print("hello save terms ==> " + saveTerms.toString());
-  List<String> terms = await searchTerm(newSentence, saveTerms); // terms in the sentence
+  List<String> terms =  searchTerm(newSentence, saveTerms); // terms in the sentence
   //List<String> terms = [];
   //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
   List<String> splitSentence = [];

@@ -239,7 +239,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
   Future<List> getUrls(String dirName, bool toSave) async {
-    List<String> splitSentenceList = splitSentence(sentence); // split the sentence
+    List<String> splitSentenceList = await splitSentence(sentence); // split the sentence
     if (splitSentenceList == null) {
 
       return null;

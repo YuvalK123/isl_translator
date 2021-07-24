@@ -14,19 +14,15 @@ import 'dart:isolate';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
+  final user = FirebaseAuth.instance.currentUser;
 
   // Completer completer = Completer();
   // completer.complete(FirebaseApp.getApps(context).isEmpty());
-
-  runApp(MyApp());
-  //bla();
-  bla();
-  print("after bla");
+  //runApp(MyApp());
  // await Firebase.initializeApp().whenComplete(() => bla());
   //final recievePort = ReceivePort();
   //final _isolateReady = Completer<void>();
-  // if (user != null && user.uid != null){
+  if (user != null && user.uid != null){
   //   print("spawning from main!");
   //   Worker();
     // recievePort.listen((dynamic message) {
@@ -46,17 +42,18 @@ void main() async {
     //
     // isolate.kill();
     // print("user is $user ${user.uid}");
-    //  List<String> futureTerms = await findTermsDB();
-    //  saveTerms = futureTerms;
-  // }else{
-  //   print("fail");
-  // }
+     List<String> futureTerms = await findTermsDB();
+     saveTerms = futureTerms;
+  }else{
+    print("fail");
+  }
   // get all terms
   // List<String> futureTerms = await findTermsDB();
   // saveTerms = futureTerms;
   // futureTerms.then((result) => saveTerms=  result)
   //     .catchError((e) => print('error in find terms'));
-  //runApp(MyApp());
+  runApp(MyApp());
+  //await myBackgroundMessageHandler();
 }
 
 void bla (){
@@ -88,6 +85,18 @@ void bla (){
     print("fail");
   }
 }
+
+Future<dynamic> myBackgroundMessageHandler() {
+  int count = 0;
+  while(count < 100)
+    {
+      print("hi");
+      count++;
+    }
+  return Future<void>.value();
+}
+
+
  void saveTermsFunc(dynamic msg) async{
   // print("user is $user ${user.uid}");
   // await Future.delayed(Duration(seconds: 10)); // not working
@@ -122,51 +131,51 @@ class MyApp extends StatelessWidget {
 
   }
 
-class Worker {
-  SendPort _sendPort;
-  Isolate _isolate;
-  final _isolateReady = Completer<void>();
-
-  Worker(FirebaseStorage firebaseStorage) {
-    init(firebaseStorage);
-  }
-
-  Future<void> init(FirebaseStorage storage) async {
-    final recievePort = ReceivePort();
-    recievePort.listen((dynamic message) {
-      if (message is SendPort) {
-        print("hi");
-        _isolateReady.complete();
-        return;
-      }
-      if (message is List<String>) {
-        print("Bye");
-        saveTerms = message;
-        _isolateReady.complete();
-        return;
-      }
-    });
-    final isolate = await Isolate.spawn(_isolateEntry, [recievePort.sendPort, storage]);
-  }
-
-  Future<void> get isolateReady => _isolateReady.future;
-
-  void dispose() {
-    _isolate.kill();
-  }
-
-  static Future<void> _isolateEntry(List<Object> args) async {
-    dynamic message = args[0];
-    FirebaseStorage storage = args[1];
-    print("loading.......");
-    SendPort sendPort;
-    // recievePort is what im listening to
-    // sendPort is what we use to send to the recieve
-    //await Firebase.initializeApp();
-    List<String> futureTerms = await findTermsDB(storage);
-    saveTerms = futureTerms;
-    sendPort = message;
-    //msg.send(saveTerms);
-    print("done saveTerms!");
-  }
-}
+// class Worker {
+//   SendPort _sendPort;
+//   Isolate _isolate;
+//   final _isolateReady = Completer<void>();
+//
+//   Worker(FirebaseStorage firebaseStorage) {
+//     init(firebaseStorage);
+//   }
+//
+//   Future<void> init(FirebaseStorage storage) async {
+//     final recievePort = ReceivePort();
+//     recievePort.listen((dynamic message) {
+//       if (message is SendPort) {
+//         print("hi");
+//         _isolateReady.complete();
+//         return;
+//       }
+//       if (message is List<String>) {
+//         print("Bye");
+//         saveTerms = message;
+//         _isolateReady.complete();
+//         return;
+//       }
+//     });
+//     final isolate = await Isolate.spawn(_isolateEntry, [recievePort.sendPort, storage]);
+//   }
+//
+//   Future<void> get isolateReady => _isolateReady.future;
+//
+//   void dispose() {
+//     _isolate.kill();
+//   }
+//
+//   static Future<void> _isolateEntry(List<Object> args) async {
+//     dynamic message = args[0];
+//     FirebaseStorage storage = args[1];
+//     print("loading.......");
+//     SendPort sendPort;
+//     // recievePort is what im listening to
+//     // sendPort is what we use to send to the recieve
+//     //await Firebase.initializeApp();
+//     List<String> futureTerms = await findTermsDB();
+//     saveTerms = futureTerms;
+//     sendPort = message;
+//     //msg.send(saveTerms);
+//     print("done saveTerms!");
+//   }
+//}
