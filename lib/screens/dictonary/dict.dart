@@ -1,11 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-// import 'package:imagebutton/imagebutton.dart';
 import 'package:isl_translator/screens/dictonary/subject.dart';
 import '../../shared/main_drawer.dart';
-import 'package:random_color/random_color.dart';
-// import 'package:isl_translator/models/button_image.dart';
 
+/*
+Dictionary class
+Dictionary of ISL videos&animations, each word belong to a specific subject
+*/
 class Dictionary extends StatefulWidget {
   @override
   _DictionaryState createState() => _DictionaryState();
@@ -16,7 +17,7 @@ class _DictionaryState extends State<Dictionary> {
   void initState() {
     super.initState();
   }
-  RandomColor _randomColor = RandomColor();
+  // list of subjects
   List<Card> _buildGridCards(BuildContext context) {
     ButtonImage holidays = new ButtonImage("hanukkah.jfif","חגים ומועדים","holidays");
     ButtonImage pronoun = new ButtonImage("pointing.jfif","כינוי גוף","pronoun");
@@ -26,60 +27,49 @@ class _DictionaryState extends State<Dictionary> {
     ButtonImage time = new ButtonImage("time.jfif","זמן","time");
     ButtonImage geography = new ButtonImage("geography.jfif","גאוגרפיה","geography");
     ButtonImage food = new ButtonImage("food.jfif","אוכל","food");
-
     List<ButtonImage> products = [holidays,pronoun,shapes,animals,body,time,geography,food];
 
+    // if the list of subject if empty - show an empty card
     if (products == null || products.isEmpty) {
       return const <Card>[];
     }
 
     final ThemeData theme = Theme.of(context);
-    /*final NumberFormat formatter = NumberFormat.simpleCurrency(
-        locale: Localizations.localeOf(context).toString());*/
 
+    // return a Card that contains the subjects we define above
     return products.map((product) {
       return Card(
-        //color: Colors.cyan[800],
         shape: RoundedRectangleBorder(side: BorderSide(color: Colors.black, width: 2),
             borderRadius: const BorderRadius.all(
                 Radius.circular(8.0)
             )),
-        // TODO: Adjust card heights (103)
         child: Stack(
           clipBehavior: Clip.none,
           children: <Widget>[
             Column(
-              // TODO: Center items on the card (103)
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
+                // show the image
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AspectRatio(
                     aspectRatio: 18 / 12,
                     child: Container(
                       alignment: Alignment.bottomCenter,
-                      //width: 100.0,
-                      //height: 50.0,
-                      //color: Colors.green[100],
-                      /*child: FittedBox(
-                        child: Image.asset("assets/images/" + product.name),
-                        fit: BoxFit.fill,
-                      )*/child:Image.asset(
+                      child:Image.asset(
                           "assets/images/" + product.name
                       ),
                     ),
                   ),
                 ),
+                // show the text below each image
                 Expanded(
                   child: Padding(
                     padding: EdgeInsets.fromLTRB(25.0, 35.0, 20.0,10.0),
                     child: SingleChildScrollView(
                       child: Column(
-                        // TODO: Align labels to the bottom and center (103)
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        // TODO: Change innermost Column (103)
                         children: <Widget>[
-                          // TODO: Handle overflowing labels (103)
                           Container(alignment: Alignment.center,
                             child: Text(
                               product.text,
@@ -94,6 +84,7 @@ class _DictionaryState extends State<Dictionary> {
                 ),
               ],
             ),
+            // define what to do when tapping the image
             Positioned(
               left: 0.0,
               top: 0.0,
@@ -105,6 +96,7 @@ class _DictionaryState extends State<Dictionary> {
                     onTap: (){
                       Navigator.push(
                         context,
+                        // show the specific subject dict
                         MaterialPageRoute(builder: (context) => Subject(product.onTap)),
                       );
                     }
@@ -142,6 +134,13 @@ class _DictionaryState extends State<Dictionary> {
   }
 }
 
+/*
+ButtonImage class
+Each button image contain:
+- name
+- text to display below to image
+- onTap variable that define which page to open when tapping
+*/
 class ButtonImage{
   String name;
   String text;
