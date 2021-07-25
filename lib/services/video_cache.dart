@@ -2,10 +2,9 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:disk_lru_cache/disk_lru_cache.dart';
-import 'dart:convert';
-
-import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:isl_translator/services/video_fetcher.dart';
+import 'package:path_provider/path_provider.dart';
 
 List<String> lettersList = ["א","ב","ג","ד","ה","ו","ז","ח","ט",
                          "י","כ","ך","ל","מ","ם","נ","ן","ס",
@@ -16,6 +15,7 @@ bool hasLettersLocal = false;
 
 class LruCache{
   final LruMap<String,String> map = LruMap();
+  String lettersCachePath = "";
   DiskLruCache _cache;
   Map<String,String> firebaseDirNames = {"live":"live_videos/", "animation":"animation_openpose/"};
   Map<String,String> cacheFolders = {"live":"Cache/live", "animation": "Cache/animation"};
@@ -38,7 +38,7 @@ class LruCache{
         print("on $firebaseDirName/$letter.mp4");
         String url = await VideoFetcher.getUrl("$letter",firebaseDirName);
         print("downloaded letter url $url");
-        await VideoFetcher().saveFile(url, "$letter.mp4", cacheFolder);
+        await LruCache().saveFile(url, "$letter.mp4", cacheFolder);
         print("saved!!");
       } catch(e){
         print("e for letter $letter is $e");
@@ -60,7 +60,7 @@ class LruCache{
           // print("on $firebaseDirName/$word.mp4");
           // String url = await VideoFetcher.getUrl(word, firebaseDirName);
           print("downloaded letter url $url");
-          await VideoFetcher().saveFile(url, "$word.mp4", cacheFolder);
+          await saveFile(url, "$word.mp4", cacheFolder);
           print("saved $word!!");
         // }
       });
@@ -70,15 +70,15 @@ class LruCache{
     }
   }
 
-  Future<bool> isFileExist(String word, bool isAnimation) async{
-    bool isLetter = word.length == 1;
-    String cacheFolder;
-    if (isLetter){
-      cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
-    }else{
-      cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
-    }
-  }
+  // Future<bool> isFileExist(String word, bool isAnimation) async{
+  //   bool isLetter = word.length == 1;
+  //   String cacheFolder;
+  //   if (isLetter){
+  //     cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
+  //   }else{
+  //     cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+  //   }
+  // }
 
   LruCache(){
     int maxSize = 10 * 1024 * 1024; // 10M
@@ -131,5 +131,137 @@ class LruCache{
   Future<void> clean() async {
     return await this.cache.clean();
   }
+
+
+  ///
+/// ordering
+///
+
+  Future<String> createLettersCachePath(String folderName) async{
+    if (folderName == null || folderName == ""){
+      folderName = "/Cache";
+    }else if (!folderName.startsWith("/")){
+      folderName = "/" + folderName;
+    }
+    if (folderName.endsWith("/")){
+      folderName.substring(0, folderName.length - 1);
+    }
+    print("folderName is $folderName");
+    Directory directory = await getExternalStorageDirectory();
+    print("path is ${directory.path}");
+    String newPath = "";
+    List<String> folders = directory.path.split("/");
+    for (int i = 1; i < folders.length; i++){
+      String folder = folders[i];
+      print("folder == $folder");
+      // newPath += "/" + folder;
+      if (folder != "android"){
+        newPath += "/" + folder;
+      }else{
+        break;
+      }
+    }
+    newPath = newPath + folderName;
+    // lettersCachePath = newPath;
+    return newPath;
+  }
+
+  Future<String> getCachePathByFolder(String folderName) async{
+    if (folderName == null || folderName == ""){
+      folderName = "/Cache";
+    }else if (!folderName.startsWith("/")){
+      folderName = "/" + folderName;
+    }
+    if (folderName.endsWith("/")){
+      folderName.substring(0, folderName.length - 1);
+    }
+    print("folderName is $folderName");
+    Directory directory = await getExternalStorageDirectory();
+    print("path is ${directory.path}");
+    String newPath = "";
+    List<String> folders = directory.path.split("/");
+    for (int i = 1; i < folders.length; i++){
+      String folder = folders[i];
+      print("folder == $folder");
+      // newPath += "/" + folder;
+      if (folder != "android"){
+        newPath += "/" + folder;
+      }else{
+        break;
+      }
+    }
+    newPath = newPath + folderName;
+    return newPath;
+  }
+
+  Future<bool> saveFile(String url, String fileName, String folderName) async{
+    Directory directory;
+    Dio dio = Dio();
+    print("path for letters be4 is $lettersCachePath");
+    try {
+      print("android");
+      if (Platform.isAndroid){
+        print("downloading for android");
+        if (await _requestPermission(Permission.storage)){
+          print("got permission");
+          String newPath = await getCachePathByFolder(folderName);
+          print("newPath is $newPath");
+          directory = Directory(newPath);
+        }
+      }else{
+        // apple, and not loaded
+      }
+      String newPath = await getCachePathByFolder(folderName);
+      print("directory is $Directory");
+      if (!(await directory.exists())){
+        print("recursive");
+        await directory.create(recursive: true);
+        print("recursed");
+      }
+      if (await directory.exists()){
+        print("exists");
+        String fullName = directory.path + "/$fileName";
+        print("full name is $fullName");
+        File saveFile = File(fullName);
+        if (await saveFile.exists()){
+          return true;
+        }
+        print("saved! now downloading to ${saveFile.path}");
+        await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
+        print("$fileName downloaded!!");
+        return true;
+      }
+      else{
+        print("doesnt exist");
+      }
+    }
+    catch (e){
+      print("save err is $e");
+    }
+    return false;
+  }
+
+  Future<bool> _requestPermission(Permission permission) async{
+    if (await permission.isGranted){
+      return true;
+    }
+    var result = await permission.request();
+    return PermissionStatus.granted.isGranted;
+  }
+
+  Future<bool> isFileExists(String word, bool isAnimation) async{
+    // String cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+    bool isLetter = word.length == 1;
+    String cacheFolder;
+    if (isLetter){
+      cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
+    }else{
+      cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+    }
+    File file = File("$cacheFolder/$word");
+    return await file.exists();
+    return null;
+  }
+
 
 }
