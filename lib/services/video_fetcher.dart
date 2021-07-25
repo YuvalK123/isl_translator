@@ -170,7 +170,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     print("indices map in _urlsCatch for word $word: $indicesMap");
     try {
       // check if word exist in the personal videos
-      String url = await getUrl(word, dirName + _auth.currentUser.uid);
+      String url = await getUrl(word, dirName + _auth.currentUser.uid + "/");
       this.indexToWord[indicesMap["k"]++] = word;
       // this.indexToWord[i] = word;
       indexToUrl[indicesMap["j"]++] = url;
