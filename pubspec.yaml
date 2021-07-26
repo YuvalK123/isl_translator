@@ -57,6 +57,7 @@ dependencies:
   localization: ^0.1.0
   flutter_spinbox: ^0.5.2
   http: ^0.12.2
+  flutter_easyloading: ^3.0.0
 
 #dependencies:
 #  flutter:
