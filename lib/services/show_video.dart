@@ -35,16 +35,23 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
 Future<void> findTermsDB() async{
   List<String> terms = [];
   // if (FirebaseStorage.instance.app.)
-  return await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
-    for (int i=0; i< result.items.length; i++){
-      String videoName = (result.items)[i].toString().substring(55,(result.items)[i].toString().length -5);
-      if(videoName.split(" ").length > 1){
-        print("adding $videoName");
-        saveTerms.add(videoName);
-      }
+  var futures = <Future>[];
+  await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
+    var items = result.items;
+    for (int i=0; i< items.length; i++){
+      futures.add(addSavedExp(items[i]));
     }
   });
+  return await Future.wait(futures);
   // return;
+}
+
+Future<void> addSavedExp(Reference item) async{
+  String videoName = item.toString().substring(55,item.toString().length -5);
+  if(videoName.split(" ").length > 1){
+    print("adding $videoName");
+    saveTerms.add(videoName);
+  }
 }
 
 /* Split the sentence to word/term and return a list of the split sentence*/

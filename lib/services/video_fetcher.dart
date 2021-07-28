@@ -194,7 +194,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
   Future<List> getUrls(String dirName, bool toSave) async {
-    List<String> splitSentenceList = await splitSentence(sentence); // split the sentence
+    List<String> splitSentenceList = splitSentence(sentence); // split the sentence
     if (splitSentenceList == null) {
       return null;
     }
@@ -216,6 +216,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
       try {
         await _urlsTry(word, isAnimation, map, dirName, indicesMap,
             splitSentenceList, urls);
+        print("indexToWord after _urlsTry: $indexToWord\n indexToUrl after _urlsTry: $indexToUrl\n  urls after _urlsTry: $urls\n");
       } on io.SocketException catch (err) {
         print(err);
         print("no internet connection");
@@ -292,7 +293,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   String dirName = "animation_openpose/";
   UserModel currUserModel;
   FirebaseAuth _auth = FirebaseAuth.instance;
-  var urlss;
+  // var urlss;
   bool isReplay = false;
   bool isPause = false;
   bool isPlay = false;
@@ -444,8 +445,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   Future<void> _initController(int index) async {
     var myUrls = this._videoFetcher.urls;
-    urlss = this._videoFetcher.indexToUrl;
-    String url = urlss[index];
+    // urlss = this._videoFetcher.indexToUrl;
+    String url = this._videoFetcher.indexToUrl[index];
     print("url for $index is $url . word is ${this._videoFetcher.indexToWord[index]}");
     VideoPlayerController controller;
     if (url.startsWith("#")){ // letter
@@ -481,12 +482,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       controller = VideoPlayerController.network(url);
     }
     print("init controller index is $index");
-    isInit[urlss[index] + index.toString()] = false;
+    isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = false;
 
     controller.setVolume(0.0);
-    _controllers[urlss[index] + index.toString()] = controller;
+    _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
     await controller.initialize();
-    isInit[urlss[index] + index.toString()] = true;
+    isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = true;
     print("finished $index init");
   }
 
@@ -583,7 +584,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         //_controller(index) = null;
         //_nextVideo();
         print("index for finish === >> " + index.toString());
-        if(index == urlss.length -1){
+        if(index == this._videoFetcher.indexToUrl.length -1){
           //add replay button
           print("finish all videos!!!");
           return;
