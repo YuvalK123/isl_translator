@@ -38,7 +38,7 @@ class LruCache{
         print("on $firebaseDirName/$letter.mp4");
         String url = await VideoFetcher.getUrl("$letter",firebaseDirName);
         print("downloaded letter url $url");
-        await LruCache().saveFile(url, "$letter.mp4", cacheFolder);
+        await LruCache().saveFile(url, "$letter.mp4", cacheFolder.contains("animation"));
         print("saved!!");
       } catch(e){
         print("e for letter $letter is $e");
@@ -50,9 +50,9 @@ class LruCache{
 
   Future<void> saveVideosFromUrls(bool isAnimation, Map<String,String> urls) async{
     isAnimation = isAnimation == null ? true : isAnimation;
-    String cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
-    String firebaseDirName = !isAnimation ? firebaseDirNames["live"] : firebaseDirNames["animation"];
-    print("save videos. isAnimation = $isAnimation, cacheFolder = $cacheFolder, firbaseDir = $firebaseDirName");
+    // String cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+    // String firebaseDirName = !isAnimation ? firebaseDirNames["live"] : firebaseDirNames["animation"];
+    // print("save videos. isAnimation = $isAnimation, cacheFolder = $cacheFolder, firbaseDir = $firebaseDirName");
     try{
 
       urls.forEach((String word, String url) async{
@@ -60,7 +60,7 @@ class LruCache{
           // print("on $firebaseDirName/$word.mp4");
           // String url = await VideoFetcher.getUrl(word, firebaseDirName);
           print("downloaded letter url $url");
-          await saveFile(url, "$word.mp4", cacheFolder);
+          await saveFile(url, "$word.mp4", isAnimation);
           print("saved $word!!");
         // }
       });
@@ -69,16 +69,6 @@ class LruCache{
       print("e for words $urls is $e");
     }
   }
-
-  // Future<bool> isFileExist(String word, bool isAnimation) async{
-  //   bool isLetter = word.length == 1;
-  //   String cacheFolder;
-  //   if (isLetter){
-  //     cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
-  //   }else{
-  //     cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
-  //   }
-  // }
 
   LruCache(){
     int maxSize = 10 * 1024 * 1024; // 10M
@@ -105,23 +95,6 @@ class LruCache{
     CacheSnapshot snapshot = await cache.get(key);
     return await snapshot.getString(0);
   }
-
-  // Future<void> writeCacheBytes(String key, String value) async {
-  //   CacheEditor editor = await cache.edit(key);
-  //   if (editor == null) {
-  //     return null;
-  //   }
-  //   HttpClient client = new HttpClient();
-  //   HttpClientRequest request = await client.openUrl("GET", Uri.parse(
-  //       "https://ss0.bdstatic.com/94oJfD_bAAcT8t7mm9GUKT-xh_/timg?image&quality=100&size=b4000_4000&sec=1534075481&di=1a90bd266d62bc5edfe1ce84ac38330e&src=http://photocdn.sohu.com/20130517/Img376200804.jpg"));
-  //   HttpClientResponse response = await request.close();
-  //   Stream<List<int>> stream = await editor.copyStream(0, response);
-  //   // The bytes has been written to disk at this point.
-  //
-  //   await StreamBuilder(builder: stream).
-  //   // await new ByteStream(stream).toBytes();
-  //   await editor.commit();
-  // }
 
   Future<Uint8List> readBytes() async{
     CacheSnapshot snapshot =  await cache.get('imagekey');
@@ -194,7 +167,8 @@ class LruCache{
     return newPath;
   }
 
-  Future<bool> saveFile(String url, String fileName, String folderName) async{
+  Future<bool> saveFile(String url, String fileName, bool isAnimation) async{
+    String folderName = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     Directory directory;
     Dio dio = Dio();
     print("path for letters be4 is $lettersCachePath");
@@ -239,6 +213,25 @@ class LruCache{
       print("save err is $e");
     }
     return false;
+  }
+
+  Future<File> fetchVideoFile(String title, bool isAnimation, String replacementStr) async{
+    if (title == null || title.length < 1){
+      return null;
+    }
+    String cacheKey = isAnimation ? "animation" : "live";
+    bool isLetter =  replacementStr == "#" ? true : false;
+    String dirName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
+    String url = title.replaceFirst("#", dirName);
+    String cacheFolder = await getCachePathByFolder(dirName);
+    url = "$cacheFolder/$title.mp4";
+    print("fetchVideoFile for title $title : loading from file $url");
+    File file = File(url);
+    if (await file.exists()){
+      print("file $file exists! fir $title title");
+      return file;
+    }
+    return null;
   }
 
   Future<bool> _requestPermission(Permission permission) async{
