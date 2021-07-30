@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
-import 'package:isl_translator/services/video_fetcher.dart';
+import 'package:isl_translator/services/video_player.dart';
 
 /*
 Subject class

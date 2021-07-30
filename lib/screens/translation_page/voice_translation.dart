@@ -214,7 +214,7 @@
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
-import 'package:isl_translator/services/video_fetcher.dart';
+import 'package:isl_translator/services/video_player.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:video_player/video_player.dart';
 

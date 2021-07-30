@@ -196,7 +196,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/video_cache.dart';
-import 'package:isl_translator/services/video_fetcher.dart';
+import 'package:isl_translator/services/video_player.dart';
 
 class TranslatePage extends StatefulWidget {
   TranslatePage({Key key, this.title}) : super(key: key);

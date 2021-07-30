@@ -39,10 +39,10 @@ class LruCache{
         print("on $firebaseDirName/$letter.mp4");
         String url = await VideoFetcher.getUrl("$letter",firebaseDirName);
         print("downloaded letter url $url");
-        await LruCache().saveFile(url, "$letter.mp4", cacheFolder.contains("animation"));
+        await VideoFetcher.lruCache.saveFile(url, "$letter.mp4", cacheFolder.contains("animation"), true);
         print("saved!!");
       } catch(e){
-        print("e for letter $letter is $e");
+        print("err for letter $letter is $e");
       }
 
     }
@@ -55,16 +55,18 @@ class LruCache{
     // String firebaseDirName = !isAnimation ? firebaseDirNames["live"] : firebaseDirNames["animation"];
     // print("save videos. isAnimation = $isAnimation, cacheFolder = $cacheFolder, firbaseDir = $firebaseDirName");
     try{
-
+      List<Future> futures = <Future>[];
       urls.forEach((String word, String url) async{
         // if (await isFileExist(word, isAnimation)) {
           // print("on $firebaseDirName/$word.mp4");
           // String url = await VideoFetcher.getUrl(word, firebaseDirName);
-          print("downloaded letter url $url");
-          await saveFile(url, "$word.mp4", isAnimation);
-          print("saved $word!!");
+          bool isLetter = word.length == 1;
+          print("adding $word to save");
+          futures.add(saveFile(url, "$word.mp4", isAnimation, isLetter));
         // }
       });
+      await Future.wait(futures);
+      print("saved words!");
 
     } catch(e){
       print("e for words $urls is $e");
@@ -81,30 +83,6 @@ class LruCache{
     );
   }
 
-  Future<void> writeCache(String key, String value) async{
-    CacheEditor editor = await this.cache.edit(key);
-    if (editor == null){
-      return null;
-    }
-    IOSink sink = await editor.newSink(0);
-    sink.write(value);
-    var result = await sink.close();
-    return await editor.commit();
-  }
-
-  Future<String> readCache(String key) async{
-    CacheSnapshot snapshot = await cache.get(key);
-    return await snapshot.getString(0);
-  }
-
-  Future<Uint8List> readBytes() async{
-    CacheSnapshot snapshot =  await cache.get('imagekey');
-    return await snapshot.getBytes(0);
-  }
-
-  Future<void> clean() async {
-    return await this.cache.clean();
-  }
 
 
   ///
@@ -174,8 +152,10 @@ class LruCache{
     return newPath;
   }
 
-  Future<bool> saveFile(String url, String fileName, bool isAnimation) async{
-    String folderName = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+  Future<bool> saveFile(String url, String fileName, bool isAnimation, bool isLetter) async{
+    String cacheKey = isAnimation ? "animation" : "live";
+    String folderName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
+    // String folderName = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     Directory directory;
     Dio dio = Dio();
     try {
@@ -256,13 +236,16 @@ class LruCache{
 
   Future<bool> isFileExists(String word, bool isAnimation) async{
     // String cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+    String cacheKey = isAnimation ? "animation" : "live";
     bool isLetter = word.length == 1;
-    String cacheFolder;
-    if (isLetter){
-      cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
-    }else{
-      cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
-    }
+    String cacheFolder = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
+
+    // String cacheFolder;
+    // if (isLetter){
+    //   cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
+    // }else{
+    //   cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
+    // }
     File file = File("$cacheFolder/$word");
     return await file.exists();
     return null;
