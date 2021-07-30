@@ -189,15 +189,25 @@ class VideoFetcher { // extends State<VideoFetcher> {
     } catch (err2) {
       var urlsList = await proccessWord(splitSentenceList[i], dirName);
       print("urls list for ${splitSentenceList[i]} is $urlsList}");
+      List<String> letters = urlsList.length > 1 ? null : splitToLetters(splitSentenceList[i]);
+      if (letters = null){
+        String url = urlsList[0];
+        indexToUrl[indicesMap["j"]++] = url;
+        urls.add(url);
+        indexToWord[indicesMap["k"]++] = url;
+        return;
+      }
       // if (urlsList.length == 1 && urlsList[0].length != 1) {
       //   this.indexToWord[indicesMap["k"]++] = word;
       //   map[splitSentenceList[i]] = urlsList[0]; // if not letters. if letters/ its cached
       //   return;
       // }
-      for (var url in urlsList) {
+      for (int i = 0; i < urlsList.length; i++) {
+        String url = urlsList[i];
         indexToUrl[indicesMap["j"]++] = url;
         urls.add(url);
         indexToWord[indicesMap["k"]++] = url;
+        wordsToUrls[letters[i]] = url;
 
         // indicesMap["k"]++;
       }
@@ -309,23 +319,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
     return urls;
   }
 
-  // Future<void> playVideos(String dirName) async{
-  //   List<String> urls = await getUrls(dirName, true);
-  //
-  //   print("urls length == > " + urls.length.toString());
-  //   // myUrls = urls;
-  //   print("hello this is the urls ==> " + urls.toString());
-  //   // if (mounted){
-  //   //   setState(() {
-  //   //     var videoPlayer = VideoFetcher2(key: UniqueKey(),myUrls: urls,);
-  //   //     this.loading = false;
-  //   //     this._videoFetcher2 = videoPlayer;
-  //   //
-  //   //     // this.videoPlayerDemo = videoPlayer;
-  //   //
-  //   //   });
-  //   // }
-  // }
 }
 
 class VideoPlayer2 extends StatefulWidget {

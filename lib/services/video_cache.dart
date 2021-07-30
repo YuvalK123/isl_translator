@@ -20,6 +20,7 @@ class LruCache{
   Map<String,String> firebaseDirNames = {"live":"live_videos/", "animation":"animation_openpose/"};
   Map<String,String> cacheFolders = {"live":"Cache/live", "animation": "Cache/animation"};
   Map<String,String> cacheLettersFolders = {"live":"Cache/live/letters", "animation":"Cache/animation/letters"};
+  bool hasPermission = false;
 
 
   DiskLruCache get cache {
@@ -140,17 +141,22 @@ class LruCache{
   }
 
   Future<String> getCachePathByFolder(String folderName) async{
+    /***
+     * function finds the android path of cache, and con to it the folderName
+     * only works for android
+     */
     if (folderName == null || folderName == ""){
+      // default cache folder.
       folderName = "/Cache";
     }else if (!folderName.startsWith("/")){
+      // folder name should be of '/...' type
       folderName = "/" + folderName;
     }
     if (folderName.endsWith("/")){
+      // folder should'nt end with '/'
       folderName.substring(0, folderName.length - 1);
     }
-    print("folderName is $folderName");
     Directory directory = await getExternalStorageDirectory();
-    print("path is ${directory.path}");
     String newPath = "";
     List<String> folders = directory.path.split("/");
     for (int i = 1; i < folders.length; i++){
@@ -158,6 +164,7 @@ class LruCache{
       print("folder == $folder");
       // newPath += "/" + folder;
       if (folder != "android"){
+        // no need to attach android to path
         newPath += "/" + folder;
       }else{
         break;
@@ -171,52 +178,54 @@ class LruCache{
     String folderName = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     Directory directory;
     Dio dio = Dio();
-    print("path for letters be4 is $lettersCachePath");
     try {
-      print("android");
       if (Platform.isAndroid){
-        print("downloading for android");
         if (await _requestPermission(Permission.storage)){
           print("got permission");
           String newPath = await getCachePathByFolder(folderName);
           print("newPath is $newPath");
           directory = Directory(newPath);
         }
-      }else{
-        // apple, and not loaded
+        else{
+          // no permission for files
+          return false;
+        }
+      } else{
+        // apple
+        return false;
       }
-      String newPath = await getCachePathByFolder(folderName);
-      print("directory is $Directory");
+      // String newPath = await getCachePathByFolder(folderName);
       if (!(await directory.exists())){
-        print("recursive");
+        // if directory exists - no need to create it. o.w - create.
         await directory.create(recursive: true);
-        print("recursed");
       }
       if (await directory.exists()){
-        print("exists");
         String fullName = directory.path + "/$fileName";
-        print("full name is $fullName");
+        print("full directory name is $fullName");
         File saveFile = File(fullName);
         if (await saveFile.exists()){
+          // file exists - no need to download
           return true;
         }
-        print("saved! now downloading to ${saveFile.path}");
+        // save file
         await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
         print("$fileName downloaded!!");
         return true;
       }
-      else{
-        print("doesnt exist");
-      }
     }
     catch (e){
-      print("save err is $e");
+      print("save file  err is $e");
     }
+    // failed to create directory
     return false;
   }
 
   Future<File> fetchVideoFile(String title, bool isAnimation, String replacementStr) async{
     if (title == null || title.length < 1){
+      return null;
+    }
+    if (!(await _requestPermission(Permission.storage))){
+      // doesnt have permission to get to storage
       return null;
     }
     String cacheKey = isAnimation ? "animation" : "live";
@@ -236,10 +245,13 @@ class LruCache{
 
   Future<bool> _requestPermission(Permission permission) async{
     if (await permission.isGranted){
+      this.hasPermission = true;
       return true;
     }
     var result = await permission.request();
-    return PermissionStatus.granted.isGranted;
+    bool perm = PermissionStatus.granted.isGranted;
+    this.hasPermission = perm;
+    return perm;
   }
 
   Future<bool> isFileExists(String word, bool isAnimation) async{
