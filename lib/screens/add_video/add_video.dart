@@ -6,6 +6,7 @@ import 'package:flutter/painting.dart';
 import 'package:flutter_spinbox/material.dart';
 import 'package:isl_translator/screens/add_video/add_expression_page.dart';
 import 'package:isl_translator/shared/main_drawer.dart';
+import 'package:flutter/services.dart';
 
 class AddVideoPage extends StatefulWidget {
   AddVideoPage({Key key, this.title}) : super(key: key);
@@ -29,6 +30,10 @@ class _AddVideoPageState extends State<AddVideoPage> {
   @override
   void initState() {
     super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
     availableCameras().then((availableCameras) {
       cameras = availableCameras;
 
@@ -44,6 +49,15 @@ class _AddVideoPageState extends State<AddVideoPage> {
       print('Error :${err.code}Error message : ${err.message}');
     });
   }
+
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    super.dispose();
+  }
+
 
   Future initController(CameraDescription description) async {
     if (controller != null) {
@@ -85,11 +99,18 @@ class _AddVideoPageState extends State<AddVideoPage> {
         ),
       );
     }
-
-    return AspectRatio(
-      aspectRatio: controller.value.aspectRatio,
-      child: CameraPreview(controller),
+    return RotatedBox(
+      quarterTurns: 2,
+      child: AspectRatio(
+        aspectRatio: controller.value.aspectRatio,
+        child: CameraPreview(controller),
+      ),
     );
+
+    // return AspectRatio(
+    //   aspectRatio: controller.value.aspectRatio,
+    //   child: CameraPreview(controller),
+    // );
   }
 
   // Display control bar
@@ -229,7 +250,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
       ),
       body: Container(
         child: SafeArea(
-          child: Column(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: <Widget>[
               Expanded(
@@ -252,13 +273,13 @@ class _AddVideoPageState extends State<AddVideoPage> {
                 ),
               ),
               Align(
-                alignment: Alignment.bottomCenter,
+                alignment: Alignment.centerRight,
                 child: Container(
-                  height: 120,
-                  width: double.infinity,
+                  height: double.infinity,
+                  width: 120,
                   padding: EdgeInsets.all(15),
                   color: Colors.black,
-                  child: Row(
+                  child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: <Widget>[
                       cameraToggleRowWidget(),
