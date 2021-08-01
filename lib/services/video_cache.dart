@@ -243,15 +243,17 @@ class LruCache{
     // String cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     String cacheKey = isAnimation ? "animation" : "live";
     bool isLetter = word.length == 1;
-    String cacheFolder = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
-
+    String dirName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
+    String cacheFolder = await getCachePathByFolder(dirName);
+    String url = "$cacheFolder/$word.mp4";
     // String cacheFolder;
     // if (isLetter){
     //   cacheFolder = !isAnimation ? cacheLettersFolders["live"] : cacheLettersFolders["animation"];
     // }else{
     //   cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     // }
-    File file = File("$cacheFolder/$word");
+    // File file = File("$cacheFolder/$word");
+    File file = File(url);
     return await file.exists();
     return null;
   }

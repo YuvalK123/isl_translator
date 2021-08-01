@@ -240,10 +240,14 @@ class VideoFetcher { // extends State<VideoFetcher> {
       String word = splitSentenceList[i];
       try {
         bool isSaved = await lruCache.isFileExists(word, isAnimation);
+        print("$word word isSaved == $isSaved");
         if (isSaved){
+          print("$word word is saved!");
           String strStart = word.length == 1 ? "#" : "&&";
           urlsWords[word] = strStart;
           indexToUrl[indicesMap["indexToUrl"]++] = strStart;
+          indexToWord[indicesMap["indexToWord"]++] = word;
+          continue;
         }
         await _urlsTry(word, isAnimation, urlsWords, dirName, indicesMap, urls);
         print("indexToWord after _urlsTry: $indexToWord\n indexToUrl after _urlsTry: $indexToUrl\n  urls after _urlsTry: $urls\n");
