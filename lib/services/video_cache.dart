@@ -208,6 +208,9 @@ class LruCache{
       // doesnt have permission to get to storage
       return null;
     }
+    if (replacementStr == null){
+      replacementStr = title.length == 1 ? "#" : "&&";
+    }
     String cacheKey = isAnimation ? "animation" : "live";
     bool isLetter =  replacementStr == "#" ? true : false;
     String dirName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
