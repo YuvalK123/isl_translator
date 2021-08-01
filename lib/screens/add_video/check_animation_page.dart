@@ -32,6 +32,7 @@ class _CheckAnimation extends State<CheckAnimation>{
 
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.black,
       appBar: AppBar(
         title: Text('תצוגה מקדימה', textDirection: TextDirection.rtl),
         backgroundColor: Colors.cyan[800],
@@ -46,8 +47,7 @@ class _CheckAnimation extends State<CheckAnimation>{
         child: Stack(
           children: [
             Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
+              alignment: Alignment.center,
               child: controller.value.isInitialized
                   ? AspectRatio(
                 aspectRatio: controller.value.aspectRatio,
