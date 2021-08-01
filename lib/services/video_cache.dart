@@ -153,6 +153,8 @@ class LruCache{
   }
 
   Future<bool> saveFile(String url, String fileName, bool isAnimation, bool isLetter) async{
+    print("saving file $fileName -> $fileName\n params: "
+        "isAnimation: $isAnimation, isLetter: $isLetter, url: $url");
     String cacheKey = isAnimation ? "animation" : "live";
     String folderName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
     // String folderName = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
@@ -208,15 +210,15 @@ class LruCache{
       // doesnt have permission to get to storage
       return null;
     }
+    bool isLetter = title.length == 1;
     if (replacementStr == null){
-      replacementStr = title.length == 1 ? "#" : "&&";
+      replacementStr = isLetter ? "#" : "&&";
     }
     String cacheKey = isAnimation ? "animation" : "live";
-    bool isLetter =  replacementStr == "#" ? true : false;
     String dirName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
-    String url = title.replaceFirst("#", dirName);
+    // String url = title.replaceFirst("#", dirName);
     String cacheFolder = await getCachePathByFolder(dirName);
-    url = "$cacheFolder/$title.mp4";
+    String url = "$cacheFolder/$title.mp4";
     print("fetchVideoFile for title $title : loading from file $url");
     File file = File(url);
     if (await file.exists()){

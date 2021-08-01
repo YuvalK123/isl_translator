@@ -41,11 +41,10 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   double aspectRatio;
   VideoFetcher _videoFetcher;
 
-  bool vidType = false;
+  bool isAnimation = true;
   String dirName = "animation_openpose/";
   UserModel currUserModel;
   FirebaseAuth _auth = FirebaseAuth.instance;
-  // var urlss;
   bool isReplay = false;
   bool isPause = false;
   bool isPlay = false;
@@ -59,23 +58,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     initAsync();
   }
 
-  // void trymeyo() async{
-  //   // io.sleep(const Duration(seconds: 2));
-  //   print("meow1");
-  //   if(widget.sentence == null){
-  //     return;
-  //   }
-  //   print("meow2");
-  //   while(!this._videoFetcher.doneLoading){
-  //     print("waiting...");
-  //     io.sleep(const Duration(seconds: 1));
-  //   }
-  //   print("sett!!!!!");
-  //   setState(() {
-  //
-  //   });
-  // }
-
   // need to move the function to another class
 
   Future<void> loadUser() async{
@@ -83,15 +65,15 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     String uid = auth.currentUser.uid;
     if (!auth.currentUser.isAnonymous){
       await for (var value in DatabaseUserService(uid: uid).users){
-        setState(() {
+        // setState(() {
           this.currUserModel = value;
-          print("videp type == > " + value.videoType.toString());
+          print("video type == > " + value.videoType.toString());
           if(value.videoType == VideoType.LIVE)
           {
-            vidType= true;
+            this.isAnimation = false;
             this.dirName = "live_videos/";
           }
-        });
+        // });
         break;
       }
     }
@@ -165,9 +147,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   }
 
   Future<VideoPlayerController> _getController(int index) async {
-    String word = this._videoFetcher.indexToWord[index];
-    bool isAnimation = this.dirName.contains("animation");
-    io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, isAnimation, null);
     // String url = this._videoFetcher.wordsToUrls[word];
     // if (word == null || url == null) {
     //   print("this._videoFetcher.indexToWord ${this._videoFetcher.indexToWord}");
@@ -189,6 +168,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     //   print("return locally for $word");
     //   return controller;
     // }
+    String word = this._videoFetcher.indexToWord[index];
+    io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
     VideoPlayerController controller;
     if (file != null){
         controller = VideoPlayerController.file(file);
@@ -392,7 +373,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       return Container();
     }
 
-    print("isready = ${this._isReady}, loading? ${this._videoFetcher.doneLoading}");
+    // print("isready = ${this._isReady}, loading? ${this._videoFetcher.doneLoading}");
     print("is Loaded $index?? ${this._videoFetcher.indexToUrl.containsKey(index)}");
     // if (!this._videoFetcher.indexToUrl.containsKey(index)){
     //   return Loading();
@@ -401,12 +382,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     //     print("setting stateush");
     //   });
     // }
-    if (this._videoFetcher.doneLoading){
-      print("hazzah 123");
-    }
-    if (this._videoFetcher.doneLoading){
-      print("done loading!!!!");
-    }
+    // if (this._videoFetcher.doneLoading){
+    //   print("hazzah 123");
+    // }
+    // if (this._videoFetcher.doneLoading){
+    //   print("done loading!!!!");
+    // }
     return !this._videoFetcher.doneLoading ? Loading() : Scaffold(
       body: SingleChildScrollView(
         child: Column(
