@@ -56,17 +56,6 @@ List<String> endingRelative = ["","","","","",""];
 Map<String, String> endings = {
   "ת": "ה",
 };
-
-
-
-Future<String> getNonPrepositional(String word, String dirName) async{
-  if (!prepositionalLetters.contains(word[0])){
-    return null;
-  }
-  return await getUrl(word.substring(1), dirName);
-}
-
-
 String nonAsciiChar = "[^\x00-\x7F]";
 
 Map<String, String> hebrewChars = {
@@ -99,6 +88,17 @@ Map<String, String> hebrewChars = {
   "ת" : "U+05EA",
 };
 
+
+Future<String> getNonPrepositional(String word, String dirName) async{
+  if (!prepositionalLetters.contains(word[0])){
+    return null;
+  }
+  return await getUrl(word.substring(1), dirName);
+}
+
+
+
+
 Future<String> getUrl(String word,String dirName) async{
   String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
   Reference ref = FirebaseStorage.instance
@@ -122,6 +122,45 @@ Future<String> getUrl(String word,String dirName) async{
       return null;
     }
   }
+}
+
+Future<String> parallelGetUrl(String word,String dirName) async{
+  String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
+  Reference ref = FirebaseStorage.instance
+      .ref()
+      .child("$dirName" + word + "$exec");
+  try {
+    // gets the video's url
+    var url = await ref.getDownloadURL();
+    return url;
+  } catch (err) { // no url
+    // check if exist in personal videos
+    var _auth = FirebaseAuth.instance;
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child("$dirName" + _auth.currentUser.uid + "/" + word + "$exec");
+    try {
+      // gets the video's url
+      var url = await ref.getDownloadURL();
+      return url;
+    } catch (err2) {
+      return null;
+    }
+  }
+}
+
+Future<String> parallelCheckForUrl(List<String> initiatives, String dirName) async{
+  List<Future<String>> futures = <Future<String>>[];
+  for (var initi in initiatives){
+    futures.add(parallelGetUrl(initi, dirName));
+  }
+  List<String> results = await Future.wait(futures);
+  for (String url in results){
+    if (url != null){
+      return url;
+    }
+  }
+  return null;
 }
 
 Future<String> checkForUrl(List<String> initiatives, String dirName) async{
@@ -326,10 +365,6 @@ String handleFinalLetter(String infin){
     return infin;
   }
   return infin;
-}
-
-String getVerb(String root){
-  return null;
 }
 
 String getRoot(int index, String pattern, String word){
@@ -561,6 +596,22 @@ Future<String> findUrlInList(List<String> list, String dirName) async{
   return null;
 }
 
+Future<String> parallelFindUrlInList(List<String> list, String dirName) async{
+  List<Future<String>> futures = <Future<String>>[];
+  for (var word in list){
+    futures.add(getUrl(word, dirName));
+  }
+  List<String> results = await Future.wait(futures);
+  for (var url in results){
+    if (url != null){
+      // print("findUrlList found url for $word: $url");
+      return url;
+    }
+  }
+  return null;
+}
+
+
 Future<String> checkGenderCase(String word, String dirName) async{
   // checks if its male/female word - גרפיקאי->גרפיקאית
   List<String> singularVersions = [];
@@ -577,14 +628,14 @@ Future<String> checkGenderCase(String word, String dirName) async{
     String singular = word;
     singularVersions = [singular + "ות", singular + "ם", singular + "ת"];
     print("singular (3) == $singularVersions");
-  }else{
+  }else{ // check versions
     String singular = word;
     singularVersions = [singular + "ות", singular + "ים", singular + "ה",
       singular + "ת", singular + "ית"];
     print("singular (4) == $singularVersions");
   }
   if (singularVersions.isNotEmpty){
-    var url = findUrlInList(singularVersions, dirName);
+    var url = await findUrlInList(singularVersions, dirName);
     if (url != null){
       return url;
     }
