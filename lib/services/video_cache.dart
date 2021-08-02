@@ -57,6 +57,9 @@ class LruCache{
     try{
       List<Future> futures = <Future>[];
       urls.forEach((String word, String url) async{
+        if (url == "&&" || url == "#"){
+          return;
+        }
         // if (await isFileExist(word, isAnimation)) {
           // print("on $firebaseDirName/$word.mp4");
           // String url = await VideoFetcher.getUrl(word, firebaseDirName);

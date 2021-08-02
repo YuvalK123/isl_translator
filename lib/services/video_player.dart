@@ -169,14 +169,17 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     //   return controller;
     // }
     String word = this._videoFetcher.indexToWord[index];
-    io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
-    VideoPlayerController controller;
-    if (file != null){
-        controller = VideoPlayerController.file(file);
-        print("return locally for $word");
-        return controller;
-    }
     String url = this._videoFetcher.wordsToUrls[word];
+    VideoPlayerController controller;
+    if (url == "&&" || url == "#"){
+      io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
+      if (file != null){
+        controller = VideoPlayerController.file(file);
+        print("return locally for $word, $controller");
+        return controller;
+      }
+      url = await VideoFetcher.getUrl(word, dirName);
+    }
     print("failed loading from cache");
     controller = VideoPlayerController.network(url);
     print("return from firebase for $word");
@@ -249,7 +252,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     print("init controller index is $index");
     isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = false;
 
-    controller.setVolume(0.0);
+    await controller.setVolume(0.0);
     _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
     await controller.initialize();
     isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = true;
