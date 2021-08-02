@@ -1,32 +1,11 @@
 import 'dart:async';
 import 'dart:io' as io;
-
-import 'package:cached_video_player/cached_video_player.dart';
-import 'package:dio/dio.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/material.dart';
-import 'package:isl_translator/services/play_video.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/services/video_cache.dart';
-import 'package:isl_translator/shared/loading.dart';
 import 'package:isl_translator/shared/reg.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:video_player/video_player.dart';
-import 'package:mutex/mutex.dart';
-
-import 'add_feedback.dart';
-
-import 'package:isl_translator/models/user.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:isl_translator/services/database.dart';
 
-// class VideoFetcher extends StatefulWidget {
-//   @override
-//   _VideoFetcherState createState() => _VideoFetcherState();
-//   final String sentence;
-//   VideoFetcher({Key key, this.sentence}): super(key: key);
-// }
 
 class VideoFetcher { // extends State<VideoFetcher> {
   bool doneLoading = false;
@@ -39,6 +18,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
   Map<String,String> wordsToUrls = {};
   Map<int,String> indexToWord = {};
   final _auth = FirebaseAuth.instance;
+  static final savedLetters = <String>[];
 
   bool get isFirstLoaded {
     return indexToUrl.containsKey(0);
@@ -51,10 +31,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
       Future.wait(refs.map((ref) {
         ref.getDownloadURL();
       }).toList());
-
-
-
-
 
 
   // List<String> specialChars = ["*","-","_","'","\"","\\","/","=","+",",",".","?","!"];
@@ -79,29 +55,15 @@ class VideoFetcher { // extends State<VideoFetcher> {
     }
     // Video doesn't exist - so split the work to letters
     var letters = splitToLetters(word);
-    List<String> lettersUrls = [], cachedUrls = [];
-    // Map<String, String> lettersUrlsMap = {};
-    // if (lettersCachePath == null || lettersCachePath == ""){
-    //   await createLettersCachePath(null);
-    // }
     for(int j=0; j < letters.length; j++){
       var letter = letters[j];
       if (!hebrewChars.containsKey(letter)){
         continue;
       }
-
-      // String cacheDirName = exec.contains("mp4") ? lruCache.cacheLettersFolders["animation"]
-      //     : lruCache.cacheLettersFolders["live"];
-      // String lettersCachePath = await lruCache.getCachePathByFolder(cacheDirName);
-      // print("cache is $lettersCachePath");
-      // if (lettersCachePath != null && lettersCachePath != ""){
-      //   io.File saveFile = io.File("$lettersCachePath/$letter.mp4");
-      //   if (await saveFile.exists()) {
-      //     cachedUrls.add("#/$letter.mp4");
-      //     print("cachedUrl for $letter");
-      //     continue;
-      //   }
-      // }
+      if (savedLetters.contains(letter)){
+        urls.add("#");
+        continue;
+      }
       print("working on ${letters[j]}.$exec");
       Reference ref = FirebaseStorage.instance
           .ref("$dirName").child("${letters[j]}.$exec");
@@ -112,16 +74,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
       // lettersUrlsMap[letter] = url;
     }
     return urls;
-    // return lettersUrlsMap;
-
-    // return cachedUrls.isEmpty ? urls : cachedUrls;
-    // print("letters urls are = $lettersUrls");
-    // for(int l=0; l < lettersUrls.length; l++){
-    //   print("adding" + lettersUrls[l]);
-    //   urls.add(lettersUrls[l]);
-    //   print("Hiiii adding to $urls");
-    // }
-    // print("got url at $url. adding to $urls");
   }
 
 
@@ -155,7 +107,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     String url = await getUrl(word, dirName);
     bool isAnimation = dirName.toLowerCase().contains("animation");
     // lruCache.saveVideosFromUrls(isAnimation, map);
-    await lruCache.saveFile(url, "$word.mp4", isAnimation, false);
+    await lruCache.saveFile(url, word, isAnimation, false);
     this.indexToWord[indicesMap["indexToWord"]++] = word;
 
     String strStart = word.length == 1 ? "#" : "&&";
@@ -195,8 +147,12 @@ class VideoFetcher { // extends State<VideoFetcher> {
         return;
       }
       for (int i = 0; i < urlsList.length; i++) {
-        bool isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
-        String url = isSaved ? "#" : urlsList[i];
+        // bool isSaved = savedLetters.contains(letters[i]);
+        // if (!isSaved){
+        //   isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
+        // }
+
+        String url = urlsList[i];
         // String url = urlsList[i];
         addToMaps(letters[i], url, indicesMap, urlsWords);
         urls.add(url);

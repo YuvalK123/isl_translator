@@ -39,7 +39,7 @@ class LruCache{
         print("on $firebaseDirName/$letter.mp4");
         String url = await VideoFetcher.getUrl("$letter",firebaseDirName);
         print("downloaded letter url $url");
-        await VideoFetcher.lruCache.saveFile(url, "$letter.mp4", cacheFolder.contains("animation"), true);
+        await VideoFetcher.lruCache.saveFile(url, letter, cacheFolder.contains("animation"), true);
         print("saved!!");
       } catch(e){
         print("err for letter $letter is $e");
@@ -65,7 +65,7 @@ class LruCache{
           // String url = await VideoFetcher.getUrl(word, firebaseDirName);
           bool isLetter = word.length == 1;
           print("adding $word to save");
-          futures.add(saveFile(url, "$word.mp4", isAnimation, isLetter));
+          futures.add(saveFile(url, word, isAnimation, isLetter));
         // }
       });
       await Future.wait(futures);
@@ -155,7 +155,8 @@ class LruCache{
     return newPath;
   }
 
-  Future<bool> saveFile(String url, String fileName, bool isAnimation, bool isLetter) async{
+  Future<bool> saveFile(String url, String title, bool isAnimation, bool isLetter) async{
+    String fileName = "$title.mp4";
     print("saving file $fileName -> $fileName\n params: "
         "isAnimation: $isAnimation, isLetter: $isLetter, url: $url");
     String cacheKey = isAnimation ? "animation" : "live";
@@ -195,6 +196,9 @@ class LruCache{
         Dio dio = Dio();
         await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
         print("$fileName downloaded!!");
+        if (isLetter){
+          VideoFetcher.savedLetters.add(title);
+        }
         return true;
       }
     }
