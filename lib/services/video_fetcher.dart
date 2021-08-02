@@ -140,21 +140,25 @@ class VideoFetcher { // extends State<VideoFetcher> {
       print("urls list for $word is $urlsList}");
       List<String> letters = urlsList.length == 1 ? null : splitToLetters(word);
       if (letters == null){
-        print("letters are null for word $word");
+        print("none letters word $word");
         String url = urlsList[0];
         addToMaps(word, url, indicesMap, urlsWords);
         urls.add(url);
         return;
       }
       for (int i = 0; i < urlsList.length; i++) {
-        // bool isSaved = savedLetters.contains(letters[i]);
-        // if (!isSaved){
-        //   isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
-        // }
+        String letter = letters[i];
+        bool isSaved = savedLetters.contains(letter);
+        if (!isSaved){
+          isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
+          if (isSaved){
+            lettersList.add(letter);
+          }
+        }
 
         String url = urlsList[i];
         // String url = urlsList[i];
-        addToMaps(letters[i], url, indicesMap, urlsWords);
+        addToMaps(letter, url, indicesMap, urlsWords);
         urls.add(url);
       }
     }

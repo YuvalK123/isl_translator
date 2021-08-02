@@ -129,7 +129,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         _buffer = buf / dur;
       });
       if (dur - pos < 1) {
-        if (index < this._videoFetcher.urls.length - 1) {
+        if (index < this._videoFetcher.indexToUrl.length - 1) {
           _nextVideo();
         }
       }
@@ -171,13 +171,14 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     String word = this._videoFetcher.indexToWord[index];
     String url = this._videoFetcher.wordsToUrls[word];
     VideoPlayerController controller;
-    if (url == "&&" || url == "#"){
+    // if (url == "&&" || url == "#"){
       io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
       if (file != null){
         controller = VideoPlayerController.file(file);
         print("return locally for $word, $controller");
         return controller;
       }
+    if (url == "&&" || url == "#"){
       url = await VideoFetcher.getUrl(word, dirName);
     }
     print("failed loading from cache");
@@ -256,6 +257,11 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
     await controller.initialize();
     isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = true;
+    if (mounted){
+      setState(() {
+        print("set state after init");
+      });
+    }
     print("finished $index init");
   }
 
@@ -293,8 +299,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         this._isReady = true;
       });
     }
+    // Future<void> future =  _controller(index).play();
     await _controller(index).play();
-    setState(() {});
+    setState(() {
+      // print("future $future");
+    });
+    // await future;
   }
 
   void flipLock(bool val) async{
@@ -333,12 +343,16 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       // _lock = false;
       flipLock(false);
     } else {
-      _initController(index + 1).whenComplete(() => /*_lock = false*/flipLock(false));
+      await _initController(index + 1);
+      flipLock(false);
+      // _initController(index + 1).whenComplete(() => /*_lock = false*/flipLock(false));
       // if(index < widget.myUrls.length - 3)
       //   {
       //     _initController(index + 2).whenComplete(() => _lock = false);
       //   }
     }
+    // flipLock(true);
+    // await _playController(++index);
   }
 
   void checkIfVideoFinished() {
@@ -414,7 +428,26 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                               Radius.circular(7.0),
                             )
                         ),
-                        child: VideoPlayer(_controller(index))),
+                        // child: (_controller(index) != null) ? // && _controller(index).value.isInitialized) ?
+                        // VideoPlayer(_controller(index)) : Loading(),
+                        child: FutureBuilder<VideoPlayerController>(
+                          initialData: null,
+                          future: videoPlayerContainer(index),
+                          builder: (context, snapshot) {
+                            VideoPlayerController controller;
+                            if (snapshot.hasError || !snapshot.hasData){
+                              return Loading();
+                            } else{
+                              controller = snapshot.data;
+                            }
+                            if (!controller.value.isInitialized){
+                              return Loading();
+                            }
+                            return VideoPlayer(controller);
+                            // return VideoPlayer(_controller(index));
+                          }
+                        ),
+                    ),
                       // child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
                     ),
 
@@ -470,34 +503,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                         child:
                         IconButton(
                           icon: const Icon(Icons.replay, color:Colors.blue),
-                          onPressed: () {
-                            print("replay");
-                            index = 0;
-                            _initController(0).then((_) {
-                              setState(() {
-                                isPause = false;
-                                this.aspectRatio = _controller(0).value.aspectRatio;
-                                this._isReady = true;
-                                this.borderColor = Colors.black;
-                              });
-
-                              _playController(0);
-                            })..onError((error, stackTrace) {print("error on loading at 0 $error");});
-                            if (_videoFetcher.indexToUrl.keys.length > 1) {
-                              _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
-                            }
-                            //toBeNamed();
-                            //_removeController(index);
-                            // _stopController(index);
-                            // index = 0;
-                            // _playController(index);
-                            // setState(() {
-                            //   index = 0;
-                            //   initState();
-                            // });
-
-                            //_controller(index).play();
-                          },
+                          onPressed: replay,
                         ),
                       ),
                     ),
@@ -535,6 +541,39 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       }
       _controller(index).pause();
     }
+  }
+  Future<VideoPlayerController> videoPlayerContainer(int index){
+    Completer<VideoPlayerController> completer = Completer();
+    completer.complete(_controller(index));
+    return completer.future;
+  }
+  void replay(){
+    print("replay");
+    index = 0;
+    _initController(0).then((_) {
+      setState(() {
+        isPause = false;
+        this.aspectRatio = _controller(0).value.aspectRatio;
+        this._isReady = true;
+        this.borderColor = Colors.black;
+      });
+
+      _playController(0);
+    })..onError((error, stackTrace) {print("error on loading at 0 $error");});
+    if (_videoFetcher.indexToUrl.keys.length > 1) {
+      _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
+    }
+    //toBeNamed();
+    //_removeController(index);
+    // _stopController(index);
+    // index = 0;
+    // _playController(index);
+    // setState(() {
+    //   index = 0;
+    //   initState();
+    // });
+
+    //_controller(index).play();
   }
 
   void play(){

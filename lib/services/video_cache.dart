@@ -196,7 +196,7 @@ class LruCache{
         Dio dio = Dio();
         await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
         print("$fileName downloaded!!");
-        if (isLetter){
+        if (isLetter && !VideoFetcher.savedLetters.contains(title)){
           VideoFetcher.savedLetters.add(title);
         }
         return true;
