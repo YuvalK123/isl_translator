@@ -21,6 +21,9 @@ class LruCache{
   Map<String,String> cacheFolders = {"live":"Cache/live", "animation": "Cache/animation"};
   Map<String,String> cacheLettersFolders = {"live":"Cache/live/letters", "animation":"Cache/animation/letters"};
   bool hasPermission = false;
+  int directorySize = 0;
+  Map<String, int> saved = {};
+  Map<String, DateTime> modifiedDates = {};
 
 
   DiskLruCache get cache {
@@ -194,8 +197,20 @@ class LruCache{
         }
         // save file
         Dio dio = Dio();
-        await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
+        var result = await dio.download(url, saveFile.path,
+            onReceiveProgress: (int received, int total) {
+          if (this.saved.containsKey(title)){
+            return;
+          }
+          this.saved[title] = total;
+          directorySize += total;
+        });// onReceiveProgress: {downloaded, totalSize});
         print("$fileName downloaded!!");
+        saveFile = File(fullName);
+        if (saveFile != null && !modifiedDates.containsKey(title)){
+          modifiedDates[title] = saveFile.statSync().modified;
+        }
+
         if (isLetter && !VideoFetcher.savedLetters.contains(title)){
           VideoFetcher.savedLetters.add(title);
         }
@@ -207,6 +222,19 @@ class LruCache{
     }
     // failed to create directory
     return false;
+  }
+
+  Future<void> deleteLeastRecentFile(bool isAnimation) async{
+    String title;
+    // get leastRecentDate
+    await deleteFile(title, isAnimation, title.length == 1);
+  }
+
+  Future<void> deleteFile(String title, bool isAnimation, bool isLetter) async{
+    String replacementStr = isLetter ? "#" : "&&";
+    File file = await fetchVideoFile(title, isAnimation, replacementStr);
+
+    file.deleteSync();
   }
 
   Future<File> fetchVideoFile(String title, bool isAnimation, String replacementStr) async{
@@ -230,6 +258,9 @@ class LruCache{
     File file = File(url);
     if (await file.exists()){
       print("file $file exists! fir $title title");
+      if (modifiedDates.containsKey(title)){
+        modifiedDates[title] = file.statSync().modified;
+      }
       return file;
     }
     return null;
