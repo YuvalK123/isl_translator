@@ -159,7 +159,6 @@ class LruCache{
     String folderName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
     // String folderName = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     Directory directory;
-    Dio dio = Dio();
     try {
       if (Platform.isAndroid){
         if (await _requestPermission(Permission.storage)){
@@ -190,6 +189,7 @@ class LruCache{
           return true;
         }
         // save file
+        Dio dio = Dio();
         await dio.download(url, saveFile.path);// onReceiveProgress: {downloaded, totalSize});
         print("$fileName downloaded!!");
         return true;
