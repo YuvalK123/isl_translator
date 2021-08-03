@@ -16,7 +16,6 @@ bool hasLettersLocal = false;
 class LruCache{
   final LruMap<String,String> map = LruMap();
   String lettersCachePath = "";
-  DiskLruCache _cache;
   Map<String,String> firebaseDirNames = {"live":"live_videos/", "animation":"animation_openpose/"};
   Map<String,String> cacheFolders = {"live":"Cache/live", "animation": "Cache/animation"};
   Map<String,String> cacheLettersFolders = {"live":"Cache/live/letters", "animation":"Cache/animation/letters"};
@@ -25,10 +24,6 @@ class LruCache{
   Map<String, int> saved = {};
   Map<String, DateTime> modifiedDates = {};
 
-
-  DiskLruCache get cache {
-    return _cache;
-  }
 
   static String getPath() {
     return Directory.current.path;
@@ -67,7 +62,7 @@ class LruCache{
           // print("on $firebaseDirName/$word.mp4");
           // String url = await VideoFetcher.getUrl(word, firebaseDirName);
           bool isLetter = word.length == 1;
-          print("adding $word to save");
+          // print("adding $word to save");
           futures.add(saveFile(url, word, isAnimation, isLetter));
         // }
       });
@@ -82,11 +77,12 @@ class LruCache{
   LruCache(){
     int maxSize = 10 * 1024 * 1024; // 10M
     Directory cacheDirectory = Directory("${Directory.systemTemp.path}/cache");
-    this._cache = DiskLruCache(
-        maxSize: maxSize,
-        directory: cacheDirectory,
-        filesCount: 1
-    );
+    print("cacheDirectory == $cacheDirectory");
+    // this._cache = DiskLruCache(
+    //     maxSize: maxSize,
+    //     directory: cacheDirectory,
+    //     filesCount: 1
+    // );
   }
 
 
@@ -111,7 +107,7 @@ class LruCache{
     List<String> folders = directory.path.split("/");
     for (int i = 1; i < folders.length; i++){
       String folder = folders[i];
-      print("folder == $folder");
+      // print("folder == $folder");
       // newPath += "/" + folder;
       if (folder != "android"){
         newPath += "/" + folder;
@@ -145,7 +141,7 @@ class LruCache{
     List<String> folders = directory.path.split("/");
     for (int i = 1; i < folders.length; i++){
       String folder = folders[i];
-      print("folder == $folder");
+      // print("folder == $folder");
       // newPath += "/" + folder;
       if (folder != "android"){
         // no need to attach android to path
@@ -204,7 +200,7 @@ class LruCache{
           }
           this.saved[title] = total;
           directorySize += total;
-        });// onReceiveProgress: {downloaded, totalSize});
+        }, );// onReceiveProgress: {downloaded, totalSize});
         print("$fileName downloaded!!");
         saveFile = File(fullName);
         if (saveFile != null && !modifiedDates.containsKey(title)){
