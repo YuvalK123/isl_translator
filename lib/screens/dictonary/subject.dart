@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
 import 'package:isl_translator/services/video_player.dart';
-
+import 'package:flutter/services.dart' show rootBundle;
 /*
 Subject class
 Each subject in the dict has a subject-dict of words that belong to this specific subject
@@ -221,14 +221,11 @@ class Subject extends StatefulWidget {
 }
 
 class _SubjectState extends State<Subject> {
-  VideoPlayerDemo videoPlayerDemo = VideoPlayerDemo(
-    key: Key("0"),
-    myUrls: [],
-  );
   List<String> myUrls;
   int ind = 1;
   SubjectName subjectName;
   String sentence;
+  String dictAssetsPath = "assets/dictionary/";
   VideoPlayer2 _videoFetcher = VideoPlayer2(
     key: UniqueKey(),
     sentence: null,
@@ -286,10 +283,59 @@ class _SubjectState extends State<Subject> {
     return null;
   }
 
-  List<Card> _buildGridCards(BuildContext context) {
+  Future<List<String>> get namess async{
+    Function func = rootBundle.loadString;
+    // rootBundle.loadString('assets/dictionary/animals.txt')).split(",")
+    switch(this.subjectName){
+      case SubjectName.ANIMALS:
+        return (await func(this.dictAssetsPath + "animals.txt")).split(",");
+        break;
+      case SubjectName.FOOD:
+        return (await func(this.dictAssetsPath + "food.txt")).split(",");
+        // return food;
+        break;
+      case SubjectName.BODY:
+        return (await func(this.dictAssetsPath + "body.txt")).split(",");
+        // return body;
+        break;
+      case SubjectName.SHAPES:
+        return (await func(this.dictAssetsPath + "shapes.txt")).split(",");
+        // return shapes;
+        break;
+      case SubjectName.TIMES:
+        return (await func(this.dictAssetsPath + "times.txt")).split(",");
+        // return times;
+        break;
+      case SubjectName.GEOG:
+        return (await func(this.dictAssetsPath + "geography.txt")).split(",");
+        // return geography;
+        break;
+      case SubjectName.PRONOUNS:
+        return (await func(this.dictAssetsPath + "pronouns.txt")).split(",");
+        // return pronouns;
+        break;
+      case SubjectName.HOLIDAYS:
+        return (await func(this.dictAssetsPath + "holidays.txt")).split(",");
+        break;
+    }
+    return null;
+  }
+
+  void printBundle() async{
+    print("yoyo\n ${(await rootBundle.loadString('assets/dictionary/animals.txt')).split(",")}");
+  }
+
+  Future<List<Card>> _buildGridCards(BuildContext context) async{
     List<ButtonImage> products = [];
-    List<String> subjects = names;
-    print(subjects.join(","));
+    List<String> subjects;
+    try{
+      subjects = await namess;
+    } catch (e){
+      print("err in dict is $e");
+      subjects = names;
+    }
+    // print(subjects.join(","));
+    // printBundle();
     for (int i = 0; i < subjects.length; i++) {
       products.add(new ButtonImage("", subjects[i], subjects[i]));
     }
@@ -448,12 +494,26 @@ class _SubjectState extends State<Subject> {
             )),
         backgroundColor: Colors.cyan[900],
       ),
-      body: GridView.count(
-          crossAxisCount: 3,
-          padding: EdgeInsets.all(16.0),
-          childAspectRatio: 8.0 / 9.0,
-          children: _buildGridCards(context) // Changed code
-          ),
+      body: FutureBuilder<List<Card>>(
+        future: _buildGridCards(context),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          List<Card> value;
+          if (snapshot.hasError || !snapshot.hasData){
+            value = <Card>[];
+          }
+          else if (snapshot.hasData){
+            value = snapshot.data;
+          }
+          return GridView.count(
+            crossAxisCount: 3,
+            padding: EdgeInsets.all(16.0),
+            childAspectRatio: 8.0 / 9.0,
+            children: value,
+
+            // children: _buildGridCards(context) // Changed code
+          );
+        },
+      ),
     );
   }
 }
