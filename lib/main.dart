@@ -9,11 +9,6 @@ import 'package:isl_translator/services/show_video.dart';
 
 int i = 0;
 bool isLoading = true;
-Future<void> bla() async{
-  await findTermsDB();
-  isLoading = false;
-  print("isLoading == > " + isLoading.toString());
-}
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +16,9 @@ void main() async {
   final user = FirebaseAuth.instance.currentUser;
   runApp(MyApp());
   if (user != null && user.uid != null){
-    bla();
+    await findTermsDB();
+    isLoading = false;
+    print("isLoading == > " + isLoading.toString());
   }else{
     print("fail");
   }

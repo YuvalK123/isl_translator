@@ -12,11 +12,13 @@ class VideoFetcher { // extends State<VideoFetcher> {
   List<String> urls = [];
   final String sentence;
   bool isValidSentence = false;
-  Map<int, String> indexToUrl = Map<int,String>();
   static String lettersCachePath;
   static LruCache lruCache = LruCache();
+
+  Map<int, String> indexToUrl = Map<int,String>();
   Map<String,String> wordsToUrls = {};
   Map<int,String> indexToWord = {};
+
   final _auth = FirebaseAuth.instance;
   static final savedLetters = <String>[];
 
@@ -25,7 +27,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
   }
 
   VideoFetcher({this.sentence});
-  // VideoPlayerDemo _videoPlayerDemo = VideoPlayerDemo(key: Key("0"), myUrls: [],);
 
   static Future<List<String>> getDowloadLinks(List<Reference> refs) =>
       Future.wait(refs.map((ref) {
@@ -107,7 +108,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     String url = await getUrl(word, dirName);
     bool isAnimation = dirName.toLowerCase().contains("animation");
     // lruCache.saveVideosFromUrls(isAnimation, map);
-    await lruCache.saveFile(url, word, isAnimation, false);
+    await lruCache.saveFile(url, word, isAnimation, false, true);
     this.indexToWord[indicesMap["indexToWord"]++] = word;
 
     String strStart = word.length == 1 ? "#" : "&&";

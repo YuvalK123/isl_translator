@@ -34,6 +34,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   bool _isReady = false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<String, bool> isInit = {};
+  Map<int, bool> isInitSuccess = {};
   Map<int, VoidCallback> _listeners = {};
   Set<String> _urls;
   Color borderColor = Colors.transparent;
@@ -45,9 +46,9 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   String dirName = "animation_openpose/";
   UserModel currUserModel;
   FirebaseAuth _auth = FirebaseAuth.instance;
-  bool isReplay = false;
+  // bool isReplay = false;
   bool isPause = false;
-  bool isPlay = false;
+  // bool isPlay = false;
 
   String getKey(Map map, dynamic key){
     return map[index] + index.toString();
@@ -92,7 +93,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       await _initController(0);
       if (mounted){
         setState(() {
-          this.aspectRatio = _controller(0).value.aspectRatio;
+          this.aspectRatio = _controller(0) != null ? _controller(0).value.aspectRatio : 1;
           this._isReady = true;
           this.borderColor = Colors.black;
         });
@@ -117,6 +118,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     return () {
       var index = this.index;
       var controller = _controller(index);
+      if (controller == null || controller.value == null) return;
       if( controller.value.buffered.length <= 0 ) return;
       int dur = controller.value.duration.inMilliseconds;
       int pos = controller.value.position.inMilliseconds;
@@ -151,27 +153,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   }
 
   Future<VideoPlayerController> _getController(int index) async {
-    // String url = this._videoFetcher.wordsToUrls[word];
-    // if (word == null || url == null) {
-    //   print("this._videoFetcher.indexToWord ${this._videoFetcher.indexToWord}");
-    //   print("getcontroller is null for index $index bec of $url or $word");
-    //   return null;
-    // }
-    // String folderName = this.dirName.contains("animation") ?
-    // LruCache().cacheFolders["animation"] : LruCache().cacheFolders["live"];
-    // // String cacheFolder = await this._videoFetcher..getCachePathByFolder(
-    // //     folderName);
-    // String cacheFolder = await VideoFetcher.lruCache.getCachePathByFolder(folderName);
-    // print("cacheFolder is $cacheFolder");
-    // io.Directory directory = io.Directory(cacheFolder);
-    // String localUrl = directory.path + "/$word.mp4";
-    // VideoPlayerController controller;
-    // io.File file = io.File(localUrl);
-    // if (await file.exists()){
-    //   controller = VideoPlayerController.file(io.File(localUrl));
-    //   print("return locally for $word");
-    //   return controller;
-    // }
     String word = this._videoFetcher.indexToWord[index];
     String url = this._videoFetcher.wordsToUrls[word];
     VideoPlayerController controller;
@@ -270,39 +251,43 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     print("init controller index is $index");
     isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = false;
 
-    // await controller.setVolume(0.0);
+    await controller.setVolume(0.0);
     String word = this._videoFetcher.indexToWord[index];
-    _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
+
     print("init for $index $word");
     try{
       await controller.initialize();
+      isInitSuccess[index] = true;
     } catch (e){
       print("$word init error is $e");
+      isInitSuccess[index] = false;
+      return;
       // await controller.dispose();
-      if (index > 0){
-        int i = index - 1;
-        try{
-          print("wait to dispose last");
-          // final prev = this._controllers[this._videoFetcher.indexToUrl[i] + i.toString()];
-          while (!isVideoFinished(i)){
-            await Future.delayed(Duration(milliseconds: 500));
-          }
-          print("prev finished ($i)");
-          _initController(index);
-          return;
-          // await _removeController(i);
-          // await _initController(i);
-          // print("disposed");
-        }
-        catch (ee){
-          print("failed to dispose $ee");
-        }
-      }
+      // if (index > 0){
+      //   int i = index - 1;
+      //   try{
+      //     print("wait to dispose last");
+      //     // final prev = this._controllers[this._videoFetcher.indexToUrl[i] + i.toString()];
+      //     while (!isVideoFinished(i)){
+      //       await Future.delayed(Duration(milliseconds: 500));
+      //     }
+      //     print("prev finished ($i)");
+      //     // _initController(index);
+      //     return;
+      //     // await _removeController(i);
+      //     // await _initController(i);
+      //     // print("disposed");
+      //   }
+      //   catch (ee){
+      //     print("failed to dispose $ee");
+      //   }
+    }
+    _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
 
       // controller = await _getController(index);
       // _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
       // controller.initialize();
-    }
+    // }
     // await controller.initialize();
     print("after init for $index $word");
     isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = true;
@@ -333,24 +318,38 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     if (!_listeners.keys.contains(index)) {
       _listeners[index] = _listenerSpawner();
     }
-    _controller(index).addListener(_listeners[index]);
-    // if(index <widget.myUrls.length)
-    // {
-    //   _controller(index).addListener(checkIfVideoFinished);
-    //
-    // }
-    _controller(index).addListener(() => finishVideo(index));
-    // if(index == _urls.length-1)
-    //   {
-    //     _controller(index).addListener(checkIfVideoFinished);
-    //   }
-    if (mounted){
-      setState(() {
-        this._isReady = true;
-      });
+    if (_listeners[index] == null) {
+      _listeners[index] = _listenerSpawner();
     }
-    // Future<void> future =  _controller(index).play();
-    await _controller(index).play();
+    if (_controller(index) != null) {
+      // await _initController(index);
+      // _playController(index);
+      // return;
+      // setState(() {
+      //   this.index++;
+      // });
+      // return;
+      //
+
+      _controller(index).addListener(_listeners[index]);
+      // if(index <widget.myUrls.length)
+      // {
+      //   _controller(index).addListener(checkIfVideoFinished);
+      //
+      // }
+      _controller(index).addListener(() => finishVideo(index));
+      // if(index == _urls.length-1)
+      //   {
+      //     _controller(index).addListener(checkIfVideoFinished);
+      //   }
+      if (mounted) {
+        setState(() {
+          this._isReady = true;
+        });
+      }
+      // Future<void> future =  _controller(index).play();
+      await _controller(index).play();
+    }
     setState(() {
       // print("future $future");
     });
@@ -378,7 +377,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       print("ended urls");
       return;
     }
-
+    int currIndex = index;
     await _stopController(index);
 
     if (index - 1 >= 0) {
@@ -401,6 +400,10 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     } else {
       await _initController(index + 1);
       flipLock(false);
+
+      while(!isVideoFinished(currIndex)){
+        await Future.delayed(Duration(milliseconds: 500));
+      }
       // _initController(index + 1).whenComplete(() => /*_lock = false*/flipLock(false));
       // if(index < widget.myUrls.length - 3)
       //   {
@@ -451,7 +454,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   @override
   Widget build(BuildContext context) {
     // print("sentence2 is ${widget.sentence}");
-    if (widget.sentence == null || !this._videoFetcher.isValidSentence) {
+    if (widget.sentence == null) {
       return Container();
     }
 
@@ -611,6 +614,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   }
   Future<VideoPlayerController> videoPlayerContainer(int index) async {
     Completer<VideoPlayerController> completer = Completer();
+    if ((isInitSuccess.containsKey(index) && !isInitSuccess[index])){
+      setState(() {
+        // this.index++;
+      });
+      return null;
+    }
     if (!isInit[this._videoFetcher.indexToUrl[index] + index.toString()]){
       await Future.delayed(Duration(milliseconds: 500));
       return videoPlayerContainer(index);

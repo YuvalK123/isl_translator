@@ -144,17 +144,10 @@ class _SignInState extends State<SignIn> {
                             }
                             if (_auth.currentUser.emailVerified){
                               if (mounted){
-                                setState(() => loading = true);
+                                setState(() {
+                                  loading = true;
+                                });
                               }
-                              // get all terms
-                              // List<String> futureTerms = await findTermsDB();
-                              // saveTerms = futureTerms;
-                              // print("spawning from login2!");
-                              // Isolate.spawn(saveTermsFunc, "");
-
-
-                              // futureTerms.then((result) => saveTerms=  result)
-                              // .catchError((e) => print('error in find terms'));
                             }else{
                               print("user signin is ${_auth.currentUser}");
                               setState(() {

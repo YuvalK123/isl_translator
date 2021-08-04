@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:isl_translator/models/pair.dart';
 import 'package:isl_translator/shared/reg.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -111,9 +112,3 @@ List<String> splitSentence(String sentence) {
 }
 
 /* Create Tuple */
-class Pair<T1, T2> {
-  final T1 a;
-  final T2 b;
-
-  Pair(this.a, this.b);
-}
