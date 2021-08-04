@@ -614,7 +614,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     );
   }
 
-
   void pause(){
     print("pause");
     if(!isPause && !isDone)
