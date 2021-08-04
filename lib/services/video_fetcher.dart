@@ -107,7 +107,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
   // }
 
 
-
   Future<void> _urlsTry(
       String word, bool isAnimation, Map<String,List<String>> urlsWords, String dirName,
       Map<String,int> indicesMap, List<String> urls, int index
@@ -118,7 +117,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     String url = await getUrl(word, dirName);
     bool isAnimation = dirName.toLowerCase().contains("animation");
     // lruCache.saveVideosFromUrls(isAnimation, map);
-    await lruCache.saveFile(url, word, isAnimation, false);
+    lruCache.saveFile(url, word, isAnimation, false);
     this.indexToWord[index] = word;
     addToMapsIndex(word, [url],indicesMap, urlsWords, index);
 
@@ -160,6 +159,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
         bool isSaved = savedLetters.contains(letter);
         if (!isSaved){
           isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
+          // isSaved = false;
           if (isSaved){
             lettersList.add(letter);
           }
@@ -293,7 +293,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
         }
         else {
           indexToWordNew[i + newIndex1] = indexToWord[i];
-          //newIndex1++;
         }
       }
     print(
@@ -311,7 +310,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     // this.wordsToUrls = urlsWords;
     this.wordsToUrls = urlsWordsList;
     if (toSave) {
-      // lruCache.saveVideosFromUrls(dirName.toLowerCase().contains("animation"), urlsWords);
+      lruCache.saveVideosFromUrls(dirName.toLowerCase().contains("animation"), wordsToUrlsNew);
     }
     this.doneLoading = true;
     // print("urls are $urls");
@@ -328,6 +327,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
       Map<String,int> indicesMap, Map<String,List<String>> urlsWords, int index) async{
     try {
       bool isSaved = (await lruCache.fetchVideoFile(word, isAnimation, null) != null);
+      // bool isSaved = false;
       print("$word word isSaved == $isSaved");
       if (isSaved){
         print("$word word is saved!");
