@@ -32,6 +32,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   bool _lock = true;
   Map<int, bool> _locks;
   bool _isReady = false;
+  bool isDone = false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<String, bool> isInit = {};
   Map<int, bool> isInitSuccess = {};
@@ -99,7 +100,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
           this.borderColor = Colors.black;
         });
       }
-      //hi
       _playController(0);
       // _initController(0).then((_) {
       //
@@ -347,6 +347,11 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       }
       // Future<void> future =  _controller(index).play();
       await _controller(index).play();
+      if(index == this._videoFetcher.indexToUrlNew.length -1){
+        // setState(() {
+        //   this.isDone = true;
+        // });
+      }
     }
     setState(() {
       // print("future $future");
@@ -421,7 +426,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       //_nextVideo();
       print("index for finish === >> " + index.toString());
       if(index == this._videoFetcher.indexToUrlNew.length -1){
-        //add replay button
+        if (mounted) {
+          print("finish all videos111111!!!");
+          setState(() {
+            isDone = true;
+          });
+        }
         print("finish all videos!!!");
         return;
       }
@@ -556,7 +566,9 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                       child: Center(
                         child:
                         IconButton(
-                          icon: isPause ? const Icon(Icons.pause, color: Colors.grey,) : const Icon(Icons.pause, color: Colors.red),
+                          icon: (isPause || isDone) ?
+                          const Icon(Icons.pause, color: Colors.grey,) :
+                          const Icon(Icons.pause, color: Colors.red),
                           onPressed: pause,
                         ),
                       ),
@@ -600,7 +612,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
   void pause(){
     print("pause");
-    if(!isPause)
+    if(!isPause && !isDone)
     {
       if (mounted){
         setState(() {
@@ -631,6 +643,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     _initController(0).then((_) {
       setState(() {
         isPause = false;
+        this.isDone = false;
         this.aspectRatio = _controller(0).value.aspectRatio;
         this._isReady = true;
         this.borderColor = Colors.black;
