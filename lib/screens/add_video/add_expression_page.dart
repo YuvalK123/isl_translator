@@ -20,6 +20,7 @@ class _AddExpression extends State<AddExpression> {
   VideoPlayerController controller;
   String uid;
   String expression = '';
+  IconData indicator;
 
   @override
   void initState() {
@@ -27,9 +28,19 @@ class _AddExpression extends State<AddExpression> {
     this.uid = _auth.currentUser.uid;
     controller = VideoPlayerController.file(File(widget.videoFile.path))
       ..initialize().then((_) {
-        setState(() {});
+        setState(() {
+          controller.addListener(() {
+            if (controller.value.position == controller.value.duration)
+              setState(() {
+                controller.pause();
+                controller.seekTo(Duration(seconds: 0));
+              });
+          });
+        });
       });
+    indicator = Icons.play_arrow;
   }
+
 
   @override
   Widget build(BuildContext context) {

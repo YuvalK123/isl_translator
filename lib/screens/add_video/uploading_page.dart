@@ -104,7 +104,7 @@ class _UploadingVideos extends State<UploadingVideos>{
       'filename': '$expression.mkv'
     };
 
-    final response = await http.post(url, body: json.encode(data)).timeout(const Duration(seconds: 40));
+    final response = await http.post(url, body: json.encode(data)).timeout(const Duration(seconds: 120));
     print(response.body);
 
   }

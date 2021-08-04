@@ -26,7 +26,15 @@ class _CheckAnimation extends State<CheckAnimation>{
     uid = _auth.currentUser.uid;
     controller = VideoPlayerController.network(widget.animationPath)
       ..initialize().then((_) {
-        setState(() {});
+        setState(() {
+          controller.addListener(() {
+            if (controller.value.position == controller.value.duration)
+              setState(() {
+                controller.pause();
+                controller.seekTo(Duration(seconds: 0));
+              });
+          });
+        });
       });
   }
 
