@@ -71,13 +71,13 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     if (!auth.currentUser.isAnonymous){
       await for (var value in DatabaseUserService(uid: uid).users){
         // setState(() {
-          this.currUserModel = value;
-          print("video type == > " + value.videoType.toString());
-          if(value.videoType == VideoType.LIVE)
-          {
-            this.isAnimation = false;
-            this.dirName = "live_videos/";
-          }
+        this.currUserModel = value;
+        print("video type == > " + value.videoType.toString());
+        if(value.videoType == VideoType.LIVE)
+        {
+          this.isAnimation = false;
+          this.dirName = "live_videos/";
+        }
         // });
         break;
       }
@@ -88,6 +88,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     await loadUser(); // load user for getting the dirName
     print("current dir name --> " + dirName);
     await this._videoFetcher.getUrls(dirName, true);
+    //await Future.delayed(Duration(seconds: 1));
     print("indexToUrl is ${_videoFetcher.indexToUrlNew}");
     if (_videoFetcher.indexToUrlNew.isNotEmpty) {
       await _initController(0);
@@ -161,8 +162,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     print("from _getController = url $url");
     VideoPlayerController controller;
     // if (url == "&&" || url == "#"){
-    // io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
-    io.File file = null;
+    io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
     if (file != null){
       controller = VideoPlayerController.file(file);
       print("return locally for $word, $controller");
@@ -281,9 +281,9 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     }
     _controllers[this._videoFetcher.indexToUrlNew[index] + index.toString()] = controller;
 
-      // controller = await _getController(index);
-      // _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
-      // controller.initialize();
+    // controller = await _getController(index);
+    // _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
+    // controller.initialize();
     // }
     // await controller.initialize();
     print("after init for $index $word");
@@ -415,7 +415,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     if (isVideoFinished(index))
     {
       _controller(index).removeListener(() => finishVideo(index));
-      _stopController(index);
       //_controller.dispose();
       //_controller(index) = null;
       //_nextVideo();
@@ -472,7 +471,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     //   print("done loading!!!!");
     // }
     // return !this._videoFetcher.doneLoading ? Loading() : Scaffold(
-
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -487,18 +485,18 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                     aspectRatio: this.aspectRatio ?? 1.0,
                     // aspectRatio: _controller(index).value.aspectRatio,
                     child: Center(child: Container(
-                        decoration: BoxDecoration(
-                            border: Border.all(
-                              color: this.borderColor,
-                              width: 4.0,
-                            ),
-                            borderRadius: BorderRadius.all(
-                              Radius.circular(7.0),
-                            )
-                        ),
-                        // child: (_controller(index) != null) ? // && _controller(index).value.isInitialized) ?
-                        // VideoPlayer(_controller(index)) : Loading(),
-                        child: FutureBuilder<VideoPlayerController>(
+                      decoration: BoxDecoration(
+                          border: Border.all(
+                            color: this.borderColor,
+                            width: 4.0,
+                          ),
+                          borderRadius: BorderRadius.all(
+                            Radius.circular(7.0),
+                          )
+                      ),
+                      // child: (_controller(index) != null) ? // && _controller(index).value.isInitialized) ?
+                      // VideoPlayer(_controller(index)) : Loading(),
+                      child: FutureBuilder<VideoPlayerController>(
                           initialData: null,
                           future: videoPlayerContainer(index),
                           builder: (context, snapshot) {
@@ -515,7 +513,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                             return VideoPlayer(controller);
                             // return VideoPlayer(_controller(index));
                           }
-                        ),
+                      ),
                     ),
                       // child: _videoFetcher.urls.length > 0 ? VideoPlayer(_controller(index)) : Container()),
                     ),
