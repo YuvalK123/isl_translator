@@ -70,7 +70,7 @@ class _SignInState extends State<SignIn> {
                           //SizedBox(width: 10.0,),
                           Container(
                             alignment: Alignment.topRight,
-                              child: Text("ברוך הבא!", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
+                              child: Text("ברוך הבא", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
                           //SizedBox(width: 10.0,),
 
                           //Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
@@ -174,8 +174,11 @@ class _SignInState extends State<SignIn> {
                 SizedBox(height: 12.0,),
                 Text(error, style: TextStyle(color: Colors.blue, fontSize: 14.0),),
                 //Image.asset("assets/images/sign_in_flag1.jpg", width: 1000, height: 150,),
-                SizedBox(height: 150.0,),
-                Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
+                //SizedBox(height: 150.0,),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0,10,0,0),
+                  child: Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
+                ),
               ],
             ),
           ),
