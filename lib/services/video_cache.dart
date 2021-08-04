@@ -31,9 +31,9 @@ class LruCache{
   Pair<String, File> leastRecentFile;
 
   LruCache(){
-    this.maxSize = 1 * 1024 * 1024; // 10M
-    Directory cacheDirectory = Directory("${Directory.systemTemp.path}/cache");
-    print("cacheDirectory == $cacheDirectory");
+    this.maxSize = 10 * 1024 * 1024; // 10M
+    // Directory cacheDirectory = Directory("${Directory.systemTemp.path}/cache");
+    // print("cacheDirectory == $cacheDirectory");
     initAsync();
   }
 
@@ -241,7 +241,7 @@ class LruCache{
       }
     }
     catch (e){
-      print("save file  err is $e");
+      print("  err is $e");
     }
     // failed to create directory
     return false;

@@ -161,7 +161,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     print("from _getController = url $url");
     VideoPlayerController controller;
     // if (url == "&&" || url == "#"){
-    io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
+    // io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
+    io.File file = null;
     if (file != null){
       controller = VideoPlayerController.file(file);
       print("return locally for $word, $controller");
@@ -414,6 +415,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     if (isVideoFinished(index))
     {
       _controller(index).removeListener(() => finishVideo(index));
+      _stopController(index);
       //_controller.dispose();
       //_controller(index) = null;
       //_nextVideo();
@@ -470,6 +472,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     //   print("done loading!!!!");
     // }
     // return !this._videoFetcher.doneLoading ? Loading() : Scaffold(
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(

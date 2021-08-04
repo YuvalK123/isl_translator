@@ -159,7 +159,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
         String letter = letters[i];
         bool isSaved = savedLetters.contains(letter);
         if (!isSaved){
-          isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
+          // isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
           if (isSaved){
             lettersList.add(letter);
           }
@@ -331,7 +331,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
   Future<void> getUrlsBetter(String word, String dirName, bool isAnimation,
       Map<String,int> indicesMap, Map<String,List<String>> urlsWords, int index) async{
     try {
-      bool isSaved = (await lruCache.fetchVideoFile(word, isAnimation, null) != null);
+      // bool isSaved = (await lruCache.fetchVideoFile(word, isAnimation, null) != null);
+      bool isSaved = false;
       print("$word word isSaved == $isSaved");
       if (isSaved){
         print("$word word is saved!");
