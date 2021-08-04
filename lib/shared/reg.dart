@@ -48,8 +48,8 @@ List<String> infinitivess = [
   "להיפגע", "לחבב", "להבין", "להביא", "לאפות", "לקבוע", "להתעמל"
 ];
 
-List<String> prepositionalLetters = ["ב","כ","מ","ל", "ו", "ה", "ש"];
-List<String> prepositionalWords = ["של"];
+List<String> prepositionalLetters = ["כש","וה","ב","כ","מ","ל", "ו", "ה", "ש"];
+List<String> prepositionalWords = ["של", "את"];
 
 List<String> endingRelative = ["","","","","",""];
 
@@ -164,25 +164,32 @@ Future<String> parallelCheckForUrl(List<String> initiatives, String dirName) asy
 }
 
 Future<String> checkForUrl(List<String> initiatives, String dirName) async{
+  List<Future<String>> futures = <Future<String>>[];
   for (var initi in initiatives){
-    var url = await getUrl(initi, dirName);
+    futures.add(parallelGetUrl(initi, dirName));
+  }
+  final urls = await Future.wait(futures);
+  for (String url in urls){
     if (url != null){
-      print("found url for $initi : $url");
       return url;
     }
-    print("no url for $initi");
   }
   return null;
 }
 
+
 Future<String> checkIfVerb(String word, String dirName) async{
   // print(" special try = ${checkSpecialVerbs(word, false).a}");
   // print(" special try 2 = ${checkSpecialVerbs2(word, false)?.a}");
-
-  List<String> initiatives = wordToInitiatives(word, patterns, infinitives);
+  if (lalechet.containsKey(word)){
+    return await getUrl(lalechet[word], dirName);
+    // return lalechet[word];
+  }
+  List<String> initiatives = await wordToInitiatives(word, patterns, infinitives);
   print("1 inits are $initiatives");
   if (initiatives != null){
     String url = await checkForUrl(initiatives, dirName);
+    print("1 init url is $url");
     if (url != null){
       return url;
     }
@@ -192,10 +199,11 @@ Future<String> checkIfVerb(String word, String dirName) async{
 
   // 2 letters
 
-  initiatives = wordToInitiatives(word, patterns2Letters, infinitives2);
+  initiatives = await wordToInitiatives(word, patterns2Letters, infinitives2);
   print("2 inits are $initiatives");
   if (initiatives != null){
     String url = await checkForUrl(initiatives, dirName);
+    print("2 init url is $url");
     if (url != null){
       return url;
     }
@@ -237,7 +245,7 @@ String handleRootH(String root){
   return root;
 }
 
-List<String> wordToInitiatives(String word, List<String> patterns, List<String> infinitives){
+Future<List<String>> wordToInitiatives(String word, List<String> patterns, List<String> infinitives) async{
   List<String> wordInitiative = [];
   // verbs.forEach((verb) {
   //   print("now at verb $verb");
@@ -249,7 +257,7 @@ List<String> wordToInitiatives(String word, List<String> patterns, List<String> 
   //     return handleVerbMatch(wordData.b, wordData.a, word); // is a verb
   //   }
   // });
-  var wordData = getVerbPattern(word, patterns); // here we check if in verb pattern
+  var wordData = await getVerbPatterns(word, patterns); // here we check if in verb pattern
   print("word data = $wordData");
   if (wordData != null){
     print("wordData not null!!");
@@ -261,38 +269,42 @@ List<String> wordToInitiatives(String word, List<String> patterns, List<String> 
 
 
 
-Pair<String, int> getVerbPattern(String word, List<String> patterns){
+Future<Pair<String, int>> getVerbPatterns(String word, List<String> patterns) async{
   // return pair of pattern/ pattern index
-  // print("patterns length is ${patterns.length}");
-  // print("patterns = $patterns");
+  final futures = <Future<Pair<String, int>>>[];
+  // List<Future<Pair<String, int>>> futures = <Future<Pair<String, int>>>[];
   for (int index = 0; index < patterns.length; index++){
-    var pattern = patterns[index];
-    print("($index) at pattern ${pattern}");
-    RegExp regExp = RegExp(pattern);
-
-    // Iterable<RegExpMatch> matches = regExp.allMatches(word);
-    bool hasMatch = regExp.hasMatch(word);
-    print("has match? $hasMatch");
-    if (hasMatch){
-
-      return Pair(pattern, index);
+    futures.add(getVerbPattern(word, patterns, index));
+  }
+  var results = await Future.wait(futures);
+  Pair<String, int> res;
+  for (var result in results){
+    if (result != null){
+      res = result;
+      if (result.b != patterns.length - 1){
+        break;
+      }
     }
   }
+  return res;
   print("___");
-  // patterns.asMap().forEach((index, pattern) {
-  //   print("($index) at pattern $pattern");
-  //   RegExp regExp = RegExp(pattern);
-  //
-  //   // Iterable<RegExpMatch> matches = regExp.allMatches(word);
-  //   bool hasMatch = regExp.hasMatch(word);
-  //   print("has match? $hasMatch");
-  //   if (hasMatch){
-  //     return Pair(pattern, index);
-  //   }
-  // });
-  return null;
+  // return null;
 }
 
+Future<Pair<String, int>> getVerbPattern(String word, List<String> patterns, int index) async{
+  // return pair of pattern/ pattern index
+  var pattern = patterns[index];
+  print("($index) at pattern ${pattern}");
+  RegExp regExp = RegExp(pattern);
+
+  // Iterable<RegExpMatch> matches = regExp.allMatches(word);
+  bool hasMatch = regExp.hasMatch(word);
+  print("has match? $hasMatch");
+  if (hasMatch) {
+    return Pair(pattern, index);
+  }
+  return null;
+}
 
 List<String> handleVerbMatch(int index, String pattern, String word, List<String> infinitives){
   print("search root...");
@@ -577,9 +589,6 @@ List<String> infinitives2 = [ // שם פועל
 ];
 
 
-
-// to be continued
-
 // if plural male/female
 
 // if single and if male - convert to female + plurals
@@ -698,6 +707,15 @@ Pair<List<String>,String> checkSpecialVerbs2(String verb, bool isRoot){
   print("yoyo1234 $inftis}");
   return Pair(inftis, root);
 }
+
+Map<String, String> lalechet = {
+  "הלך": "ללכת",
+  "הלכה": "ללכת",
+  "ילך": "ללכת",
+  "תלך": "ללכת",
+  "הולך": "ללכת",
+  "הולכת": "ללכת",
+};
 
 List<String> startingletters = ["א","י","מ","נ","ת", "ה"]; // אזדקן, תזדקן, נזדקן, יזדקן, מזדקן, הזדקן
 List<String> specialRootLettersT = ["ד","ט","ת"];
