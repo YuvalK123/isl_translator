@@ -245,13 +245,21 @@ class VideoFetcher { // extends State<VideoFetcher> {
     //create map(index to url)
     final keys = indexToUrlList.keys;
     int newIndex = 0;
-    for (var i in keys) {
-      print(indexToUrlList[i]);
-      for (int j = 0; j < indexToUrlList[i].length; j++) {
-        indexToUrlNew[newIndex] = indexToUrlList[i][j];
-        newIndex++;
+    for(int i=0; i< indexToUrlList.keys.length; i++)
+      {
+        for (int j = 0; j < indexToUrlList[i].length; j++) {
+          indexToUrlNew[i + newIndex] = indexToUrlList[i][j];
+          newIndex++;
+        }
+        newIndex--;
       }
-    }
+    // for (var i in keys) {
+    //   print(indexToUrlList[i]);
+    //   for (int j = 0; j < indexToUrlList[i].length; j++) {
+    //     indexToUrlNew[i + newIndex] = indexToUrlList[i][j];
+    //   }
+    //   newIndex += indexToUrlList[i].length -1;
+    // }
 
 
     //crete map(word to url)
@@ -281,25 +289,13 @@ class VideoFetcher { // extends State<VideoFetcher> {
             indexToWordNew[i + newIndex1] = letters[j];
             newIndex1++;
           }
+          newIndex1--;
         }
         else {
           indexToWordNew[i + newIndex1] = indexToWord[i];
           //newIndex1++;
         }
       }
-    // for (var i in keysIndexToWord) {
-    //   if (isLettersMap[i]) {
-    //     var letters = splitToLetters(indexToWord[i]);
-    //     for (int j = 0; j < letters.length; j++) {
-    //       indexToWordNew[j + newIndex1] = letters[j];
-    //       newIndex1++;
-    //     }
-    //   }
-    //   else {
-    //     indexToWordNew[newIndex1] = indexToWord[i];
-    //     newIndex1++;
-    //   }
-    // }
     print(
         "finished get urlsss\n indexToUrlNew $indexToUrlNew\n wordsToUrls $wordsToUrls"
             "\n indexToWordNew $indexToWordNew");
