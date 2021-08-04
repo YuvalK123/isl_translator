@@ -99,6 +99,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
           this.borderColor = Colors.black;
         });
       }
+      //hi
       _playController(0);
       // _initController(0).then((_) {
       //
