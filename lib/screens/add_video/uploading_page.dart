@@ -52,6 +52,9 @@ class _UploadingVideos extends State<UploadingVideos>{
 
   }
 
+  /// loading the new video to firebase
+  /// notify the server about the new video
+  /// waiting until the server confirm that the animation is ready
   Future<void> loadToStorage() async {
     try{
       setState(() => progressInfo = 'loading video to firebase');
@@ -79,6 +82,7 @@ class _UploadingVideos extends State<UploadingVideos>{
     }
   }
 
+  /// checking the server address
   Future<String> getServerAddr() async {
     Reference ref = FirebaseStorage.instance.ref().child('addr.txt');
     Uint8List data = await ref.getData();
@@ -88,6 +92,7 @@ class _UploadingVideos extends State<UploadingVideos>{
   }
 
 
+  /// uploading video to firebase
   Future<void> uploadVideo() async {
     Reference ref = FirebaseStorage.instance.ref();
     Reference videoRef = ref.child('live_videos').child(uid).child('${widget.expression}.mkv');
@@ -96,6 +101,8 @@ class _UploadingVideos extends State<UploadingVideos>{
 
   }
 
+  /// sending an https post massage to the server to notify it about the new
+  /// video and its name
   Future<void> notifyServer(uid ,expression) async {
     String url = await getServerAddr();
     Map<String, String> data = {
@@ -109,6 +116,7 @@ class _UploadingVideos extends State<UploadingVideos>{
 
   }
 
+  /// getting the animation firebase path
   Future<String> getAnimationUrl(uid, expression) async{
     String firebasePath = 'animation_openpose/$uid/$expression.mp4';
     Reference ref = FirebaseStorage.instance.ref().child(firebasePath);

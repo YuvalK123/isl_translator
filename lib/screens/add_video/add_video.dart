@@ -106,11 +106,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
         child: CameraPreview(controller),
       ),
     );
-
-    // return AspectRatio(
-    //   aspectRatio: controller.value.aspectRatio,
-    //   child: CameraPreview(controller),
-    // );
   }
 
   // Display control bar
@@ -162,11 +157,6 @@ class _AddVideoPageState extends State<AddVideoPage> {
           ),
           label: Text(
             '',
-            // '${lensDirection.toString().substring(lensDirection.toString().indexOf('.') + 1).toUpperCase()}',
-            // style: TextStyle(
-            //   color: Colors.white,
-            //   fontWeight: FontWeight.w500,
-            // ),
           ),
         ),
       ),
@@ -297,11 +287,13 @@ class _AddVideoPageState extends State<AddVideoPage> {
     );
   }
 
+
   void showCameraException(CameraException e) {
     String errorText = 'Error: ${e.code}\nError message: ${e.description}';
     print(errorText);
   }
 
+  /// counting down for recording
   void countDown(context) {
     counter = recordingDelay + 1;
 
@@ -316,6 +308,10 @@ class _AddVideoPageState extends State<AddVideoPage> {
     });
   }
 
+  /// recording sequence
+  /// starting countdown and start to record after its done.
+  /// recording for a duration of time that was previously defined.
+  /// navigating out of the page after thr recording is done
   void onCapturePressed(context) async {
     countDown(context);
     await Future.delayed(Duration(seconds: recordingDelay + 1));
@@ -335,6 +331,8 @@ class _AddVideoPageState extends State<AddVideoPage> {
     }
   }
 
+  /// camera switch
+  /// pick the camera we want to use.
   void onSwitchCamera() {
     selectedCameraIndex =
     selectedCameraIndex < cameras.length - 1 ? selectedCameraIndex + 1 : 0;
@@ -343,6 +341,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
   }
 
 
+  /// return the correct camera icon
   IconData getCameraLensIcon(CameraLensDirection direction) {
     switch (direction) {
       case CameraLensDirection.back:
