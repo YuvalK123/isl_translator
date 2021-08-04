@@ -284,7 +284,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
                     children: <Widget>[
                       cameraToggleRowWidget(),
                       cameraControlWidget(context),
-                      timing(context),
+                      SingleChildScrollView(child: timing(context)),
                       // Spacer()
                     ],
                   ),

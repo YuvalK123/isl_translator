@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:camera/camera.dart';
@@ -9,6 +10,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:isl_translator/screens/add_video/check_animation_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 
 
 class UploadingVideos extends StatefulWidget {
@@ -51,17 +53,30 @@ class _UploadingVideos extends State<UploadingVideos>{
   }
 
   Future<void> loadToStorage() async {
-    setState(() => progressInfo = 'loading video to firebase');
-    await uploadVideo();
-    setState(() => progressInfo = 'video uploaded. waiting for server response...');
-    print('video uploaded');
-    await notifyServer(uid, widget.expression);
-    setState(() => progressInfo = 'new expression added. downloading animation...');
-    String animationPath = await getAnimationUrl(uid, widget.expression);
-    Navigator.pushReplacement(context, MaterialPageRoute(
-        builder: (context) => CheckAnimation(animationPath: animationPath)
-    ));
-
+    try{
+      setState(() => progressInfo = 'loading video to firebase');
+      await uploadVideo();
+      setState(() => progressInfo = 'video uploaded. waiting for server response...');
+      print('video uploaded');
+      await notifyServer(uid, widget.expression);
+      setState(() => progressInfo = 'new expression added. downloading animation...');
+      String animationPath = await getAnimationUrl(uid, widget.expression);
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => CheckAnimation(animationPath: animationPath)
+      ));
+    } on TimeoutException catch(_) {
+      setState(() => progressInfo = 'the connection is taking to long\ncheck your connection and try again later.');
+      await Future.delayed(Duration(seconds: 3));
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => TranslationScreen()
+      ));
+    } catch(_) {
+      setState(() => progressInfo = 'something went wrong with the server\nplease try again.');
+      await Future.delayed(Duration(seconds: 3));
+      Navigator.pushReplacement(context, MaterialPageRoute(
+          builder: (context) => TranslationScreen()
+      ));
+    }
   }
 
   Future<String> getServerAddr() async {
@@ -89,7 +104,7 @@ class _UploadingVideos extends State<UploadingVideos>{
       'filename': '$expression.mkv'
     };
 
-    final response = await http.post(url, body: json.encode(data));
+    final response = await http.post(url, body: json.encode(data)).timeout(const Duration(seconds: 40));
     print(response.body);
 
   }
