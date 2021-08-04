@@ -273,19 +273,33 @@ class VideoFetcher { // extends State<VideoFetcher> {
     //crete map(index to word)
     final keysIndexToWord = indexToWord.keys;
     int newIndex1 = 0;
-    for (var i in keysIndexToWord) {
-      if (isLettersMap[i]) {
-        var letters = splitToLetters(indexToWord[i]);
-        for (int j = 0; j < letters.length; j++) {
-          indexToWordNew[newIndex1] = letters[j];
-          newIndex1++;
+    for(int i=0; i < keysIndexToWord.length; i++)
+      {
+        if (isLettersMap[i]) {
+          var letters = splitToLetters(indexToWord[i]);
+          for (int j = 0; j < letters.length; j++) {
+            indexToWordNew[i + newIndex1] = letters[j];
+            newIndex1++;
+          }
+        }
+        else {
+          indexToWordNew[i + newIndex1] = indexToWord[i];
+          //newIndex1++;
         }
       }
-      else {
-        indexToWordNew[newIndex1] = indexToWord[i];
-        newIndex1++;
-      }
-    }
+    // for (var i in keysIndexToWord) {
+    //   if (isLettersMap[i]) {
+    //     var letters = splitToLetters(indexToWord[i]);
+    //     for (int j = 0; j < letters.length; j++) {
+    //       indexToWordNew[j + newIndex1] = letters[j];
+    //       newIndex1++;
+    //     }
+    //   }
+    //   else {
+    //     indexToWordNew[newIndex1] = indexToWord[i];
+    //     newIndex1++;
+    //   }
+    // }
     print(
         "finished get urlsss\n indexToUrlNew $indexToUrlNew\n wordsToUrls $wordsToUrls"
             "\n indexToWordNew $indexToWordNew");
