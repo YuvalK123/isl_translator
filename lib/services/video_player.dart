@@ -88,8 +88,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     await loadUser(); // load user for getting the dirName
     print("current dir name --> " + dirName);
     await this._videoFetcher.getUrls(dirName, true);
-    print("indexToUrl is ${_videoFetcher.indexToUrl}");
-    if (_videoFetcher.indexToUrl.isNotEmpty) {
+    print("indexToUrl is ${_videoFetcher.indexToUrlNew}");
+    if (_videoFetcher.indexToUrlNew.isNotEmpty) {
       await _initController(0);
       if (mounted){
         setState(() {
@@ -104,7 +104,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       //
       //   _playController(0);
       // })..onError((error, stackTrace) {print("error on loading at 0 $error");});
-      if (_videoFetcher.indexToUrl.keys.length > 1) {
+      if (_videoFetcher.indexToUrlNew.keys.length > 1) {
         _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
       }
     }
@@ -135,7 +135,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         _buffer = buf / dur;
       });
       if (dur - pos < 1) {
-        if (index < this._videoFetcher.indexToUrl.length - 1) {
+        if (index < this._videoFetcher.indexToUrlNew.length - 1) {
           _nextVideo();
         }
       }
@@ -146,49 +146,45 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     // print("index == $index, ${this._videoFetcher.indexToUrl} ${this._videoFetcher.indexToUrl[index]}");
     // if (this._videoFetcher.urls.length > index){
     // print("index url is $index : ${this._videoFetcher.indexToUrl[index]}");
-    if(this._videoFetcher.indexToUrl.containsKey(index)){
-      return _controllers[this._videoFetcher.indexToUrl[index] + index.toString()];
+    if(this._videoFetcher.indexToUrlNew.containsKey(index)){
+      return _controllers[this._videoFetcher.indexToUrlNew[index] + index.toString()];
     }
     return null;
   }
 
   Future<VideoPlayerController> _getController(int index) async {
-    String word = this._videoFetcher.indexToWord[index];
-    String url = this._videoFetcher.wordsToUrls[word];
+    String word = this._videoFetcher.indexToWordNew[index];
+    //String url = this._videoFetcher.wordsToUrls[word];
+    print("from _getController = word $word");
+
+    String url = this._videoFetcher.wordsToUrlsNew[word];
+    print("from _getController = url $url");
     VideoPlayerController controller;
     // if (url == "&&" || url == "#"){
-      io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
-      if (file != null){
-        controller = VideoPlayerController.file(file);
-        print("return locally for $word, $controller");
-        return controller;
-      }
+    io.File file = await VideoFetcher.lruCache.fetchVideoFile(word, this.isAnimation, null);
+    if (file != null){
+      controller = VideoPlayerController.file(file);
+      print("return locally for $word, $controller");
+      return controller;
+    }
     if (url == "&&" || url == "#"){
-      try{
-        url = await VideoFetcher.getUrl(word, dirName);
-      } catch (e){
-        // handle exception
-        setState(() {
-          this.index++;
-        });
-        return null;
-      }
-
+      url = await VideoFetcher.getUrl(word, dirName);
     }
     print("failed loading from cache");
     controller = VideoPlayerController.network(url);
     print("return from firebase for $word");
-    print("index url is $index : word = $word, ${this._videoFetcher.indexToUrl[index]}, $url");
+    print("index url is $index : word = $word, ${this._videoFetcher.indexToUrlNew[index]}");
     return controller;
   }
 
+
   Future<void> _initController2(int index) async {
-    String title = this._videoFetcher.indexToWord[index];
+    String title = this._videoFetcher.indexToWordNew[index];
 
     var myUrls = this._videoFetcher.urls;
     // urlss = this._videoFetcher.indexToUrl;
-    String url = this._videoFetcher.indexToUrl[index];
-    print("url for $index is $url . word is ${this._videoFetcher.indexToWord[index]}");
+    String url = this._videoFetcher.indexToUrlNew[index];
+    print("url for $index is $url . word is ${this._videoFetcher.indexToWordNew[index]}");
     VideoPlayerController controller;
     if (url.startsWith("#")){ // letter
       var file = await VideoFetcher.lruCache.fetchVideoFile(title, this.dirName.contains("animation"), "#");
@@ -228,13 +224,13 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       controller = VideoPlayerController.network(url);
     }
     print("init controller index is $index");
-    isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = false;
+    isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()] = false;
 
     controller.setVolume(0.0);
-    _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
+    _controllers[this._videoFetcher.indexToUrlNew[index] + index.toString()] = controller;
 
     await controller.initialize();
-    isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = true;
+    isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()] = true;
     print("finished $index init");
   }
 
@@ -245,14 +241,14 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     VideoPlayerController controller = await _getController(index);
     if (controller == null){
       print("got null for controller at index $index!");
-      String url = this._videoFetcher.indexToUrl[index];
+      String url = this._videoFetcher.indexToUrlNew[index];
       controller = VideoPlayerController.network(url);
     }
     print("init controller index is $index");
-    isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = false;
+    isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()] = false;
 
     await controller.setVolume(0.0);
-    String word = this._videoFetcher.indexToWord[index];
+    String word = this._videoFetcher.indexToWordNew[index];
 
     print("init for $index $word");
     try{
@@ -282,7 +278,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       //     print("failed to dispose $ee");
       //   }
     }
-    _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
+    _controllers[this._videoFetcher.indexToUrlNew[index] + index.toString()] = controller;
 
       // controller = await _getController(index);
       // _controllers[this._videoFetcher.indexToUrl[index] + index.toString()] = controller;
@@ -290,7 +286,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     // }
     // await controller.initialize();
     print("after init for $index $word");
-    isInit[this._videoFetcher.indexToUrl[index] + index.toString()] = true;
+    isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()] = true;
     if (mounted){
       setState(() {
         print("set state after init");
@@ -303,7 +299,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   Future<void> _removeController(int index) async {
     // await Future.delayed(const Duration(milliseconds: 1500), _controller(index).dispose);
     await _controller(index).dispose();
-    _controllers.remove(this._videoFetcher.urls[index] + index.toString());
+    _controllers.remove(this._videoFetcher.indexToUrlNew[index] + index.toString());
     _listeners.remove(index);
   }
 
@@ -373,7 +369,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       // await _controller(index)?.pause();
       //return;
     }
-    if(index == this._videoFetcher.indexToUrl.length - 1) {
+    if(index == this._videoFetcher.indexToUrlNew.length - 1) {
       print("ended urls");
       return;
     }
@@ -394,7 +390,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     await _playController(++index);
     // _playController(++index);
 
-    if (index == this._videoFetcher.indexToUrl.length - 1) {
+    if (index == this._videoFetcher.indexToUrlNew.length - 1) {
       // _lock = false;
       flipLock(false);
     } else {
@@ -422,7 +418,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       //_controller(index) = null;
       //_nextVideo();
       print("index for finish === >> " + index.toString());
-      if(index == this._videoFetcher.indexToUrl.length -1){
+      if(index == this._videoFetcher.indexToUrlNew.length -1){
         //add replay button
         print("finish all videos!!!");
         return;
@@ -510,7 +506,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                               controller = snapshot.data;
                             }
                             // if (!controller.value.isInitialized){
-                            if (!isInit[this._videoFetcher.indexToUrl[index] + index.toString()]){
+                            if (!isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()]){
                               return Loading();
                             }
                             return VideoPlayer(controller);
@@ -620,7 +616,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       });
       return null;
     }
-    if (!isInit[this._videoFetcher.indexToUrl[index] + index.toString()]){
+    if (!isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()]){
       await Future.delayed(Duration(milliseconds: 500));
       return videoPlayerContainer(index);
     }
@@ -640,7 +636,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
 
       _playController(0);
     })..onError((error, stackTrace) {print("error on loading at 0 $error");});
-    if (_videoFetcher.indexToUrl.keys.length > 1) {
+    if (_videoFetcher.indexToUrlNew.keys.length > 1) {
       _initController(1).whenComplete(() => /*_lock = false*/flipLock(false));
     }
   }
