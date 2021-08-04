@@ -107,7 +107,6 @@ class VideoFetcher { // extends State<VideoFetcher> {
   // }
 
 
-
   Future<void> _urlsTry(
       String word, bool isAnimation, Map<String,List<String>> urlsWords, String dirName,
       Map<String,int> indicesMap, List<String> urls, int index
@@ -118,7 +117,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     String url = await getUrl(word, dirName);
     bool isAnimation = dirName.toLowerCase().contains("animation");
     // lruCache.saveVideosFromUrls(isAnimation, map);
-    await lruCache.saveFile(url, word, isAnimation, false, false);
+    lruCache.saveFile(url, word, isAnimation, false, false);
     this.indexToWord[index] = word;
     addToMapsIndex(word, [url],indicesMap, urlsWords, index);
 
@@ -159,7 +158,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
         String letter = letters[i];
         bool isSaved = savedLetters.contains(letter);
         if (!isSaved){
-          // isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
+          isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
+          // isSaved = false;
           if (isSaved){
             lettersList.add(letter);
           }
@@ -245,13 +245,21 @@ class VideoFetcher { // extends State<VideoFetcher> {
     //create map(index to url)
     final keys = indexToUrlList.keys;
     int newIndex = 0;
-    for (var i in keys) {
-      print(indexToUrlList[i]);
+    for(int i=0; i< indexToUrlList.keys.length; i++)
+    {
       for (int j = 0; j < indexToUrlList[i].length; j++) {
-        indexToUrlNew[newIndex] = indexToUrlList[i][j];
+        indexToUrlNew[i + newIndex] = indexToUrlList[i][j];
         newIndex++;
       }
+      newIndex--;
     }
+    // for (var i in keys) {
+    //   print(indexToUrlList[i]);
+    //   for (int j = 0; j < indexToUrlList[i].length; j++) {
+    //     indexToUrlNew[i + newIndex] = indexToUrlList[i][j];
+    //   }
+    //   newIndex += indexToUrlList[i].length -1;
+    // }
 
 
     //crete map(word to url)
@@ -274,32 +282,19 @@ class VideoFetcher { // extends State<VideoFetcher> {
     final keysIndexToWord = indexToWord.keys;
     int newIndex1 = 0;
     for(int i=0; i < keysIndexToWord.length; i++)
-      {
-        if (isLettersMap[i]) {
-          var letters = splitToLetters(indexToWord[i]);
-          for (int j = 0; j < letters.length; j++) {
-            indexToWordNew[i + newIndex1] = letters[j];
-            newIndex1++;
-          }
+    {
+      if (isLettersMap[i]) {
+        var letters = splitToLetters(indexToWord[i]);
+        for (int j = 0; j < letters.length; j++) {
+          indexToWordNew[i + newIndex1] = letters[j];
+          newIndex1++;
         }
-        else {
-          indexToWordNew[i + newIndex1] = indexToWord[i];
-          //newIndex1++;
-        }
+        newIndex1--;
       }
-    // for (var i in keysIndexToWord) {
-    //   if (isLettersMap[i]) {
-    //     var letters = splitToLetters(indexToWord[i]);
-    //     for (int j = 0; j < letters.length; j++) {
-    //       indexToWordNew[j + newIndex1] = letters[j];
-    //       newIndex1++;
-    //     }
-    //   }
-    //   else {
-    //     indexToWordNew[newIndex1] = indexToWord[i];
-    //     newIndex1++;
-    //   }
-    // }
+      else {
+        indexToWordNew[i + newIndex1] = indexToWord[i];
+      }
+    }
     print(
         "finished get urlsss\n indexToUrlNew $indexToUrlNew\n wordsToUrls $wordsToUrls"
             "\n indexToWordNew $indexToWordNew");
@@ -315,7 +310,7 @@ class VideoFetcher { // extends State<VideoFetcher> {
     // this.wordsToUrls = urlsWords;
     this.wordsToUrls = urlsWordsList;
     if (toSave) {
-      // lruCache.saveVideosFromUrls(dirName.toLowerCase().contains("animation"), urlsWords);
+      lruCache.saveVideosFromUrls(dirName.toLowerCase().contains("animation"), wordsToUrlsNew);
     }
     this.doneLoading = true;
     // print("urls are $urls");
@@ -331,8 +326,8 @@ class VideoFetcher { // extends State<VideoFetcher> {
   Future<void> getUrlsBetter(String word, String dirName, bool isAnimation,
       Map<String,int> indicesMap, Map<String,List<String>> urlsWords, int index) async{
     try {
-      // bool isSaved = (await lruCache.fetchVideoFile(word, isAnimation, null) != null);
-      bool isSaved = false;
+      bool isSaved = (await lruCache.fetchVideoFile(word, isAnimation, null) != null);
+      // bool isSaved = false;
       print("$word word isSaved == $isSaved");
       if (isSaved){
         print("$word word is saved!");
@@ -356,5 +351,3 @@ class VideoFetcher { // extends State<VideoFetcher> {
 
 
 }
-
-
