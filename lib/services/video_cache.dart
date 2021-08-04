@@ -84,7 +84,7 @@ class LruCache{
       });
       await Future.wait(futures);
       if (toDelete(isAnimation, 0)){
-        deleteLeastRecentFile(isAnimation);
+        // deleteLeastRecentFile(isAnimation);
       }
       print("saved words!");
 
@@ -231,7 +231,7 @@ class LruCache{
           modifiedDates[title] = saveFile.statSync().modified;
         }
         if (toUpdate && toDelete(isAnimation, this.saved[title])){
-          await deleteLeastRecentFile(isAnimation);
+          // await deleteLeastRecentFile(isAnimation);
         }
 
         if (isLetter && !VideoFetcher.savedLetters.contains(title)){
@@ -349,6 +349,9 @@ class LruCache{
   Future<void> _deleteLeastRecent(bool isAnimation) async{
     if (this.leastRecentFile == null){
       await _updateLeastRecentFile(isAnimation);
+      if (this.leastRecentFile == null){
+        return;
+      }
     }
     int size = await this.leastRecentFile.b.length();
     this.leastRecentFile.b.delete(recursive: true);

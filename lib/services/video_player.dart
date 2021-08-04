@@ -355,11 +355,16 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   }
 
   void flipLock(bool val) async{
-    await _mutex.acquire();
-    setState(() {
-      _lock = val;
-    });
-    _mutex.release();
+
+    if (mounted){
+      await _mutex.acquire();
+      setState(() {
+        _lock = val;
+      });
+      _mutex.release();
+    }
+
+
   }
 
   void _nextVideo() async {
