@@ -19,14 +19,14 @@ class _DictionaryState extends State<Dictionary> {
   }
   // list of subjects
   List<Card> _buildGridCards(BuildContext context) {
-    ButtonImage holidays = new ButtonImage("hanukkah.jfif","חגים ומועדים","holidays");
-    ButtonImage pronoun = new ButtonImage("pointing.jfif","כינוי גוף","pronoun");
-    ButtonImage animals = new ButtonImage("animals.jfif","בעלי חיים","animals");
-    ButtonImage shapes = new ButtonImage("shapes.jfif", "צורות","shapes");
-    ButtonImage body = new ButtonImage("body.jfif","גוף האדם","body");
-    ButtonImage time = new ButtonImage("time.jfif","זמן","time");
-    ButtonImage geography = new ButtonImage("geography.jfif","גאוגרפיה","geography");
-    ButtonImage food = new ButtonImage("food.jfif","אוכל","food");
+    ButtonImage holidays = new ButtonImage("hanukkah.jfif","חגים ומועדים",SubjectName.HOLIDAYS);
+    ButtonImage pronoun = new ButtonImage("pointing.jfif","כינוי גוף",SubjectName.PRONOUNS);
+    ButtonImage animals = new ButtonImage("animals.jfif","בעלי חיים",SubjectName.ANIMALS);
+    ButtonImage shapes = new ButtonImage("shapes.jfif", "צורות",SubjectName.SHAPES);
+    ButtonImage body = new ButtonImage("body.jfif","גוף האדם",SubjectName.BODY);
+    ButtonImage time = new ButtonImage("time.jfif","זמן",SubjectName.TIMES);
+    ButtonImage geography = new ButtonImage("geography.jfif","גאוגרפיה",SubjectName.GEOG);
+    ButtonImage food = new ButtonImage("food.jfif","אוכל",SubjectName.FOOD);
     List<ButtonImage> products = [holidays,pronoun,shapes,animals,body,time,geography,food];
 
     // if the list of subject if empty - show an empty card
@@ -97,7 +97,7 @@ class _DictionaryState extends State<Dictionary> {
                       Navigator.push(
                         context,
                         // show the specific subject dict
-                        MaterialPageRoute(builder: (context) => Subject(product.onTap)),
+                        MaterialPageRoute(builder: (context) => Subject(subjectName: product.onTap,)),
                       );
                     }
                 ),
@@ -144,7 +144,7 @@ Each button image contain:
 class ButtonImage{
   String name;
   String text;
-  String onTap;
+  SubjectName onTap;
 
   ButtonImage(this.name, this.text,this.onTap);
 }
