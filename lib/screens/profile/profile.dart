@@ -1,8 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_switch/flutter_switch.dart';
-import 'package:isl_translator/shared/internet_alert_dialouge.dart';
 import '../../models/profile_image.dart';
 import '../../shared/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
@@ -640,11 +641,6 @@ class MapScreenState extends State<ProfilePage>
                           )
                         ],
                       ),
-                      // Container(
-                      //showAlert(context);
-                      //Container(),
-                      // showInternetAlert ? InternetAlertDialogue() : Container()
-                      // ),
                     ],
                   ),
                 );
@@ -680,7 +676,7 @@ class MapScreenState extends State<ProfilePage>
                   try{
                     saveData();
                   } on io.SocketException catch (err){
-                    // showInternetAlert(context);
+                    print(err);
                     print("not internet");
                   }
                   catch(e){

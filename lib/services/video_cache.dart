@@ -210,7 +210,7 @@ class LruCache{
         }
         // save file
         Dio dio = Dio();
-        var result = await dio.download(url, saveFile.path,
+        await dio.download(url, saveFile.path,
             onReceiveProgress: (int received, int total) {
           // total *= 8;
           if (this.saved.containsKey(title) || title.length < 2){
@@ -286,7 +286,7 @@ class LruCache{
       this.hasPermission = true;
       return true;
     }
-    var result = await permission.request();
+    await permission.request();
     bool perm = PermissionStatus.granted.isGranted;
     this.hasPermission = perm;
     return perm;

@@ -9,7 +9,6 @@ import 'package:isl_translator/screens/profile/profile.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/database.dart';
-import 'package:provider/provider.dart';
 
 enum pageButton{
   TRANSLATION, ADDVID, PROFILE, DICT
@@ -37,7 +36,6 @@ class MainDrawer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // future user image
-    String imgUrl = 'https://static.toiimg.com/photo/msid-67586673/67586673.jpg';
     this._profileImage.setState = (context as Element).markNeedsBuild;
     this._profileImage.setImage();
     // final DatabaseUserService userService = DatabaseUserService(uid: user.uid);

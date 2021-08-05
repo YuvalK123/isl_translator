@@ -1,8 +1,8 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
-import 'package:flutter/material.dart';
 import 'package:isl_translator/models/pair.dart';
 import 'package:isl_translator/shared/reg.dart';
-import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
 List<String> saveTerms = [];
@@ -34,8 +34,6 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
 /* Find all the terms in DB - maybe to do it only once and save it? */
 // Future<List<String>> findTermsDB() async {
 Future<void> findTermsDB() async{
-  List<String> terms = [];
-  // if (FirebaseStorage.instance.app.)
   var futures = <Future>[];
   await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
     var items = result.items;

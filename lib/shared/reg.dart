@@ -2,7 +2,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/models/pair.dart';
-import 'package:isl_translator/services/show_video.dart';
 
 
 List<String> infinitivess = [
@@ -252,17 +251,6 @@ String handleRootH(String root){
 }
 
 Future<List<String>> wordToInitiatives(String word, List<String> patterns, List<String> infinitives) async{
-  List<String> wordInitiative = [];
-  // verbs.forEach((verb) {
-  //   print("now at verb $verb");
-  //   if (verb[0] == "א"){
-  //     // TODO: remove a if past tense
-  //   }
-  //   var wordData = getVerbPattern(word); // here we check if in verb pattern
-  //   if (wordData != null){
-  //     return handleVerbMatch(wordData.b, wordData.a, word); // is a verb
-  //   }
-  // });
   var wordData = await getVerbPatterns(word, patterns); // here we check if in verb pattern
   print("word data = $wordData");
   if (wordData != null){
@@ -293,14 +281,12 @@ Future<Pair<String, int>> getVerbPatterns(String word, List<String> patterns) as
     }
   }
   return res;
-  print("___");
-  // return null;
 }
 
 Future<Pair<String, int>> getVerbPattern(String word, List<String> patterns, int index) async{
   // return pair of pattern/ pattern index
   var pattern = patterns[index];
-  print("($index) at pattern ${pattern}");
+  print("($index) at pattern $pattern");
   RegExp regExp = RegExp(pattern);
 
   // Iterable<RegExpMatch> matches = regExp.allMatches(word);
@@ -368,7 +354,7 @@ List<String> handleVerbMatch(int index, String pattern, String word, List<String
 
 String handleFinalLetter(String infin){
   // if last letter is a final letter small letter, handle it
-  String lastLetter = infin[infin.length - 1], newInfin = "";
+  String lastLetter = infin[infin.length - 1];
   if (lastLetter == "כ"){
 
   } else if (lastLetter == "מ"){
