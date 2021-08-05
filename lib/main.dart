@@ -18,23 +18,19 @@ void main() async {
   if (user != null && user.uid != null){
     await findTermsDB();
     isLoading = false;
-    print("isLoading == > " + isLoading.toString());
   }else{
     print("fail");
   }
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
+  /// This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return StreamProvider<UserModel>.value(
       value: AuthService().user,
       child: MaterialApp(
-        // navigatorObservers: [routeObserver],
         home: Wrapper(),
-        //builder: EasyLoading.init(),
-        // home: Home()
       ),
     );
   }
