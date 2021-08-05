@@ -13,10 +13,10 @@ class VideoFetcher {
   final String sentence;
   bool isValidSentence = false;
   static String lettersCachePath;
-  static LruCache lruCache = LruCache();
+  static LruCache lruCache = LruCache(20);
   final _auth = FirebaseAuth.instance;
-  static final savedLetters = <String>[];
-
+  static final animSavedLetters = <String>[];
+  static final liveSavedLetters = <String>[];
   Map<String, List<String>> wordsToUrls = {};
   Map<String, String> wordsToUrlsNew = {};
   Map<int,String> indexToWord = {};
@@ -34,8 +34,10 @@ class VideoFetcher {
 
 
   Future<List<String>> processWord(String word,String dirName) async{
-    String exec = dirName == "animation_openpose/" ? "mp4" : "mkv";
+    bool isAnimation = dirName.contains("animation");
+    String exec = isAnimation ? "mp4" : "mkv";
     List<String> urls = [];
+    List<String> savedLetters = isAnimation ? animSavedLetters : liveSavedLetters;
     print("check for verb...");
     final stopWatch = Stopwatch()..start();
     var verb = await checkIfVerb(word, dirName);
@@ -103,6 +105,7 @@ class VideoFetcher {
       Map<String,int> indicesMap, List<String> urls, int index
       ) async{
     print("indices map in _urlsCatch for word $word: $indicesMap");
+    List<String> savedLetters = isAnimation ? animSavedLetters : liveSavedLetters;
     try {
       // check if word exist in the personal videos
       String url = await getUrl(word, dirName + _auth.currentUser.uid + "/");

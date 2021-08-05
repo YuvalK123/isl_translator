@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
-import 'package:disk_lru_cache/disk_lru_cache.dart';
 import 'package:isl_translator/models/pair.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:isl_translator/services/video_fetcher.dart';
@@ -10,11 +9,7 @@ List<String> lettersList = ["א","ב","ג","ד","ה","ו","ז","ח","ט",
                          "י","כ","ך","ל","מ","ם","נ","ן","ס",
                           "ע","פ","ף","צ","ץ","ק","ר","ש","ת"];
 
-bool hasLettersLocal = false;
-
-
 class LruCache{
-  final LruMap<String,String> map = LruMap();
   String lettersCachePath = "";
   Map<String,String> firebaseDirNames = {"live":"live_videos/", "animation":"animation_openpose/"};
   Map<String,String> cacheFolders = {"live":"Cache/live", "animation": "Cache/animation"};
@@ -29,10 +24,8 @@ class LruCache{
   int maxSize;
   Pair<String, File> leastRecentFile;
 
-  LruCache(){
-    this.maxSize = 20 * 1024 * 1024; // 10M
-    // Directory cacheDirectory = Directory("${Directory.systemTemp.path}/cache");
-    // print("cacheDirectory == $cacheDirectory");
+  LruCache(int mbSize){
+    this.maxSize = mbSize * 1024 * 1024; // 10M
     initAsync();
   }
 
@@ -43,24 +36,6 @@ class LruCache{
 
   static String getPath() {
     return Directory.current.path;
-  }
-
-  static Future<void> saveLetters(String firebaseDirName, String cacheFolder) async{
-    print("saving letters in $cacheFolder");
-    // return;
-    for (var letter in lettersList){
-      try{
-        print("on $firebaseDirName/$letter.mp4");
-        String url = await VideoFetcher.getUrl("$letter",firebaseDirName);
-        print("downloaded letter url $url");
-        await VideoFetcher.lruCache.saveFile(url, letter, cacheFolder.contains("animation"), true, false);
-        print("saved!!");
-      } catch(e){
-        print("err for letter $letter is $e");
-      }
-
-    }
-    hasLettersLocal = true;
   }
 
   Future<void> saveVideosFromUrls(bool isAnimation, Map<String,String> urls) async{
@@ -94,13 +69,6 @@ class LruCache{
     }
   }
 
-
-
-
-
-  ///
-/// ordering
-///
 
   Future<String> createLettersCachePath(String folderName) async{
     if (folderName == null || folderName == ""){
@@ -173,18 +141,13 @@ class LruCache{
       String url, String title, bool isAnimation, bool isLetter, bool toUpdate
       ) async{
     String fileName = "$title.mp4";
-    print("saving file $fileName -> $fileName\n params: "
-        "isAnimation: $isAnimation, isLetter: $isLetter, url: $url");
     String cacheKey = isAnimation ? "animation" : "live";
     String folderName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
-    // String folderName = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     Directory directory;
     try {
       if (Platform.isAndroid){
         if (await _requestPermission(Permission.storage)){
-          print("got permission");
           String newPath = await getCachePathByFolder(folderName);
-          print("newPath is $newPath");
           directory = Directory(newPath);
         }
         else{
@@ -202,7 +165,6 @@ class LruCache{
       }
       if (await directory.exists()){
         String fullName = directory.path + "/$fileName";
-        print("full directory name is $fullName");
         File saveFile = File(fullName);
         if (await saveFile.exists()){
           // file exists - no need to download
@@ -212,7 +174,6 @@ class LruCache{
         Dio dio = Dio();
         await dio.download(url, saveFile.path,
             onReceiveProgress: (int received, int total) {
-          // total *= 8;
           if (this.saved.containsKey(title) || title.length < 2){
             return;
           }
@@ -222,11 +183,7 @@ class LruCache{
           } else{
             this.liveDirectorySize += total;
           }
-
-          print("saved $fileName! total == $total, received == $received");
-        }, );// onReceiveProgress: {downloaded, totalSize});
-        print("anim dir size == $animDirectorySize, live == $liveDirectorySize");
-        print("$fileName downloaded!!");
+        }, );// onReceiveProgress: {downloaded, totalSize});;
         saveFile = File(fullName);
         final modifiedDates = isAnimation ? animModifiedDates : liveModifiedDates;
         if (saveFile != null && !modifiedDates.containsKey(title)){
@@ -235,15 +192,16 @@ class LruCache{
         if (toUpdate && toDelete(isAnimation, this.saved[title])){
           await deleteLeastRecentFile(isAnimation);
         }
-
-        if (isLetter && !VideoFetcher.savedLetters.contains(title)){
-          VideoFetcher.savedLetters.add(title);
+        List<String> savedLetters = isAnimation ?
+        VideoFetcher.animSavedLetters : VideoFetcher.liveSavedLetters;
+        if (isLetter && !savedLetters.contains(title)){
+          savedLetters.add(title);
         }
         return true;
       }
     }
     catch (e){
-      print("  err is $e");
+      print("err is $e");
     }
     // failed to create directory
     return false;
@@ -269,10 +227,8 @@ class LruCache{
     // String url = title.replaceFirst("#", dirName);
     String cacheFolder = await getCachePathByFolder(dirName);
     String url = "$cacheFolder/$title.mp4";
-    print("fetchVideoFile for title $title : loading from file $url");
     File file = File(url);
     if (await file.exists()){
-      print("file $file exists! fir $title title");
       if (modifiedDates.containsKey(title)){
         modifiedDates[title] = file.statSync().modified;
       }
