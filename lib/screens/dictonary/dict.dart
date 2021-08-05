@@ -3,21 +3,25 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/screens/dictonary/subject.dart';
 import '../../shared/main_drawer.dart';
 
-/*
-Dictionary class
-Dictionary of ISL videos&animations, each word belong to a specific subject
-*/
+
+/// Dictionary class
+///
+/// Dictionary of ISL videos & animations
+/// Each word belong to a specific subject
 class Dictionary extends StatefulWidget {
   @override
   _DictionaryState createState() => _DictionaryState();
 }
 
 class _DictionaryState extends State<Dictionary> {
+
+  /// Init
   @override
   void initState() {
     super.initState();
   }
-  // list of subjects
+
+  /// List of subjects
   List<Card> _buildGridCards(BuildContext context) {
     ButtonImage holidays = new ButtonImage("hanukkah.jfif","חגים ומועדים",SubjectName.HOLIDAYS);
     ButtonImage pronoun = new ButtonImage("pointing.jfif","כינוי גוף",SubjectName.PRONOUNS);
@@ -29,7 +33,7 @@ class _DictionaryState extends State<Dictionary> {
     ButtonImage food = new ButtonImage("food.jfif","אוכל",SubjectName.FOOD);
     List<ButtonImage> products = [holidays,pronoun,shapes,animals,body,time,geography,food];
 
-    // if the list of subject if empty - show an empty card
+    /// If the subject list is empty - show an empty card
     if (products == null || products.isEmpty) {
       return const <Card>[];
     }

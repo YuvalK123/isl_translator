@@ -16,8 +16,8 @@ class AuthService {
   }
 
   // auth change user stream
-  Stream<UserModel> get user{
-    return _auth.authStateChanges().map(_userFromFirebase);
+  Stream<UserModel> get user async*{
+    yield* _auth.authStateChanges().map(_userFromFirebase);
     // .map((FirebaseUser user) => _userFromFirebase(user));
   }
 

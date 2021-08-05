@@ -91,7 +91,7 @@ class VideoFetcher {
     // gets the video's url
     String url = await getUrl(word, dirName);
     bool isAnimation = dirName.toLowerCase().contains("animation");
-    lruCache.saveFile(url, word, isAnimation, false, false);
+    await lruCache.saveFile(url, word, isAnimation, false, false);
     this.indexToWord[index] = word;
     addToMapsIndex(word, [url],indicesMap, urlsWords, index);
     urls.add(url);
@@ -222,7 +222,7 @@ class VideoFetcher {
     this.wordsToUrls = urlsWordsList;
     // save video to cache
     if (toSave) {
-      lruCache.saveVideosFromUrls(dirName.toLowerCase().contains("animation"), wordsToUrlsNew);
+      await lruCache.saveVideosFromUrls(dirName.toLowerCase().contains("animation"), wordsToUrlsNew);
     }
     this.doneLoading = true;
     return urls;

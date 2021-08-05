@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:highlight_text/highlight_text.dart';
-import 'package:isl_translator/screens/home/home.dart';
-import 'package:isl_translator/services/video_cache.dart';
 import '../../shared/main_drawer.dart';
-import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'voice_translation.dart';
 import 'text_translation.dart';
 
+/// Main function
+///
+/// Run the TranslationWrapper class (home page)
+/// that allows us to move easily between
+/// the Text_to_ISL page to Voice_to_ISL page
 void main() {
   runApp(TranslationWrapper());
 }
 
+/// TranslationWrapper class
+///
+/// Allows the user to move easily between
+/// the Text_to_ISL page to Voice_to_ISL page
 class TranslationWrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,6 @@ class TranslationWrapper extends StatelessWidget {
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
       home: TranslationScreen(),
-
     );
   }
 }
@@ -34,23 +38,21 @@ class TranslationScreen extends StatefulWidget {
 
 class _TranslationScreenState extends State<TranslationScreen> {
 
-  stt.SpeechToText _speech;
-  bool _isListening = false;
-  String _text;
-  double _confidence = 0.0;
-
+  /// Init
   @override
   void initState() {
     super.initState();
-    _speech = stt.SpeechToText();
   }
 
+  /// Translation wrapper
+  ///
+  /// Allow the user to navigate easily between
+  /// Text_to_ISL page to Voice_to_ISL page
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-
         appBar: AppBar(
             title: Container(
               alignment: Alignment.centerRight,
@@ -62,6 +64,7 @@ class _TranslationScreenState extends State<TranslationScreen> {
                 )
             ),
             backgroundColor: Colors.cyan[900],
+            /// Bar for navigate between Text_to_ISL page to Voice_to_ISL page
             bottom: const TabBar(
               isScrollable: true,
               tabs: [
@@ -75,7 +78,9 @@ class _TranslationScreenState extends State<TranslationScreen> {
           bottom: false,
           child: TabBarView(
               children: [
+                /// Voice to ISL
                 RecordPage(),
+                /// Text to ISL
                 TranslatePage(),
               ]
           ),
@@ -83,7 +88,6 @@ class _TranslationScreenState extends State<TranslationScreen> {
       ),
     );
   }
-
 }
 
 
