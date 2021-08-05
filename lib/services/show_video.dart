@@ -50,7 +50,7 @@ Future<void> findTermsDB() async{
 Future<void> addSavedExp(Reference item) async{
   String videoName = item.toString().substring(55,item.toString().length -5);
   if(videoName.split(" ").length > 1){
-    print("adding $videoName");
+    // print("adding $videoName");
     saveTerms.add(videoName);
   }
 }

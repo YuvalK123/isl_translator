@@ -1,4 +1,5 @@
 import 'package:isl_translator/models/user.dart';
+import 'package:provider/provider.dart';
 import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -10,6 +11,7 @@ class AuthService {
     // var dbs = DatabaseUserService(uid: user.uid);
     return user != null ? UserModel(
       uid: user.uid,
+        emailVerified: user.emailVerified
     ) : null ;
   }
 
@@ -67,19 +69,26 @@ class AuthService {
       return _userFromFirebase(user);
     }catch(e){
       print(e.toString());
-      return null;
+      return e.toString().split("]")[1].replaceFirst(' ', '');
     }
   }
 
   // sign out
   Future signOut() async {
     try{
+      if (_auth.currentUser.isAnonymous){
+        deleteUser();
+      }
       return await _auth.signOut();
     }
     catch(e){
       print(e.toString());
 
     }
+  }
+
+  void deleteUser() async{
+
   }
 
 }

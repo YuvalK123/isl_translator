@@ -69,7 +69,8 @@ class ProfileImage{
     // }
     this.imageUrl = await getImageUrl();
     // this._img = NetworkImage(this.imageUrl);
-    this._img = this._isLocal ? Image.asset(imageUrl): NetworkImage(this.imageUrl);
+    // this._img = this._isLocal ? Image.asset(imageUrl): NetworkImage(this.imageUrl);
+    this._img = this.imageUrl == null ? this._localAnonImg: NetworkImage(this.imageUrl);
     // if (this.setState != null) this.setState();
 
   }
@@ -94,14 +95,15 @@ class ProfileImage{
 
     if(!isImageExist)
     {
-      storageReference = FirebaseStorage.instance.ref("assets").child('user.png');
-      try {
-        // gets the video's url
-        imageUrl = await storageReference.getDownloadURL();
-
-      } catch (err) {
-        print("don't exist");
-      }
+      return null;
+      // storageReference = FirebaseStorage.instance.ref("assets").child('user.png');
+      // try {
+      //   // gets the video's url
+      //   imageUrl = await storageReference.getDownloadURL();
+      //
+      // } catch (err) {
+      //   print("don't exist");
+      // }
     }
     print("done get image");
     return imageUrl;

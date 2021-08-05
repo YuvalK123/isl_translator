@@ -112,40 +112,7 @@ class _RegisterState extends State<Register> {
                   child: Text("הרשמ/י",
                       style: TextStyle(color: Colors.white)
                   ),
-                  onPressed: () async {
-                    print("pressed");
-                    if (_formKey.currentState.validate()){
-                      print("validated");
-
-                      print("email $email , password $password");
-                      dynamic result = await _authService.
-                      registerUserWithEmailAndPassword(email, password);
-                      setState(() {
-                        if (_auth.currentUser.emailVerified){
-                          this.verify = false;
-                          loading = true;
-                        }
-                      });
-                      print("registered");
-                      if (result == null){
-                        print("res == null");
-                        setState(() {
-                          loading = false;
-                          error = 'Please supply a valid email';
-                        } );
-                      }else{
-                        DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid).updateUserData2(
-                          username: userName,
-                          gender: "o",
-                          videoType: VideoType.ANIMATION,
-                        );
-                        setState(() {
-                          this.verify = true;
-                        });
-
-                      }
-                    }
-                  },
+                  onPressed: register,
                 ),
                 SizedBox(height: 12.0,),
                 Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),),
@@ -156,6 +123,45 @@ class _RegisterState extends State<Register> {
         ),
       ),
     );
+  }
+
+  void register() async{
+    print("pressed");
+    if (_formKey.currentState.validate()){
+      print("validated");
+
+      print("email $email , password $password");
+      dynamic result = await _authService.
+      registerUserWithEmailAndPassword(email, password);
+      if (result.runtimeType == String){
+        print("res == null");
+        setState(() {
+          loading = false;
+          // error = 'Please supply a valid email';
+          error = 'Failed to register\n$result';
+        } );
+        return;
+      }else{
+        DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid).updateUserData2(
+          username: userName,
+          gender: "o",
+          videoType: VideoType.ANIMATION,
+        );
+        setState(() {
+          error = "";
+          this.verify = true;
+        });
+        setState(() {
+          if (_auth.currentUser.emailVerified){
+            this.verify = false;
+            loading = true;
+          }
+        });
+        print("registered");
+
+
+      }
+    }
   }
 }
 
@@ -190,5 +196,7 @@ class FormField extends StatelessWidget {
       // });
     );
   }
+
+
 }
 
