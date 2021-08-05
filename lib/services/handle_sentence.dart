@@ -7,7 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 
 List<String> saveTerms = [];
 
-/* Split the word to letters */
+/// Split [word] to letters
 List<String> splitToLetters(String word) {
   List<String> lettersList = List<String>(word.length);
   var num = 0;
@@ -18,7 +18,8 @@ List<String> splitToLetters(String word) {
   return lettersList;
 }
 
-/* Search for terms in the sentence and return a list ot terms */
+/// Search for terms in the [sentence] and return
+/// [saveTerms] a list ot terms
 List<String> searchTerm(String sentence, List<String> saveTerms) {
   List<String> terms = [];
   for (var i = 0; i < saveTerms.length; i++) {
@@ -27,12 +28,11 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
       terms.add(saveTerms[i]);
     }
   }
-  print(terms);
   return terms;
 }
 
-/* Find all the terms in DB - maybe to do it only once and save it? */
-// Future<List<String>> findTermsDB() async {
+/// Find all the terms in DB
+/// terms are phrases of 2+ words
 Future<void> findTermsDB() async{
   var futures = <Future>[];
   await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
@@ -42,18 +42,17 @@ Future<void> findTermsDB() async{
     }
   });
   return await Future.wait(futures);
-  // return;
 }
 
+/// save expression of [item] reference
 Future<void> addSavedExp(Reference item) async{
   String videoName = item.toString().substring(55,item.toString().length -5);
   if(videoName.split(" ").length > 1){
-    // print("adding $videoName");
     saveTerms.add(videoName);
   }
 }
 
-/* Split the sentence to word/term and return a list of the split sentence*/
+/// Split the [sentence] to word/term and return a list of the split sentence
 List<String> splitSentence(String sentence) {
   if (sentence == null){
     return null;
@@ -61,24 +60,13 @@ List<String> splitSentence(String sentence) {
   List<String> hebrewLetters = hebrewChars.keys.toList();
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
-  print("^[${hebrewLetters.toString()}]'");
   var vals = hebrewLetters.toString().substring(1,hebrewLetters.toString().length - 1).replaceAll(",", "");
   newSentence = newSentence.replaceAll(RegExp('[^$vals]'), "");
-  print("fixed sentence is $newSentence");
   if (newSentence.isEmpty){
     return null;
   }
   List<String> sentenceList = newSentence.split(" "); //split the sentence to words
-
-  // // get all terms
-  // Future<List<String>> futureTerms = findTermsDB();
-  // print('futureTerms');
-  // futureTerms.then((result) => saveTerms=  result)
-  //     .catchError((e) => print('error'));
-  print("hello save terms ==> " + saveTerms.toString());
   List<String> terms = searchTerm(newSentence, saveTerms); // terms in the sentence
-  //List<String> terms = [];
-  //var new_terms = sentence.replaceAll(new RegExp(r'[\u200f]'), "");
   List<String> splitSentence = [];
 
   // save the index and the length of the terms
@@ -86,7 +74,6 @@ List<String> splitSentence(String sentence) {
   for (int i = 0; i < terms.length; i++) {
     indexTerms.add(Pair(newSentence.indexOf(terms[i]), terms[i].length));
   }
-  //indexTerms.sort((a, b) => getIndex(a).compareTo(getIndex(b)));
   indexTerms.sort((x,y) => x.a.compareTo(y.a));
 
   // split the sentence to word and terms
@@ -108,5 +95,3 @@ List<String> splitSentence(String sentence) {
 
   return splitSentence;
 }
-
-/* Create Tuple */
