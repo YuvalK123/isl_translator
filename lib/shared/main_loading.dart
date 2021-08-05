@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:isl_translator/services/show_video.dart';
+import 'package:isl_translator/services/handle_sentence.dart';
 int i = 0;
 bool isLoading = true;
 Future<void> bla() async{

@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/screens/wrapper.dart';
 import 'package:provider/provider.dart';
-import 'package:isl_translator/services/show_video.dart';
+import 'package:isl_translator/services/handle_sentence.dart';
 
 int i = 0;
 bool isLoading = true;

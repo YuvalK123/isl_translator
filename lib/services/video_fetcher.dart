@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:io' as io;
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:isl_translator/services/show_video.dart';
+import 'package:isl_translator/services/handle_sentence.dart';
 import 'package:isl_translator/services/video_cache.dart';
 import 'package:isl_translator/shared/reg.dart';
 import 'package:firebase_auth/firebase_auth.dart';

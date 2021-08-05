@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
-import 'package:isl_translator/services/show_video.dart';
+import 'package:isl_translator/services/handle_sentence.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
