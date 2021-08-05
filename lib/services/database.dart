@@ -59,8 +59,4 @@ class DatabaseUserService{
     return usersCollection.doc(this.uid).snapshots()
         .map(_userModelFromSnapshot);
   }
-
-  Future<void> deleteUser() async{
-    return this.usersCollection.doc(this.uid).delete();
-  }
 }
