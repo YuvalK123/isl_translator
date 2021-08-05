@@ -40,7 +40,7 @@ class _DictionaryState extends State<Dictionary> {
 
     final ThemeData theme = Theme.of(context);
 
-    // return a Card that contains the subjects we define above
+    /// Return a Card that contains the subjects we define above
     return products.map((product) {
       return Card(
         shape: RoundedRectangleBorder(side: BorderSide(color: Colors.black, width: 2),
@@ -53,7 +53,7 @@ class _DictionaryState extends State<Dictionary> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                // show the image
+                /// Show the image
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: AspectRatio(
@@ -88,7 +88,7 @@ class _DictionaryState extends State<Dictionary> {
                 ),
               ],
             ),
-            // define what to do when tapping the image
+            /// Define what to do when tapping the image
             Positioned(
               left: 0.0,
               top: 0.0,
@@ -100,7 +100,7 @@ class _DictionaryState extends State<Dictionary> {
                     onTap: (){
                       Navigator.push(
                         context,
-                        // show the specific subject dict
+                        /// Show the specific subject dict
                         MaterialPageRoute(builder: (context) => Subject(subjectName: product.onTap,)),
                       );
                     }
@@ -113,6 +113,7 @@ class _DictionaryState extends State<Dictionary> {
     }).toList();
   }
 
+  /// Build the dictionary
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -138,13 +139,11 @@ class _DictionaryState extends State<Dictionary> {
   }
 }
 
-/*
-ButtonImage class
-Each button image contain:
-- name
-- text to display below to image
-- onTap variable that define which page to open when tapping
-*/
+
+/// ButtonImage class
+///
+/// Each button image contain: name, text to display below the image,
+/// onTap variable that define which page to open when tapping
 class ButtonImage{
   String name;
   String text;
