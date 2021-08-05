@@ -10,7 +10,6 @@ import 'package:isl_translator/screens/translation_page/translation_wrapper.dart
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/database.dart';
 import 'package:provider/provider.dart';
-import 'package:isl_translator/screens/add_video/instructions_page.dart';
 
 enum pageButton{
   TRANSLATION, ADDVID, PROFILE, DICT
@@ -128,7 +127,7 @@ class MainDrawer extends StatelessWidget {
               ),
               FirebaseAuth.instance.currentUser.isAnonymous ? Container() : DrawerButton(
                   title: "הוסף וידיאו",
-                  onTap: () => pushPage(context, InstructionsPage()),
+                  onTap: () => pushPage(context, AddVideoPage()),
                   icon: Icon(Icons.video_library),
                 isCurrPage: this.currPage == pageButton.ADDVID,
               ),

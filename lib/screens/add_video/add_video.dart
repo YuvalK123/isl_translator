@@ -30,6 +30,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
   @override
   void initState() {
     super.initState();
+    Timer.run(() => instructions(context));
 
     // setting the screen orientation to landscape
     SystemChrome.setPreferredOrientations([
@@ -51,6 +52,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     }).catchError((err) {
       print('Error :${err.code}Error message : ${err.message}');
     });
+
   }
 
   void dispose() {
@@ -164,6 +166,24 @@ class _AddVideoPageState extends State<AddVideoPage> {
           ),
         ),
       ),
+    );
+  }
+
+  void instructions(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('הנחיות לצילום', textDirection: TextDirection.rtl),
+            content: Text('על מנת ליצור סרטונים אחידים הצילום מתבצע בתצורה אופקית.\nמומלץ לעמוד במרכז שדה הצילום,\nולצלם את פלג הגוף העליון מהמותניים ומעלה', textDirection: TextDirection.rtl),
+            actions: <Widget>[
+              MaterialButton(
+                  child: Icon(Icons.check),
+                  onPressed: () => Navigator.of(context).pop()
+              ),
+            ],
+          );
+        }
     );
   }
 
