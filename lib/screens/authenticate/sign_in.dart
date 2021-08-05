@@ -31,7 +31,7 @@ class _SignInState extends State<SignIn> {
   @override
   Widget build(BuildContext context) {
     return loading ? Loading() : Scaffold(
-      //backgroundColor: Colors.white60,
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.cyan[800],
         elevation: 0.0,
@@ -55,19 +55,27 @@ class _SignInState extends State<SignIn> {
             key: _formKey,
             child: Column(
               children: <Widget> [
+                //SizedBox(height: 20.0,),
+                //Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
                 SizedBox(height: 20.0,),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
-                      SizedBox(width: 10.0,),
-                      Container(
-                        alignment: Alignment.topRight,
-                          child: Text("!שלום", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
-                      SizedBox(width: 10.0,),
-                      Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
-                    ],
+                Container(
+                  alignment: Alignment.topRight,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        Expanded(child: Image.asset("assets/images/sign_in_flag1.jpg", width: 200, height: 70,)),
+
+                        //Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
+                        //SizedBox(width: 10.0,),
+                        Container(
+                          alignment: Alignment.topRight,
+                            child: Text("ברוך הבא", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
+                        //SizedBox(width: 10.0,),
+
+                        //Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
+                      ],
+                    ),
                   ),
                 ),
                 SizedBox(height: 40.0,),
@@ -95,82 +103,39 @@ class _SignInState extends State<SignIn> {
                   onChanged: (val) => setState(() => password = val) ,
                   obscureText: true,
                 ),
-                SizedBox(height: 20.0,),
-
+                SizedBox(height: 10.0,),
+                SizedBox(height: 10.0,),
                 Row(
                   children: [
                     Expanded(
                       child: RaisedButton(
-                          color: Colors.amber[700],
+                          color: Colors.green[400],
                           child: Text("התחבר/י באופן אנונימי", textAlign: TextAlign.center,
                               style: TextStyle(color: Colors.white)),
-                          onPressed: () async {
-                            dynamic result = await _authService.signInAnon();
-                            if (result == null){
-                              setState(() {
-                                loading = false;
-                                error = 'Could not sign in';
-                              });
-                            }else{
-                              print("spawning from login1!");
-                              // Isolate.spawn(saveTermsFunc, "");
-                              // List<String> futureTerms = await findTermsDB();
-                              // saveTerms = futureTerms;
-                            }
-                          }
+                          onPressed: logInAnon,
                       ),
                     ),
                     SizedBox(width: 20.0,),
                     Expanded(
                       child: RaisedButton(
-                        color: Colors.green[400],
+                        color: Colors.green[800],
                         child: Text("התחבר/י",
                             style: TextStyle(color: Colors.white)
                         ),
-                        onPressed: () async {
-                          // true - valid form. false - invalid form
-                          if (_formKey.currentState.validate()){
-
-
-                            dynamic result = await _authService.
-                            signInUserWithEmailAndPassword(email, password);
-                            print("result sign in $result");
-                            if (result.runtimeType == String){
-                              setState(() {
-                                loading = false;
-                                error = 'Could not sign in\n${result.toString()}';
-                              });
-                              return;
-                            }
-                            if (_auth.currentUser.emailVerified){
-                              if (mounted){
-                                setState(() => loading = true);
-                              }
-                              // get all terms
-                              // List<String> futureTerms = await findTermsDB();
-                              // saveTerms = futureTerms;
-                              // print("spawning from login2!");
-                              // Isolate.spawn(saveTermsFunc, "");
-
-
-                              // futureTerms.then((result) => saveTerms=  result)
-                              // .catchError((e) => print('error in find terms'));
-                            }else{
-                              print("user signin is ${_auth.currentUser}");
-                              setState(() {
-                                loading = false;
-                                error = 'Email not verified!';
-                              });
-                            }
-                          }
-                        },
+                        onPressed: logIn,
                       ),
                     ),
                   ],
                 ),
 
                 SizedBox(height: 12.0,),
-                Text(error, style: TextStyle(color: Colors.blue, fontSize: 14.0),)
+                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),),
+                //Image.asset("assets/images/sign_in_flag1.jpg", width: 1000, height: 150,),
+                //SizedBox(height: 150.0,),
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(0,10,0,0),
+                  child: Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
+                ),
               ],
             ),
           ),
@@ -179,12 +144,49 @@ class _SignInState extends State<SignIn> {
     );
   }
 
+  void logInAnon() async {
+    dynamic result = await _authService.signInAnon();
+    if (result == null) {
+      setState(() {
+        loading = false;
+        error = 'Could not sign in';
+      });
+    }
+  }
 
-  // void saveTermsFunc(String msg) async{
-  //   print("loading terms from sign in....");
-  //   List<String> futureTerms = await findTermsDB();
-  //   saveTerms = futureTerms;
-  //   print("done loading... from sign in");
-  // }
+
+  void logIn() async{
+    // true - valid form. false - invalid form
+    if (_formKey.currentState.validate()){
+
+
+      dynamic result = await _authService.
+      signInUserWithEmailAndPassword(email, password);
+      print("result sign in $result");
+      if (result.runtimeType == String){
+        print("result is string");
+        setState(() {
+          loading = false;
+          error = 'Could not sign in\n${result.toString()}';
+        });
+        return;
+      }
+      if (_auth.currentUser.emailVerified){
+        if (mounted){
+          findTermsDB();
+          setState(() {
+            print("result verified");
+            // loading = true;
+          });
+        }
+      }else{
+        print("user signin is ${_auth.currentUser}");
+        setState(() {
+          loading = false;
+          error = 'Email not verified!';
+        });
+      }
+    }
+  }
 
 }

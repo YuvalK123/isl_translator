@@ -27,13 +27,14 @@ class UserModel {
   VideoType videoType;
   String videoTypeStr;
   Gender genderModel;
-  String ImgURL = "....";
+  final bool emailVerified;
   //
   // Gender get genderModel{
   //   return _gender;
   // }
 
-  UserModel({ this.uid, this.username, this.age, this.gender, this.videoType, this.videoTypeStr }){
+  UserModel({ this.uid, this.username, this.age, this.gender,
+    this.videoType, this.videoTypeStr, this.emailVerified }){
     this.videoType = this.videoTypeStr == VideoType.ANIMATION.toString() ? VideoType.ANIMATION : VideoType.LIVE;
     switch (gender){
       case 'f':
@@ -49,7 +50,9 @@ class UserModel {
 
   @override
   String toString(){
-    return "$uid, username: $username, age: ${age.toString()}, gender: $gender $genderModel} type: ${this.videoType.toString()}";
+    return "$uid, username: $username, age: ${age.toString()}, "
+        "gender: $gender $genderModel} type: ${this.videoType.toString()}, "
+        "emailVeified $emailVerified";
   }
 
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:isl_translator/models/pair.dart';
 import 'package:isl_translator/shared/reg.dart';
 import 'package:video_player/video_player.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -49,7 +50,7 @@ Future<void> findTermsDB() async{
 Future<void> addSavedExp(Reference item) async{
   String videoName = item.toString().substring(55,item.toString().length -5);
   if(videoName.split(" ").length > 1){
-    print("adding $videoName");
+    // print("adding $videoName");
     saveTerms.add(videoName);
   }
 }
@@ -111,9 +112,3 @@ List<String> splitSentence(String sentence) {
 }
 
 /* Create Tuple */
-class Pair<T1, T2> {
-  final T1 a;
-  final T2 b;
-
-  Pair(this.a, this.b);
-}

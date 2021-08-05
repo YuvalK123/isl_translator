@@ -2,29 +2,230 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/services/play_video.dart';
 import 'package:isl_translator/services/video_player.dart';
-
+import 'package:flutter/services.dart' show rootBundle;
 /*
 Subject class
 Each subject in the dict has a subject-dict of words that belong to this specific subject
 */
-class Subject extends StatefulWidget {
-  final String name;
 
-  Subject(this.name);
+List<String> geography = [
+  "תל אביב יפו",
+  "רמת גן",
+  "ירושלים",
+  "אילת",
+  "חיפה",
+  "כפר סבא",
+  "פתח תקווה",
+  "ראשון לציון",
+  "חדרה",
+  "רעננה",
+  "אשדוד",
+  "גבעתיים",
+  "דימונה",
+  "זיכרון יעקב",
+  "ראש העין",
+  "מודיעין",
+  "קיבוץ",
+  "מושב"
+];
+
+List<String> holidays = [
+  "חג",
+  "מנהג",
+  "ראש השנה",
+  "סוכות",
+  "חנוכה",
+  "פורים",
+  "פסח",
+  "יום העצמאות",
+  "לג בעומר"
+];
+
+List<String> times = [
+  "דקה",
+  "שנייה",
+  "בוקר",
+  "לפני הצהריים",
+  "צהריים",
+  "אחרי הצהריים",
+  "ערב",
+  "לילה",
+  "יום",
+  "אתמול",
+  "שלשום",
+  "היום",
+  "מחר",
+  "מחרתיים",
+  "שבוע",
+  "שבועיים",
+  "חודש",
+  "שנה",
+  "ינואר",
+  "פבואר",
+  "מארס",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+  "יום ראשון",
+  "יום שני",
+  "יום שלישי",
+  "יום רביעי",
+  "יום חמישי",
+  "יום שישי",
+  "יום שבת",
+  "מוצאי שבת",
+  "עכשיו"
+];
+
+List<String> animals = [
+  "דולפין",
+  "נמלה",
+  "קיפוד",
+  "נחש",
+  "צפרדע",
+  "חמור",
+  "סוס",
+  "ארנב",
+  "פרפר",
+  "שפן",
+  "דוב",
+  "אריה",
+  "נמר",
+  "זאב",
+  "תנין",
+  "לווייתן",
+  "ציפור",
+  "דבורה",
+  "זבוב",
+  "יתוש",
+  "ינשוף",
+  "תוכי",
+  "אייל",
+  "צבי",
+  "עכביש",
+  "טווס",
+  "פיל"
+];
+
+List<String> pronouns = [
+  "אותנו",
+  "היא",
+  "הוא",
+  "אותך",
+  "אתה",
+  "את",
+  "אותי",
+  "אני",
+  "לנו",
+  "הם",
+  "הן",
+  "שלכן",
+  "שלכם",
+  "שלנו",
+  "בשבילה",
+  "בשבילו",
+  "שלה",
+  "שלו",
+  "בשבילך",
+  "שלך",
+  "בשבילי",
+  "שלי",
+  "אותן",
+  "אותם",
+  "לך",
+  "לי",
+  "לה",
+  "לכם",
+  "זה",
+  "זאת",
+  "אנחנו"
+];
+
+List<String> shapes = [
+  "עיגול",
+  "ריבוע",
+  "מלבן",
+  "משולש",
+  "טרפז",
+  "מעוין",
+  "משושה",
+  "מעגל",
+  "צורה"
+];
+
+List<String>  body = [
+  "פנים",
+  "עיניים",
+  "אוזניים",
+  "אף",
+  "יד",
+  "רגל",
+  "סנטר",
+  "עורף",
+  "מרפק",
+  "מצח",
+  "גרון",
+  "שיניים",
+  "דם",
+  "כבד",
+  "כליות",
+  "ריאות",
+  "לב",
+  "עצם"
+];
+
+List<String> food = [
+  "כריך",
+  "קציצה",
+  "בורקס",
+  "עוגייה",
+  "פיצה",
+  "מרק",
+  "אורז",
+  "גלידה",
+  "מלח",
+  "פלפל שחור",
+  "בטטה",
+  "תפוח אדמה",
+  "עגבנייה",
+  "מלפפון",
+  "בננה",
+  "תפוח",
+  "אגס",
+  "שזיף",
+  "תאנה",
+  "לימון",
+  "סופגנייה",
+  "רימון",
+  "אוזן המן",
+  "מופלטה"
+];
+
+enum SubjectName{
+  ANIMALS, FOOD, BODY, SHAPES, TIMES, GEOG, PRONOUNS, HOLIDAYS
+}
+
+class Subject extends StatefulWidget {
+  final SubjectName subjectName;
+
+  Subject({this.subjectName});
 
   @override
   _SubjectState createState() => _SubjectState();
 }
 
 class _SubjectState extends State<Subject> {
-  VideoPlayerDemo videoPlayerDemo = VideoPlayerDemo(
-    key: Key("0"),
-    myUrls: [],
-  );
   List<String> myUrls;
   int ind = 1;
-  String subjectName;
+  SubjectName subjectName;
   String sentence;
+  String dictAssetsPath = "assets/dictionary/";
   VideoPlayer2 _videoFetcher = VideoPlayer2(
     key: UniqueKey(),
     sentence: null,
@@ -33,7 +234,7 @@ class _SubjectState extends State<Subject> {
   @override
   void initState() {
     super.initState();
-    subjectName = widget.name;
+    subjectName = widget.subjectName;
   }
 
   // Play videos function
@@ -52,233 +253,132 @@ class _SubjectState extends State<Subject> {
     }
   }
 
-  List<Card> _buildGridCards(BuildContext context) {
-    List<ButtonImage> products = [];
-    if (subjectName == "holidays") {
-      List names = [
-        "חג",
-        "מנהג",
-        "ראש השנה",
-        "סוכות",
-        "חנוכה",
-        "פורים",
-        "פסח",
-        "יום העצמאות",
-        "לג בעומר"
-      ];
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
-    } else if (subjectName == "pronoun") {
-      List names = [
-        "אותנו",
-        "היא",
-        "הוא",
-        "אותך",
-        "אתה",
-        "את",
-        "אותי",
-        "אני",
-        "לנו",
-        "הם",
-        "הן",
-        "שלכן",
-        "שלכם",
-        "שלנו",
-        "בשבילה",
-        "בשבילו",
-        "שלה",
-        "שלו",
-        "בשבילך",
-        "שלך",
-        "בשבילי",
-        "שלי",
-        "אותן",
-        "אותם",
-        "לך",
-        "לי",
-        "לה",
-        "לכם",
-        "זה",
-        "זאת",
-        "אנחנו"
-      ];
-
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
-    } else if (subjectName == "animals") {
-      List names = [
-        "דולפין",
-        "נמלה",
-        "קיפוד",
-        "נחש",
-        "צפרדע",
-        "חמור",
-        "סוס",
-        "ארנב",
-        "פרפר",
-        "שפן",
-        "דוב",
-        "אריה",
-        "נמר",
-        "זאב",
-        "תנין",
-        "לווייתן",
-        "ציפור",
-        "דבורה",
-        "זבוב",
-        "יתוש",
-        "ינשוף",
-        "תוכי",
-        "אייל",
-        "צבי",
-        "עכביש",
-        "טווס",
-        "פיל"
-      ];
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
-    } else if (subjectName == "shapes") {
-      List names = [
-        "עיגול",
-        "ריבוע",
-        "מלבן",
-        "משולש",
-        "טרפז",
-        "מעוין",
-        "משושה",
-        "מעגל",
-        "צורה"
-      ];
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
-    } else if (subjectName == "body") {
-      List names = [
-        "פנים",
-        "עיניים",
-        "אוזניים",
-        "אף",
-        "יד",
-        "רגל",
-        "סנטר",
-        "עורף",
-        "מרפק",
-        "מצח",
-        "גרון",
-        "שיניים",
-        "דם",
-        "כבד",
-        "כליות",
-        "ריאות",
-        "לב",
-        "עצם"
-      ];
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
-    } else if (subjectName == "time") {
-      List names = [
-        "דקה",
-        "שנייה",
-        "בוקר",
-        "לפני הצהריים",
-        "צהריים",
-        "אחרי הצהריים",
-        "ערב",
-        "לילה",
-        "יום",
-        "אתמול",
-        "שלשום",
-        "היום",
-        "מחר",
-        "מחרתיים",
-        "שבוע",
-        "שבועיים",
-        "חודש",
-        "שנה",
-        "ינואר",
-        "פבואר",
-        "מארס",
-        "אפריל",
-        "מאי",
-        "יוני",
-        "יולי",
-        "אוגוסט",
-        "ספטמבר",
-        "אוקטובר",
-        "נובמבר",
-        "דצמבר",
-        "יום ראשון",
-        "יום שני",
-        "יום שלישי",
-        "יום רביעי",
-        "יום חמישי",
-        "יום שישי",
-        "יום שבת",
-        "מוצאי שבת",
-        "עכשיו"
-      ];
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
-    } else if (subjectName == "geography") {
-      List names = [
-        "תל אביב יפו",
-        "רמת גן",
-        "ירושלים",
-        "אילת",
-        "חיפה",
-        "כפר סבא",
-        "פתח תקווה",
-        "ראשון לציון",
-        "חדרה",
-        "רעננה",
-        "אשדוד",
-        "גבעתיים",
-        "דימונה",
-        "זיכרון יעקב",
-        "ראש העין",
-        "מודיעין",
-        "קיבוץ",
-        "מושב"
-      ];
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
-    } else if (subjectName == "food") {
-      List names = [
-        "כריך",
-        "קציצה",
-        "בורקס",
-        "עוגייה",
-        "פיצה",
-        "מרק",
-        "אורז",
-        "גלידה",
-        "מלח",
-        "פלפל שחור",
-        "בטטה",
-        "תפוח אדמה",
-        "עגבנייה",
-        "מלפפון",
-        "בננה",
-        "תפוח",
-        "אגס",
-        "שזיף",
-        "תאנה",
-        "לימון",
-        "סופגנייה",
-        "רימון",
-        "אוזן המן",
-        "מופלטה"
-      ];
-      for (int i = 0; i < names.length; i++) {
-        products.add(new ButtonImage("", names[i], names[i]));
-      }
+  List<String> get names{
+    switch(this.subjectName){
+      case SubjectName.ANIMALS:
+        return animals;
+        break;
+      case SubjectName.FOOD:
+        return food;
+        break;
+      case SubjectName.BODY:
+        return body;
+        break;
+      case SubjectName.SHAPES:
+        return shapes;
+        break;
+      case SubjectName.TIMES:
+        return times;
+        break;
+      case SubjectName.GEOG:
+        return geography;
+        break;
+      case SubjectName.PRONOUNS:
+        return pronouns;
+        break;
+      case SubjectName.HOLIDAYS:
+        return holidays;
+        break;
     }
+    return null;
+  }
+
+  Future<List<String>> get namess async{
+    Function func = rootBundle.loadString;
+    // rootBundle.loadString('assets/dictionary/animals.txt')).split(",")
+    switch(this.subjectName){
+      case SubjectName.ANIMALS:
+        return (await func(this.dictAssetsPath + "animals.txt")).split(",");
+        break;
+      case SubjectName.FOOD:
+        return (await func(this.dictAssetsPath + "food.txt")).split(",");
+        // return food;
+        break;
+      case SubjectName.BODY:
+        return (await func(this.dictAssetsPath + "body.txt")).split(",");
+        // return body;
+        break;
+      case SubjectName.SHAPES:
+        return (await func(this.dictAssetsPath + "shapes.txt")).split(",");
+        // return shapes;
+        break;
+      case SubjectName.TIMES:
+        return (await func(this.dictAssetsPath + "times.txt")).split(",");
+        // return times;
+        break;
+      case SubjectName.GEOG:
+        return (await func(this.dictAssetsPath + "geography.txt")).split(",");
+        // return geography;
+        break;
+      case SubjectName.PRONOUNS:
+        return (await func(this.dictAssetsPath + "pronouns.txt")).split(",");
+        // return pronouns;
+        break;
+      case SubjectName.HOLIDAYS:
+        return (await func(this.dictAssetsPath + "holidays.txt")).split(",");
+        break;
+    }
+    return null;
+  }
+
+  void printBundle() async{
+    print("yoyo\n ${(await rootBundle.loadString('assets/dictionary/animals.txt')).split(",")}");
+  }
+
+  Future<List<Card>> _buildGridCards(BuildContext context) async{
+    List<ButtonImage> products = [];
+    List<String> subjects;
+    try{
+      subjects = await namess;
+    } catch (e){
+      print("err in dict is $e");
+      subjects = names;
+    }
+    // print(subjects.join(","));
+    // printBundle();
+    for (int i = 0; i < subjects.length; i++) {
+      products.add(new ButtonImage("", subjects[i], subjects[i]));
+    }
+    // if (subjectName == "holidays") {
+    //
+    //
+    // } else if (subjectName == "pronoun") {
+    //
+    //
+    //   for (int i = 0; i < names.length; i++) {
+    //     products.add(new ButtonImage("", names[i], names[i]));
+    //   }
+    // } else if (subjectName == "animals") {
+    //
+    //   for (int i = 0; i < names.length; i++) {
+    //     products.add(new ButtonImage("", names[i], names[i]));
+    //   }
+    // } else if (subjectName == "shapes") {
+    //
+    //   for (int i = 0; i < names.length; i++) {
+    //     products.add(new ButtonImage("", names[i], names[i]));
+    //   }
+    // } else if (subjectName == "body") {
+    //
+    //   for (int i = 0; i < names.length; i++) {
+    //     products.add(new ButtonImage("", names[i], names[i]));
+    //   }
+    // } else if (subjectName == "time") {
+    //
+    //   for (int i = 0; i < names.length; i++) {
+    //     products.add(new ButtonImage("", names[i], names[i]));
+    //   }
+    // } else if (subjectName == "geography") {
+    //
+    //   for (int i = 0; i < names.length; i++) {
+    //     products.add(new ButtonImage("", names[i], names[i]));
+    //   }
+    // } else if (subjectName == "food") {
+    //
+    //   for (int i = 0; i < names.length; i++) {
+    //     products.add(new ButtonImage("", names[i], names[i]));
+    //   }
+    // }
 
     if (products == null || products.isEmpty) {
       return const <Card>[];
@@ -394,12 +494,26 @@ class _SubjectState extends State<Subject> {
             )),
         backgroundColor: Colors.cyan[900],
       ),
-      body: GridView.count(
-          crossAxisCount: 3,
-          padding: EdgeInsets.all(16.0),
-          childAspectRatio: 8.0 / 9.0,
-          children: _buildGridCards(context) // Changed code
-          ),
+      body: FutureBuilder<List<Card>>(
+        future: _buildGridCards(context),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          List<Card> value;
+          if (snapshot.hasError || !snapshot.hasData){
+            value = <Card>[];
+          }
+          else if (snapshot.hasData){
+            value = snapshot.data;
+          }
+          return GridView.count(
+            crossAxisCount: 3,
+            padding: EdgeInsets.all(16.0),
+            childAspectRatio: 8.0 / 9.0,
+            children: value,
+
+            // children: _buildGridCards(context) // Changed code
+          );
+        },
+      ),
     );
   }
 }

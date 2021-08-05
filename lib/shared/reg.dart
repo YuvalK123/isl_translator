@@ -1,6 +1,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:isl_translator/models/pair.dart';
 import 'package:isl_translator/services/show_video.dart';
 
 
@@ -90,7 +91,12 @@ Map<String, String> hebrewChars = {
 
 
 Future<String> getNonPrepositional(String word, String dirName) async{
-  if (!prepositionalLetters.contains(word[0])){
+  if (!prepositionalLetters.contains(word[0])){ //||
+      // !prepositionalLetters.contains(word.substring(0,1))){
+    return null;
+  }
+  String subStr = word.substring(1);
+  if (subStr.length < 2){
     return null;
   }
   return await getUrl(word.substring(1), dirName);
@@ -452,6 +458,7 @@ List<String> patterns2Letters = [
   "..תם", // רצתם
   // "מ...{1,2}", // מפעל
   "..", // רץ
+  "ה..", // רץ
 ];
 
 Map<int, String> indexToInfti = {

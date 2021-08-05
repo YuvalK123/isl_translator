@@ -5,6 +5,7 @@ import 'package:isl_translator/screens/authenticate/authenticate.dart';
 
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:flutter/material.dart';
+import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,23 +16,43 @@ bool hasLoaded = false;
 
 class Wrapper extends StatelessWidget {
   final _auth = FirebaseAuth.instance;
+  final authService = AuthService();
+
+  // @override
+  // Widget build(BuildContext context) {
+  //   final user = Provider.of<UserModel>(context);
+  //   if (user != null && ((user.emailVerified || _auth.currentUser.isAnonymous))){
+  //     print("user not null from wrapper $user");
+  //     // if (user.emailVerified || _auth.currentUser.isAnonymous){
+  //       print("from _auth ${_auth.currentUser}");
+  //       // print("good save terms!!!!");
+  //       return TranslationWrapper();
+  //   }
+  //   return Authenticate();
+  // }
 
   @override
   Widget build(BuildContext context) {
     final user = Provider.of<UserModel>(context);
-    print("user wrapper $user");
-    // print("user data is ${DatabaseUserService(uid: user.uid).users}");
-    // return either home or authenticate widget
-    // if (user != null){
-    //   if (_auth.currentUser.emailVerified)
-    // }
-    if (user != null && (_auth.currentUser.emailVerified || _auth.currentUser.isAnonymous)){
-      //saveTermsForShow();
-      // Worker();
-      print("good save terms!!!!");
-      return TranslationWrapper();
-    }
-    return Authenticate();
+    return StreamBuilder<UserModel>(
+      stream: authService.user,
+        builder: (BuildContext context, AsyncSnapshot snapShot) {
+          // if (!snapShot.hasData || snapShot.hasError){
+          //   return Authenticate();
+          // }
+          if (snapShot.hasData && (!snapShot.hasError)) {
+            UserModel currUser = snapShot.data;
+            print("currUser $currUser");
+            print("_auth.currentUser ${_auth.currentUser}");
+            if (currUser != null &&
+                (currUser.emailVerified || _auth.currentUser.isAnonymous)) {
+              print("yay!");
+              return TranslationWrapper();
+            }
+          }
+          return Authenticate();;
+        }
+    );
   }
 
   Future<void> saveTermsForShow() async{
@@ -42,52 +63,5 @@ class Wrapper extends StatelessWidget {
     // saveTerms = futureTerms;
     hasLoaded = true;
     print("finish saved terms");
-  }
-}
-
-class Worker {
-  SendPort _sendPort;
-  Isolate _isolate;
-  final _isolateReady = Completer<void>();
-
-  Worker() {
-    init();
-  }
-
-  Future<void> init() async {
-    final recievePort = ReceivePort();
-    recievePort.listen((dynamic message) {
-      if (message is SendPort) {
-        print("hi");
-        _isolateReady.complete();
-        return;
-      }
-      if (message is List<String>) {
-        print("Bye");
-        saveTerms = message;
-        _isolateReady.complete();
-        return;
-      }
-    });
-    final isolate = await Isolate.spawn(_isolateEntry, recievePort.sendPort);
-  }
-
-  Future<void> get isolateReady => _isolateReady.future;
-
-  void dispose() {
-    _isolate.kill();
-  }
-
-  static Future<void> _isolateEntry(dynamic message) async {
-    print("loading.......");
-    SendPort sendPort;
-    // recievePort is what im listening to
-    // sendPort is what we use to send to the recieve
-
-    // List<String> futureTerms = await findTermsDB();
-    // saveTerms = futureTerms;
-    sendPort = message;
-    //msg.send(saveTerms);
-    print("done saveTerms!");
   }
 }
