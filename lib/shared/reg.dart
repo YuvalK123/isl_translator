@@ -374,7 +374,6 @@ Future<String> checkGenderCase(String word, String dirName) async{
     if (singular.length > 1){
       singularVersions.add(singular);
     }
-    // var url = await findUrlInList(singularVersions, dirName);
     var url = await parallelFindUrlInList(singularVersions, dirName);
     if (url != null){
       return url;

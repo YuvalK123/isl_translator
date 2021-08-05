@@ -1,6 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
 import 'dart:async';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isl_translator/models/pair.dart';
 import 'package:isl_translator/shared/reg.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -34,13 +35,28 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
 /// Find all the terms in DB
 /// terms are phrases of 2+ words
 Future<void> findTermsDB() async{
+  saveTerms.clear();
   var futures = <Future>[];
+  final uid = FirebaseAuth.instance.currentUser.uid;
+  String personalDirName = "animation_openpose/$uid/";
   await FirebaseStorage.instance.ref().child("animation_openpose/").listAll().then((result) {
     var items = result.items;
     for (int i=0; i< items.length; i++){
       futures.add(addSavedExp(items[i]));
     }
   });
+  // perosnal folder
+  try{
+    await FirebaseStorage.instance.ref().child(personalDirName).listAll().then((result) {
+      var items = result.items;
+      for (int i=0; i< items.length; i++){
+        futures.add(addSavedExp(items[i]));
+      }
+    });
+  } catch (e){
+    print("not personal folder\n $e");
+  }
+
   return await Future.wait(futures);
 }
 
