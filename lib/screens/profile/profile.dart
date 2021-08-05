@@ -29,7 +29,6 @@ class MapScreenState extends State<ProfilePage>
   bool wrongOldPass = false;
   Gender _character = Gender.FEMALE;
   UserModel currUserModel;
-  bool showInternetAlert = false;
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
@@ -644,7 +643,7 @@ class MapScreenState extends State<ProfilePage>
                       // Container(
                       //showAlert(context);
                       //Container(),
-                      //showInternetAlert ? InternetAlertDialogue() : Container()
+                      // showInternetAlert ? InternetAlertDialogue() : Container()
                       // ),
                     ],
                   ),
@@ -681,6 +680,7 @@ class MapScreenState extends State<ProfilePage>
                   try{
                     saveData();
                   } on io.SocketException catch (err){
+                    // showInternetAlert(context);
                     print("not internet");
                   }
                   catch(e){
