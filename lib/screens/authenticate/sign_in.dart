@@ -55,35 +55,26 @@ class _SignInState extends State<SignIn> {
             key: _formKey,
             child: Column(
               children: <Widget> [
-                //SizedBox(height: 20.0,),
-                //Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
+                SizedBox(height: 20.0,),
                 Container(
                   alignment: Alignment.topRight,
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
-                    child: Expanded(
                       child: Row(
                         children: [
                           Expanded(child: Image.asset("assets/images/sign_in_flag1.jpg", width: 200, height: 70,)),
-
-                          //Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
                           //SizedBox(width: 10.0,),
                           Container(
                             alignment: Alignment.topRight,
                               child: Text("ברוך הבא", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
-                          //SizedBox(width: 10.0,),
-
-                          //Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
                         ],
                       ),
                     ),
                   ),
-                ),
                 SizedBox(height: 40.0,),
                 Container(
                     alignment: Alignment.topRight,
                     child: Text("התחבר/י למשתמש שלך", style: TextStyle(fontWeight: FontWeight.bold, fontSize:20,fontStyle: FontStyle.italic),)),
-                //Image.asset("assets/images/colorful_hand.jfif", width: 100, height: 100,),
                 SizedBox(height: 20.0,),
                 TextFormField(
                   textDirection: TextDirection.rtl,
@@ -173,8 +164,6 @@ class _SignInState extends State<SignIn> {
 
                 SizedBox(height: 12.0,),
                 Text(error, style: TextStyle(color: Colors.blue, fontSize: 14.0),),
-                //Image.asset("assets/images/sign_in_flag1.jpg", width: 1000, height: 150,),
-                //SizedBox(height: 150.0,),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0,10,0,0),
                   child: Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
