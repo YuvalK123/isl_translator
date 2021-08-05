@@ -30,10 +30,13 @@ class _AddVideoPageState extends State<AddVideoPage> {
   @override
   void initState() {
     super.initState();
+
+    // setting the screen orientation to landscape
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.landscapeLeft,
       DeviceOrientation.landscapeRight,
     ]);
+
     availableCameras().then((availableCameras) {
       cameras = availableCameras;
 
@@ -58,7 +61,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     super.dispose();
   }
 
-
+  /// Initializing camera controller
   Future initController(CameraDescription description) async {
     if (controller != null) {
       await controller.dispose();
@@ -87,7 +90,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     }
   }
 
-  // Display camera preview
+  /// Display camera preview
   Widget cameraPreviewWidget() {
     if (controller == null || !controller.value.isInitialized) {
       return const Text(
@@ -108,7 +111,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     );
   }
 
-  // Display control bar
+  /// Display control bar
   Widget cameraControlWidget(context) {
     return Expanded(
         child: Align(
@@ -137,6 +140,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
     );
   }
 
+  /// The camera picker widget
   Widget cameraToggleRowWidget(){
     if (cameras == null || cameras.isEmpty){
       return Spacer();
@@ -162,6 +166,7 @@ class _AddVideoPageState extends State<AddVideoPage> {
       ),
     );
   }
+
 
   Widget timing(BuildContext context){
     return Expanded(
