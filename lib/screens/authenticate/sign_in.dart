@@ -65,15 +65,9 @@ class _SignInState extends State<SignIn> {
                     child: Row(
                       children: [
                         Expanded(child: Image.asset("assets/images/sign_in_flag1.jpg", width: 200, height: 70,)),
-
-                        //Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
-                        //SizedBox(width: 10.0,),
                         Container(
                           alignment: Alignment.topRight,
                             child: Text("ברוך הבא", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
-                        //SizedBox(width: 10.0,),
-
-                        //Expanded(child: Image.asset("assets/images/colorful_hand.jfif", width: 80, height: 80,)),
                       ],
                     ),
                   ),
@@ -82,7 +76,6 @@ class _SignInState extends State<SignIn> {
                 Container(
                     alignment: Alignment.topRight,
                     child: Text("התחבר/י למשתמש שלך", style: TextStyle(fontWeight: FontWeight.bold, fontSize:20,fontStyle: FontStyle.italic),)),
-                //Image.asset("assets/images/colorful_hand.jfif", width: 100, height: 100,),
                 SizedBox(height: 20.0,),
                 TextFormField(
                   textDirection: TextDirection.rtl,
