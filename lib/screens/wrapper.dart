@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/authenticate/authenticate.dart';
+import 'package:isl_translator/screens/authenticate/sign_in.dart';
 
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:flutter/material.dart';
@@ -14,54 +15,30 @@ import 'dart:isolate';
 
 bool hasLoaded = false;
 
-class Wrapper extends StatelessWidget {
-  final _auth = FirebaseAuth.instance;
-  final authService = AuthService();
+class Wrapper extends StatefulWidget {
+  @override
+  State<Wrapper> createState() => _WrapperState();
+}
 
-  // @override
-  // Widget build(BuildContext context) {
-  //   final user = Provider.of<UserModel>(context);
-  //   if (user != null && ((user.emailVerified || _auth.currentUser.isAnonymous))){
-  //     print("user not null from wrapper $user");
-  //     // if (user.emailVerified || _auth.currentUser.isAnonymous){
-  //       print("from _auth ${_auth.currentUser}");
-  //       // print("good save terms!!!!");
-  //       return TranslationWrapper();
-  //   }
-  //   return Authenticate();
-  // }
+class _WrapperState extends State<Wrapper> {
+  final _auth = FirebaseAuth.instance;
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserModel>(context);
-    return StreamBuilder<UserModel>(
-      stream: authService.user,
-        builder: (BuildContext context, AsyncSnapshot snapShot) {
-          // if (!snapShot.hasData || snapShot.hasError){
-          //   return Authenticate();
-          // }
-          if (snapShot.hasData && (!snapShot.hasError)) {
-            UserModel currUser = snapShot.data;
-            print("currUser $currUser");
-            print("_auth.currentUser ${_auth.currentUser}");
-            if (currUser != null &&
-                (currUser.emailVerified || _auth.currentUser.isAnonymous)) {
-              print("yay!");
-              return TranslationWrapper();
-            }
-          }
-          return Authenticate();;
-        }
-    );
+    final user = Provider.of<User>(context);
+    print("user from wrapper $user");
+    bool cond = (user != null && ((user.emailVerified || _auth.currentUser.isAnonymous)));
+    // if (user != null && ((user.emailVerified || _auth.currentUser.isAnonymous))){
+    //   print("user not null from wrapper $user");
+    //   // if (user.emailVerified || _auth.currentUser.isAnonymous){
+    //     print("from _auth ${_auth.currentUser}");
+    //     // print("good save terms!!!!");
+    //   setState(() {
+    //
+    //   });
+    //     return TranslationWrapper();
+    // }
+    return cond ? TranslationWrapper() : Authenticate();
   }
 
-  Future<void> saveTermsForShow() async{
-    if (hasLoaded){
-      return;
-    }
-    // List<String> futureTerms = await findTermsDB();
-    // saveTerms = futureTerms;
-    hasLoaded = true;
-    print("finish saved terms");
-  }
 }

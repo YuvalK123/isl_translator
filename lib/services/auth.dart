@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/models/user.dart';
+import 'package:isl_translator/screens/authenticate/authenticate.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/material.dart';
 import 'database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -16,8 +19,14 @@ class AuthService {
   }
 
   // auth change user stream
-  Stream<UserModel> get user async*{
-    yield* _auth.authStateChanges().map(_userFromFirebase);
+  Stream<User> get user{
+    return _auth.authStateChanges();//.map(_userFromFirebase);
+    // .map((FirebaseUser user) => _userFromFirebase(user));
+  }
+
+  // auth change user stream
+  Future<UserModel> get userAsync{
+    return _auth.authStateChanges().map(_userFromFirebase).first;
     // .map((FirebaseUser user) => _userFromFirebase(user));
   }
 
@@ -74,17 +83,23 @@ class AuthService {
   }
 
   // sign out
-  Future signOut() async {
+  Future signOut(BuildContext context) async {
     try{
       if (_auth.currentUser.isAnonymous){
         await _auth.currentUser.delete();
       }
-      return await _auth.signOut();
+      await _auth.signOut();
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+        builder: (context) => Authenticate(),
+      ));
+
     }
     catch(e){
       print(e.toString());
 
     }
+
   }
+
 
 }

@@ -163,7 +163,7 @@ class MainDrawer extends StatelessWidget {
                   title: "התנתק/י",
                   onTap: () async {
                     // Navigator.of(context).pop();
-                    await auth.signOut();
+                    await auth.signOut(context);
                   },
                   icon: Icon(Icons.logout),
                 isCurrPage: false,

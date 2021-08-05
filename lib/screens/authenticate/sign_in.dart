@@ -1,16 +1,16 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
 import 'package:isl_translator/services/auth.dart';
 import 'package:isl_translator/services/show_video.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
-import 'dart:isolate';
 
 class SignIn extends StatefulWidget {
 
   final Function toggleView;
-
+  static final AuthService authService = AuthService();
   SignIn({ this.toggleView });
 
   @override
@@ -19,7 +19,7 @@ class SignIn extends StatefulWidget {
 
 class _SignInState extends State<SignIn> {
 
-  final AuthService _authService = AuthService();
+  final AuthService _authService = SignIn.authService;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
   FirebaseAuth _auth = FirebaseAuth.instance;
@@ -144,7 +144,13 @@ class _SignInState extends State<SignIn> {
         loading = false;
         error = 'Could not sign in';
       });
+      return;
     }
+    Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => TranslationWrapper(),
+        )
+    );
   }
 
 
@@ -171,6 +177,11 @@ class _SignInState extends State<SignIn> {
             print("result verified");
             // loading = true;
           });
+          Navigator.of(context).pushReplacement(
+              MaterialPageRoute(
+                builder: (context) => TranslationWrapper(),
+              )
+          );
         }
       }else{
         print("user signin is ${_auth.currentUser}");
