@@ -1,12 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:isl_translator/services/play_video.dart';
-import 'package:isl_translator/services/video_player.dart';
 import 'package:flutter/services.dart' show rootBundle;
-/*
-Subject class
-Each subject in the dict has a subject-dict of words that belong to this specific subject
-*/
+import 'package:isl_translator/services/video_player.dart';
 
 List<String> geography = [
   "תל אביב יפו",
@@ -207,10 +202,13 @@ List<String> food = [
   "מופלטה"
 ];
 
+/// Subjects Name
 enum SubjectName{
   ANIMALS, FOOD, BODY, SHAPES, TIMES, GEOG, PRONOUNS, HOLIDAYS
 }
 
+/// Subject class
+/// Each subject in the dict has a subject-dict of words that belong to this specific subject
 class Subject extends StatefulWidget {
   final SubjectName subjectName;
 
@@ -518,13 +516,10 @@ class _SubjectState extends State<Subject> {
   }
 }
 
-/*
-ButtonImage class
-Each button image contain:
-- name
-- text to display below to image
-- onTap variable that define which page to open when tapping
-*/
+/// ButtonImage class
+///
+/// Each button image contain: name, text to display below the image,
+/// onTap variable that define which page to open when tapping
 class ButtonImage {
   String name;
   String text;

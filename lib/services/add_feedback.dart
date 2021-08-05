@@ -3,31 +3,30 @@ import 'package:isl_translator/services/database_feedback.dart';
 import 'package:quick_feedback/quick_feedback.dart';
 import 'package:flutter/material.dart';
 
+/// Feedback UI
 void showFeedback(context,inputSentence) {
   showDialog(
     context: context,
     builder: (context) {
       return QuickFeedback(
-          title: '?איך היה התרגום', // Title of dialog
-          showTextBox: true, // default false
+          title: '?איך היה התרגום', /// Title of dialog
+          showTextBox: true,
           textBoxHint:
-          'שתפ/י אותנו עוד', // Feedback text field hint text default: Tell us more
-          submitText: 'שלח', // submit button text default: SUBMIT
+          'שתפ/י אותנו עוד', /// Feedback text field hint text default
+          submitText: 'שלח', /// Submit button
           onSubmitCallback: (feedback) {
-            print('$feedback');
             addFeedback(feedback['rating'],feedback['feedback'],inputSentence);
             Navigator.of(context).pop();
           },
           askLaterText: 'ביטול',
           onAskLaterCallback: () {
-            print('Do something on ask later click');
-            //Navigator.of(context).pop();
           }
       );
     },
   );
 }
 
+/// Gets sentence, rating and free text and Add the feedback to the firebase
 Future addFeedback(int newRating, String newText, String newSentence) async{
   FirebaseAuth auth = FirebaseAuth.instance;
   String id = auth.currentUser.uid;
