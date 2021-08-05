@@ -1,8 +1,9 @@
+// ignore_for_file: deprecated_member_use
+
 import 'dart:async';
 import 'dart:io' as io;
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:isl_translator/services/video_cache.dart';
 import 'package:isl_translator/shared/loading.dart';
 import 'package:video_player/video_player.dart';
 import 'package:mutex/mutex.dart';
@@ -27,17 +28,12 @@ class VideoPlayer2 extends StatefulWidget {
 
 class _VideoPlayer2State extends State<VideoPlayer2> {
   int index = 0;
-  double _position = 0;
-  double _buffer = 0;
   bool _lock = true;
-  Map<int, bool> _locks;
-  bool _isReady = false;
   bool isDone = false;
   Map<String, VideoPlayerController> _controllers = {};
   Map<String, bool> isInit = {};
   Map<int, bool> isInitSuccess = {};
   Map<int, VoidCallback> _listeners = {};
-  Set<String> _urls;
   Color borderColor = Colors.transparent;
   Mutex _mutex = Mutex();
   double aspectRatio;
@@ -46,10 +42,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   bool isAnimation = true;
   String dirName = "animation_openpose/";
   UserModel currUserModel;
-  FirebaseAuth _auth = FirebaseAuth.instance;
-  // bool isReplay = false;
   bool isPause = false;
-  // bool isPlay = false;
 
   String getKey(Map map, dynamic key){
     return map[index] + index.toString();
@@ -96,7 +89,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       if (mounted){
         setState(() {
           this.aspectRatio = _controller(0) != null ? _controller(0).value.aspectRatio : 1;
-          this._isReady = true;
           this.borderColor = Colors.black;
         });
       }
@@ -125,16 +117,16 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       int dur = controller.value.duration.inMilliseconds;
       int pos = controller.value.position.inMilliseconds;
 
-      int buf = controller.value.buffered[controller.value.buffered.length-1].end.inMilliseconds;
+      // int buf = controller.value.buffered[controller.value.buffered.length-1].end.inMilliseconds;
       // int buf = controller.value.buffered.last.end.inMilliseconds;
 
       setState(() {
         if (dur <= pos) {
-          _position = 0;
+        //   _position = 0;
           return;
         }
-        _position = pos / dur;
-        _buffer = buf / dur;
+        // _position = pos / dur;
+        // _buffer = buf / dur;
       });
       if (dur - pos < 1) {
         if (index < this._videoFetcher.indexToUrlNew.length - 1) {
@@ -179,62 +171,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     return controller;
   }
 
-
-  Future<void> _initController2(int index) async {
-    String title = this._videoFetcher.indexToWordNew[index];
-
-    var myUrls = this._videoFetcher.urls;
-    // urlss = this._videoFetcher.indexToUrl;
-    String url = this._videoFetcher.indexToUrlNew[index];
-    print("url for $index is $url . word is ${this._videoFetcher.indexToWordNew[index]}");
-    VideoPlayerController controller;
-    if (url.startsWith("#")){ // letter
-      var file = await VideoFetcher.lruCache.fetchVideoFile(title, this.dirName.contains("animation"), "#");
-      print("file from fetching for # is $file");
-      print("letter!");
-      if(VideoFetcher.lettersCachePath == null){
-        String folderName;
-        if (this.dirName.contains("animation")){
-          folderName = LruCache().cacheLettersFolders["animation"];
-        }else{
-          folderName = LruCache().cacheLettersFolders["live"];
-        }
-        String newPath = await VideoFetcher.lruCache.createLettersCachePath(folderName);
-      }
-      url = url.replaceFirst("#", VideoFetcher.lettersCachePath);
-      print("loading from file $url");
-      controller = VideoPlayerController.file(io.File(url));
-    }
-    else if (url.startsWith("&&")){
-      var file = await VideoFetcher.lruCache.fetchVideoFile(title, this.dirName.contains("animation"), "&&");
-      controller = VideoPlayerController.file(file);
-      // print("file from fetching for && is $file");
-      // print("saved file!");
-      // String folderName = this.dirName.contains("animation") ?
-      //   LruCache().cacheFolders["animation"] :
-      //   LruCache().cacheFolders["live"];
-      // url = url.replaceFirst("&&", VideoFetcher.lettersCachePath);
-      // print("loading from file $url");
-      // controller = VideoPlayerController.file(io.File(url));
-    }
-    else{
-      print("not letter or saved file!");
-      controller = await _getController(index);
-    }
-    if (controller == null){
-      print("got null for controller!");
-      controller = VideoPlayerController.network(url);
-    }
-    print("init controller index is $index");
-    isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()] = false;
-
-    controller.setVolume(0.0);
-    _controllers[this._videoFetcher.indexToUrlNew[index] + index.toString()] = controller;
-
-    await controller.initialize();
-    isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()] = true;
-    print("finished $index init");
-  }
 
   Future<void> _initController(int index) async {
     if (!mounted){
@@ -342,7 +278,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       //   }
       if (mounted) {
         setState(() {
-          this._isReady = true;
         });
       }
       // Future<void> future =  _controller(index).play();
@@ -649,7 +584,6 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
         isPause = false;
         this.isDone = false;
         this.aspectRatio = _controller(0).value.aspectRatio;
-        this._isReady = true;
         this.borderColor = Colors.black;
       });
 

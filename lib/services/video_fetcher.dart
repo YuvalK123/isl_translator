@@ -157,7 +157,6 @@ class VideoFetcher {
     List<String> urls = [];
     int j = 0,
         k = 0;
-    Map<String, List<String>> urlsWords = {};
     Map<String, List<String>> urlsWordsList = {};
 
     Map<String, int> indicesMap = {"indexToUrl": j, "indexToWord": k};
