@@ -6,19 +6,13 @@ import 'package:isl_translator/screens/wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:isl_translator/services/handle_sentence.dart';
 
-int i = 0;
-bool isLoading = true;
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   final user = FirebaseAuth.instance.currentUser;
   runApp(MyApp());
-  if (user != null && user.uid != null){
+  if (user != null && user.uid != null && !user.emailVerified){
     await findTermsDB();
-    isLoading = false;
-  }else{
-    print("fail");
   }
 }
 
