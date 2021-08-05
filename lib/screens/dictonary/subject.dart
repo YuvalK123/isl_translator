@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:isl_translator/services/video_player.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:isl_translator/services/video_player.dart';
 
 List<String> geography = [
   "תל אביב יפו",
