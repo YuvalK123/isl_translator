@@ -8,28 +8,21 @@ import 'package:firebase_auth/firebase_auth.dart';
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  // create user based on firebase user
+  /// create [user] based on firebase user
   UserModel _userFromFirebase(User user){
-    // var dbs = DatabaseUserService(uid: user.uid);
     return user != null ? UserModel(
       uid: user.uid,
         emailVerified: user.emailVerified
     ) : null ;
   }
 
-  // auth change user stream
+  /// auth change user stream
   Stream<User> get user{
-    return _auth.authStateChanges();//.map(_userFromFirebase);
-    // .map((FirebaseUser user) => _userFromFirebase(user));
+    return _auth.authStateChanges();
   }
 
-  // auth change user stream
-  Future<UserModel> get userAsync{
-    return _auth.authStateChanges().map(_userFromFirebase).first;
-    // .map((FirebaseUser user) => _userFromFirebase(user));
-  }
 
-  // sign in anon
+  /// sign in anon
   Future signInAnon() async {
     try{
       // user object
@@ -43,24 +36,20 @@ class AuthService {
     }
   }
 
-  // sign in with email and password
+  /// sign in with [email] and [password]
   Future signInUserWithEmailAndPassword(String email, String password) async{
-    print("email $email pass $password auth $_auth");
     try{
       UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email.replaceAll(' ', ''), password: password
       );
-      print("sign in result $result");
       User user = result.user;
-      print("user from auth sign in $user");
       return _userFromFirebase(user);
     }catch(e){
-      print("sign in err ${e.toString()}");
       return e.toString().split("]")[1].replaceFirst(' ', '');
     }
   }
 
-  // register with email & password
+  /// register with [email] & [password]
   Future registerUserWithEmailAndPassword(String email, String password) async{
     try{
       UserCredential result = await _auth.createUserWithEmailAndPassword(
@@ -70,7 +59,7 @@ class AuthService {
       // create a new document for the user with the uid
       await DatabaseUserService(uid: user.uid).updateUserData(
         username: "new user",
-        gender: 'f',
+        gender: 'f', // default value
       );
       return _userFromFirebase(user);
     }catch(e){
@@ -79,7 +68,7 @@ class AuthService {
     }
   }
 
-  // sign out
+  /// sign out
   Future signOut(BuildContext context) async {
     try{
       if (_auth.currentUser.isAnonymous){
@@ -95,8 +84,6 @@ class AuthService {
       print(e.toString());
 
     }
-
   }
-
 
 }

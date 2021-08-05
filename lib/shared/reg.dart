@@ -1,62 +1,11 @@
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/models/pair.dart';
 
 
-List<String> infinitivess = [
-  "להדיח", "לסלק", "להדיח כלים", "להעתיק",  "לסתום", "לצבוע",
-  "לפתוח דלת", "לרתוח", "לדעת", "להיכשל בבחינה", "לפתוח", "להטיל ספק",
-  "לפתוח חלון", "לעקור שן", "לפרוץ בבכי", "לעקור", "לרכוב",
-  "לרכוב על אופניים", "לרכוב על סוס", "לפתוח תיק", "למעוך אוכל", "למעוך",
-  "לעקור צמח", "לרחוץ בעל חיים", "לרחוץ", "לנקד", "לסרב", "לצחצח נעליים",
-  "לצחצח שיניים", "לנעוץ", "להבריק", "לצחצח", "לקצר", "להתרחץ", "להסתפר",
-  "להתאבד", "לעלות", "לעלות במדרגות", "לקטוף פרי", "לקטוף",
-  "לגדוע", "לעלות במדרגות נעות", "לכרות", "לנפח", "לקטוע", "לנפח גלגל",
-  "לעלות במעלית", "לאהוב", "לאהוב משהו", "לבקר", "לימוד", "להדליק טלוויזיה",
-  "להדליק מדורה", "להדליק אור", "להדליק", "להדליק גפרור", "להתחנן",
-  "לתפוס בשעת מעשה", "לברור", "לישון", "לכבות מדורה", "להשתיק", "להתנחל",
-  "לכבות שריפה", "להשתמש", "לכבות גפרור", "לדחות", "לכבות", "לטייל",
-  "להסתובב", "לכבות את האור", "לטעון",  "לפחד",
-  "למשוך", "לחסום", "לקרוא", "לרוץ", "לקום", "לנתק", "לי", "להבטיח", "לשיר",
-  "לעשות", "לצחוק", "לטוס", "לקלף", "לשבוע", "להיפרד", "להיפרד לשלום",
-  "לבגוד", "להחליף", "לבגוד במדינה", "לטפל", "לסדר", "לארגן", "להחליט",
-  "לנום", "להיכנס", "להתחיל", "לדרוך", "להשקיט", "לרמוס", "לנוח", "להגר",
-  "למיין", "לעזוב את הארץ", "לתפוס על חם", "לבזבז", "לחשוב", "לתפוס",
-  "לקלוט", "לגלח", "לעטוף", "לרקוד", "לגהץ", "לטרוף", "לנבוח", "לשלם",
-  "לתמוך", "להתאכזב", "לחייך", "להאמין", "להזיע", "לבכות", "ליפול", "לבוא",
-  "להמציא", "להצטבר", "לפטפט", "לשדרג", "להשפיע", "להיכשל", "לעודד",
-  "להכין", "להשקיף", "לראות", "לפייס", "להזמין", "להצטרף", "להרביץ",
-  "לנצל", "לשמוע", "לך", "לברוא", "לסבול", "לרכז", "להצליח", "לקשט",
-  "לפסול",  "לשכנע", "לשים לב", "לברך", "להתפלל",
-   "להמיר",  "ללמוד",  "לשתות", "לנגוס", "ללגום",
-  "למזוג",  "לאחל", "ללמד", "ללכת", "לצאת", "ללכת ברגל",
-  "לתקוע בשופר", "לדבר", "לסרוג", "לצלול", "לקחת", "לשכוח", "לחתור", "לבקש", "להיזהר",
-  "לשאול", "לקנות", "להילחם", "להסתכל סביב", "להתפטר", "לנאום", "לקפל", "לפטר", "לבדוק", "לשטוף", "להיכנע",
-  "להמריא", "לתת", "להשתעל", "לנמנם", "לנחם", "לסמוך", "לחשוד", "לברוח", "להפריד", "לטפס",
-  "להתעורר", "לרחם", "לחפש", "להפריע", "ללוות", "לצפות", "ללוש", "לבטל", "לגרש", "לדקור", "לזרוק", "להתרגש",
-  "לשנוא", "להתנגד", "לטבול", "לזרוע", "לחנוק", "לרשום", "להפסיד", "להחזיר", "להטעין", "לזלזל", "למרוח",
-  "לכעוס", "לאסוף", "להשתדל", "להתפלא", "להעביר", "לנגוע", "למצוא", "לערבב", "להתקרב", "להוציא", "למהר", "להפוך",
-  "לעזוב", "לסגור", "לגעור", "להכניס", "להתלונן", "לשלוח", "לנדוד", "לצוות", "להתרכז", "לזעום", "להסכים", "להגיע",
-  "לשבת", "ללטף", "לשכב", "להתחרט", "לחגוג", "להגיד", "לאכול", "לבלוע", "להירדם", "לדרוש", "לשאוב", "לדרוס",
-  "לעבוד", "לנגב",  "להצטער", "להתקשר", "לירות", "לחתוך", "ללעוג", "לשחק", "להודיע", "להיבהל",
-  "למכור", "לקבל", "ללבוש", "לצייר", "להחליק", "לצעוק", "להקים", "להתבייש", "לשמור", "להרוג", "להשתתף", "לעזור",
-  "לנסות", "לחטוף", "להתחשב",
-  "להיעלב", "לחלות", "לפגוש", "להריח", "לחזור", "לשים", "לבחור", "להוסיף", "לגזור", "לעמוד", "לנחות",
-  "לעצור", "להקשיב", "להתחייב", "להתלבט", "לכם", "לעקוץ", "לכתוב", "לזכור", "לנסוע", "לרצות", "לא מבין",
-  "לא מכיר", "להחזיק", "להכיר", "לרדוף", "לפזר", "לקפוץ", "לנחש", "להרגיש",
-  "להיפגע", "לחבב", "להבין", "להביא", "לאפות", "לקבוע", "להתעמל"
-];
-
 List<String> prepositionalLetters = ["כש","וה","ב","כ","מ","ל", "ו", "ה", "ש"];
 List<String> prepositionalWords = ["של", "את"];
 
-List<String> endingRelative = ["","","","","",""];
-
-Map<String, String> endings = {
-  "ת": "ה",
-};
-String nonAsciiChar = "[^\x00-\x7F]";
 
 Map<String, String> hebrewChars = {
   "א" : "U+05D0",
@@ -89,6 +38,7 @@ Map<String, String> hebrewChars = {
 };
 
 
+/// check if [word] has a starting letter/s in [dirname]
 Future<String> getNonPrepositional(String word, String dirName) async{
   if (!prepositionalLetters.contains(word[0])){ //||
       // !prepositionalLetters.contains(word.substring(0,1))){
@@ -98,12 +48,13 @@ Future<String> getNonPrepositional(String word, String dirName) async{
   if (subStr.length < 2){
     return null;
   }
+  // return await VideoFetcher.getUrl(word.substring(1), dirName);
   return await getUrl(word.substring(1), dirName);
 }
 
 
 
-
+/// to delete
 Future<String> getUrl(String word,String dirName) async{
   String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
   Reference ref = FirebaseStorage.instance
@@ -129,35 +80,12 @@ Future<String> getUrl(String word,String dirName) async{
   }
 }
 
-Future<String> parallelGetUrl(String word,String dirName) async{
-  String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
-  Reference ref = FirebaseStorage.instance
-      .ref()
-      .child("$dirName" + word + "$exec");
-  try {
-    // gets the video's url
-    var url = await ref.getDownloadURL();
-    return url;
-  } catch (err) { // no url
-    // check if exist in personal videos
-    var _auth = FirebaseAuth.instance;
-    Reference ref = FirebaseStorage.instance
-        .ref()
-        .child("$dirName" + _auth.currentUser.uid + "/" + word + "$exec");
-    try {
-      // gets the video's url
-      var url = await ref.getDownloadURL();
-      return url;
-    } catch (err2) {
-      return null;
-    }
-  }
-}
-
+/// check for list of [initiatives] parallel if in [dirname]
+/// and if it is, return the url
 Future<String> parallelCheckForUrl(List<String> initiatives, String dirName) async{
   List<Future<String>> futures = <Future<String>>[];
   for (var initi in initiatives){
-    futures.add(parallelGetUrl(initi, dirName));
+    futures.add(getUrl(initi, dirName));
   }
   List<String> results = await Future.wait(futures);
   for (String url in results){
@@ -168,47 +96,24 @@ Future<String> parallelCheckForUrl(List<String> initiatives, String dirName) asy
   return null;
 }
 
-Future<String> checkForUrl(List<String> initiatives, String dirName) async{
-  List<Future<String>> futures = <Future<String>>[];
-  for (var initi in initiatives){
-    futures.add(parallelGetUrl(initi, dirName));
-  }
-  final urls = await Future.wait(futures);
-  for (String url in urls){
-    if (url != null){
-      return url;
-    }
-  }
-  return null;
-}
 
-
+/// checks if [word] is a verb by checking in [dirname] in firebase
 Future<String> checkIfVerb(String word, String dirName) async{
-  // print(" special try = ${checkSpecialVerbs(word, false).a}");
-  // print(" special try 2 = ${checkSpecialVerbs2(word, false)?.a}");
+  // special verb
   if (lalechet.containsKey(word)){
     return await getUrl(lalechet[word], dirName);
-    // return lalechet[word];
   }
   List<String> initiatives = await wordToInitiatives(word, patterns, infinitives);
-  print("1 inits are $initiatives");
   if (initiatives != null){
-    String url = await checkForUrl(initiatives, dirName);
-    print("1 init url is $url");
+    String url = await parallelCheckForUrl(initiatives, dirName);
     if (url != null){
       return url;
     }
   }
-
-  // search for url
-
   // 2 letters
-
   initiatives = await wordToInitiatives(word, patterns2Letters, infinitives2);
-  print("2 inits are $initiatives");
   if (initiatives != null){
-    String url = await checkForUrl(initiatives, dirName);
-    print("2 init url is $url");
+    String url = await parallelCheckForUrl(initiatives, dirName);
     if (url != null){
       return url;
     }
@@ -219,7 +124,7 @@ Future<String> checkIfVerb(String word, String dirName) async{
     specialCase = checkSpecialVerbs2(word, false);
   }
   if (specialCase != null){
-   String url = await findUrlInList(specialCase.a, dirName);
+   String url = await parallelFindUrlInList(specialCase.a, dirName);
    if (url != null){
      return url;
    }
@@ -228,21 +133,12 @@ Future<String> checkIfVerb(String word, String dirName) async{
   if (url != null){
     return url;
   }
-
-  // search for url
-  // for (var initi in initiatives){
-  //   var url = await getUrl(initi, dirName);
-  //   if (url != null){
-  //     print("found url for $initi : $url");
-  //     return url;
-  //   }
-  //   print("no url for $initi");
-  // }
-
-  // no url for this verb
+  // no url for this verb, or is not a verb
   return null;
 }
 
+
+/// if [root] is with h, fix it
 String handleRootH(String root){
   if (root.endsWith("ה") || root.endsWith("י")){ // היה/
     return root.substring(0, root.length-1) + "ת";
@@ -250,23 +146,25 @@ String handleRootH(String root){
   return root;
 }
 
-Future<List<String>> wordToInitiatives(String word, List<String> patterns, List<String> infinitives) async{
+
+/// convert [word] to [infinitives] by checking regex with [patterns]
+/// and return all infinitives if found
+Future<List<String>> wordToInitiatives(
+    String word, List<String> patterns, List<String> infinitives
+    ) async{
   var wordData = await getVerbPatterns(word, patterns); // here we check if in verb pattern
-  print("word data = $wordData");
   if (wordData != null){
-    print("wordData not null!!");
-    var handleMatch = handleVerbMatch(wordData.b, wordData.a, word, infinitives); // is a verb
+    var handleMatch = handleVerbMatch(wordData.a, word, infinitives); // is a verb
     return handleMatch;
     }
   return null;
 }
 
 
-
+/// find first pattern in [patterns] that [word] is by it
+/// return pair of pattern/ pattern index
 Future<Pair<String, int>> getVerbPatterns(String word, List<String> patterns) async{
-  // return pair of pattern/ pattern index
   final futures = <Future<Pair<String, int>>>[];
-  // List<Future<Pair<String, int>>> futures = <Future<Pair<String, int>>>[];
   for (int index = 0; index < patterns.length; index++){
     futures.add(getVerbPattern(word, patterns, index));
   }
@@ -283,48 +181,40 @@ Future<Pair<String, int>> getVerbPatterns(String word, List<String> patterns) as
   return res;
 }
 
+/// return pair of [patterns] and pattern [index]
 Future<Pair<String, int>> getVerbPattern(String word, List<String> patterns, int index) async{
-  // return pair of pattern/ pattern index
   var pattern = patterns[index];
-  print("($index) at pattern $pattern");
   RegExp regExp = RegExp(pattern);
-
-  // Iterable<RegExpMatch> matches = regExp.allMatches(word);
   bool hasMatch = regExp.hasMatch(word);
-  print("has match? $hasMatch");
   if (hasMatch) {
     return Pair(pattern, index);
   }
   return null;
 }
 
-List<String> handleVerbMatch(int index, String pattern, String word, List<String> infinitives){
-  print("search root...");
+// /// if last letter of [infin] is a final letter small letter, handle it
+
+/// if found match of [word] in pattern, convert to all [infinitives]
+List<String> handleVerbMatch(String pattern, String word, List<String> infinitives){
   List<String> wordInitiatives = [];
-  String root = getRoot(index, pattern, word);
-  print("root be4 process is $root");
+  String root = getRoot(pattern, word);
   root = handleRootH(root);
-  print("root after process is $root");
   if (specialRootLetters.keys.contains(root[0])){
     var verbCheck = checkSpecialVerbs(root, true);
     if (verbCheck != null){
       wordInitiatives.addAll(verbCheck.a);
-      // String url = await findUrlInList(verbCheck.a, "dirName");
     }
   }else if (specialRootLettersT.contains(root[0])){
     var verbCheck = checkSpecialVerbs2(root, true);
     if (verbCheck != null){
       wordInitiatives.addAll(verbCheck.a);
-      // String url = await findUrlInList(verbCheck.a, "dirName");
     }
   }
 
   for (var infinitive in infinitives){ // get list of infinitives
     int rootIndex = 0;
-    print("infinitive is $infinitive, root is $root");
     String infin = "";
     for (int i = 0; i <infinitive.length; i++){
-      print("($i) infin letter = ${infinitive[i]}");
       String letter = infinitive[i];
       if (letter == ".") {
         infin += root[rootIndex++];
@@ -338,22 +228,12 @@ List<String> handleVerbMatch(int index, String pattern, String word, List<String
     }
     infin = handleFinalLetter(infin);
     wordInitiatives.add(infin);
-
-    // להתפעל
-
-    // לפעול
-    // לפעל
-    // לחשוב
-    // לחשב
-    // להפעיל
   }
-  print("got for $word -> $wordInitiatives");
   // handle final letters
   return wordInitiatives;
 }
-
 String handleFinalLetter(String infin){
-  // if last letter is a final letter small letter, handle it
+
   String lastLetter = infin[infin.length - 1];
   if (lastLetter == "כ"){
 
@@ -371,36 +251,30 @@ String handleFinalLetter(String infin){
   return infin;
 }
 
-String getRoot(int index, String pattern, String word){
+
+/// get root of [word] from [pattern]
+String getRoot(String pattern, String word){
   String root = "";
   int i = 0, ii = 0;
-  print("start root loop");
   for (i =0; i < pattern.length; i++){
     var letter = pattern[i];
-    print("($i) $letter");
     if (letter == "."){
       root += word[i];
-    }else if(letter == "{"){
-      print("break");
+    }else if(letter == "{"){ // if done
       ii = i + 5;
       break;
     }
   }
-  // print("pattern at ii = ${pattern[ii]}");
+  // check if has finale after {}
   for (int j = i; j < word.length; j++){
-    print("at j loop");
     if (pattern.length > ii && pattern[ii] != "."){
-      print("ii nono $ii ${pattern[ii]}");
       ii++;
       continue;
     }
-    print("yay $i");
     root += word[j];
   }
   return root;
 }
-
-// רציתי -> רציתי, רצו, רציתן/ם
 
 List<String> patterns = [
   "...{1,2}תי", // אהבתי
@@ -428,143 +302,21 @@ List<String> patterns = [
   "...{1,2}", // אהב
 ];
 
-// רץ
-// קם
-
 List<String> patterns2Letters = [
   "..תי", // רצתי
   "נ.ו.", //נרוץ
   "י.ו.", //ירוץ
   "ת.ו.", //תרוץ
-  // "..ו.{1,2}", //אהוב
   "..נו", //רצנו
   "..ת", // רצת
   "..ו", // רצו
   "..תן", // רצתן
   "..תם", // רצתם
-  // "מ...{1,2}", // מפעל
   "..", // רץ
   "ה..", // רץ
 ];
 
-Map<int, String> indexToInfti = {
-  1 : "ללכת",
-  2: "לרוץ",
-  3 : "לקום",
-  4: "לתת",
-  5: "לשים",
-  6: "ללוש",
-  7: "לבוא"
 
-};
-
-Map<String, int> shortRootsVerbs = {
-  "הלך" : 1,
-  "הלכה" : 1,
-  "ילך" : 1,
-  "תלך" : 1,
-  "הלכו" : 1,
-  "ילכו" : 1,
-  "הולכים" : 1,
-  "נלכנה" : 1,
-  "הלכתי" : 1,
-  "הלכנו" : 1,
-  "הלכתם" : 1,
-  "הלכתן" : 1,
-  "אתהלך" : 1,
-  "הולך" : 1,
-  "הולכת" : 1,
-
-  "רץ" : 2,
-  "רצה" : 2,
-  "ירוץ" : 2,
-  "תרוץ" : 2,
-  "רצו" : 2,
-  "ירוצו" : 2,
-  "רצים" : 2,
-  "נרוץ" : 2,
-  "רצתי" : 2,
-  "רצנו" : 2,
-  "רצתם" : 2,
-  "רצתן" : 2,
-  "ארוץ" : 2,
-
-  "קם" : 3,
-  "קמה" : 3,
-  "יקום" : 3,
-  "קמו" : 3,
-  "קמות" : 3,
-  "קמים" : 3,
-  "יקומו" : 3,
-  "תקומו" : 3,
-
-  "נתן" : 4,
-  "יתן" : 4,
-  "תתן" : 4,
-  "נתנו" : 4,
-  "יתנו" : 4,
-  "נותנים" : 4,
-  "נותנות" : 4,
-  "תתנו" : 4,
-
-  "שם" : 5,
-  "תשים" : 5,
-  "ישים" : 5,
-  "ישימו" : 5,
-  "שמה" : 5,
-  "שמים" : 5,
-  "שמות" : 5,
-  "תשימו" : 5,
-
-  "לש" : 6,
-  "תלוש" : 6,
-  "ילוש" : 6,
-  "ילושו" : 6,
-  "לשה" : 6,
-  "לשים" : 6,
-  "אלוש" : 6,
-  "תלושו" : 6,
-};
-
-List<String> pluralVerbs = [
-  "", // נפעול
-  "", // נפעול
-  "", // תפעלו
-];
-
-
-
-
-// List<String> patterns = [
-//   "...+${hebrewChars["ת"]}${hebrewChars["י"]}", // אהבתי
-//   ".${hebrewChars["ו"]}..+", // אוהב
-//   "${hebrewChars["מ"]}.${hebrewChars["ו"]}..+", // מאוהב
-//   "${hebrewChars["מ"]}.${hebrewChars["ו"]}.$nonAsciiChar+${hebrewChars["ת"]}", // מאוהבת
-//   "${hebrewChars["א"]}${hebrewChars["ת"]}..$nonAsciiChar+", // אתאהב
-//   "${hebrewChars["י"]}${hebrewChars["ת"]}..$nonAsciiChar+", //יתאהב
-//   "${hebrewChars["ת"]}${hebrewChars["ת"]}..$nonAsciiChar+", //תתאהב
-//   "${hebrewChars["י"]}..$nonAsciiChar+", //יאהב
-//   "${hebrewChars["ת"]}..$nonAsciiChar+", //תאהב
-//   "..$nonAsciiChar+", // אהב
-//   "..${hebrewChars["ו"]}$nonAsciiChar+", //אהוב
-//   "..$nonAsciiChar+${hebrewChars["נ"]}${hebrewChars["ו"]}", //פעלנו
-//   "..$nonAsciiChar+${hebrewChars["ת"]}", // אהבת
-//   "..$nonAsciiChar+${hebrewChars["ו"]}", // אהבו
-//   "..$nonAsciiChar+${hebrewChars["ת"]}${hebrewChars["ן"]}", // אהבתן
-//   "..$nonAsciiChar+${hebrewChars["ת"]}${hebrewChars["ם"]}", // אהבתם
-// ];
-
-
-
-List<String> verbsRoots = [
-  "פעל",
-  "נפעל",
-  "הפעיל",
-  "הפעל",
-  "פיעל",
-  "פועל",
-  "התפעל"
-];
 
 List<String> infinitives = [ // שם פועל
   "ל..ו.+", // לפעול
@@ -581,63 +333,49 @@ List<String> infinitives2 = [ // שם פועל
   "ל..", // לחשב
 ];
 
-
-// if plural male/female
-
-// if single and if male - convert to female + plurals
-// if single and if female - convert to male + plurals
-
-Future<String> findUrlInList(List<String> list, String dirName) async{
-  for (var word in list){
-    var url = await getUrl(word, dirName);
-    if (url != null){
-      print("findUrlList found url for $word: $url");
-      return url;
-    }
-  }
-  return null;
-}
-
-Future<String> parallelFindUrlInList(List<String> list, String dirName) async{
+/// find urls in [words] , and if find valid url returns it
+Future<String> parallelFindUrlInList(List<String> words, String dirName) async{
   List<Future<String>> futures = <Future<String>>[];
-  for (var word in list){
+  for (var word in words){
+    // futures.add(VideoFetcher.getUrl(word, dirName));
     futures.add(getUrl(word, dirName));
   }
   List<String> results = await Future.wait(futures);
   for (var url in results){
     if (url != null){
-      // print("findUrlList found url for $word: $url");
       return url;
     }
   }
   return null;
 }
 
-
+///  checks if its male/female [word], and sends versions of it with
+///  the [dirname] to see if works
 Future<String> checkGenderCase(String word, String dirName) async{
-  // checks if its male/female word - גרפיקאי->גרפיקאית
+  // גרפיקאי->גרפיקאית
   List<String> singularVersions = [];
+  String singular;
   if (word.endsWith("ים") || word.endsWith("ות")){ // גרושים/גרושות, פועלים/פועלות
-    String singular = word.substring(0,word.length-2);
-    singularVersions = [singular, singular + "ה", singular + "ית", singular + "ת", singular + "י"];
-    print("singular (1) == $singularVersions");
+    singular = word.substring(0,word.length-2);
+    singularVersions = [singular + "ה", singular + "ית", singular + "ת", singular + "י"];
   }
   else if (word.endsWith("ה") ||  word.endsWith("ת")){
-    String singular = word.substring(0,word.length-1);
-    singularVersions = [singular, singular + "ות", singular + "ים", singular + "ו"];
-    print("singular (2) == $singularVersions");
+    singular = word.substring(0,word.length-1);
+    singularVersions = [singular + "ות", singular + "ים", singular + "ו"];
   } else if(word.endsWith("י")){
-    String singular = word;
+    singular = word;
     singularVersions = [singular + "ות", singular + "ם", singular + "ת"];
-    print("singular (3) == $singularVersions");
   }else{ // check versions
-    String singular = word;
+    singular = word;
     singularVersions = [singular + "ות", singular + "ים", singular + "ה",
       singular + "ת", singular + "ית"];
-    print("singular (4) == $singularVersions");
   }
   if (singularVersions.isNotEmpty){
-    var url = await findUrlInList(singularVersions, dirName);
+    if (singular.length > 1){
+      singularVersions.add(singular);
+    }
+    // var url = await findUrlInList(singularVersions, dirName);
+    var url = await parallelFindUrlInList(singularVersions, dirName);
     if (url != null){
       return url;
     }
@@ -645,41 +383,32 @@ Future<String> checkGenderCase(String word, String dirName) async{
   return null;
 }
 
+/// check if [verb] special verb with z,s
 Pair<List<String>,String> checkSpecialVerbs(String verb, bool isRoot){
   // הזדקן, השתמש, הסתפר
-  // Map<String, String> specialLetters = {
-  //   "ס": "ת",
-  //   "ש" : "ת",
-  //   "ז" : "ד",
-  //   "צ" : "ט",
-  // };
-  // List<String> startingletters = ["א","י","מ","נ","ת", "ה"]; // אזדקן, תזדקן, נזדקן, יזדקן, מזדקן
   String root = verb;
   List<String> inftis = [];
   if(!isRoot){
     if (!specialRootLetters.keys.contains(verb[1]) || !startingletters.contains(verb[0])){
       return null;
     }
-    // root = verb[1] + verb[3] + verb[4];
     root = verb.substring(1);
     inftis.add("ל" + root); // לספר, לצלם
-    // if (verb.length > 5) {
-    //   root += verb[5];
-    // }
   }
 
-  String infti = "לה" + root[0] + specialRootLetters[root[0]] + root.substring(1); //root[1] + root[2]; // להזדקן, להשתמש, להסתפר
+  String infti = "לה" + root[0] + specialRootLetters[root[0]] + root.substring(1);
   inftis.add(infti);
   return Pair(inftis, root);
 }
 
 
+
+/// check if [verb] is special verb with short
 Pair<List<String>,String> checkSpecialVerbs2(String verb, bool isRoot){
-  // הזדקן, השתמש, הסתפר
+  // אתמר במקום אתתמר, אטלפן, אדפק
   String root = verb;
   List<String> inftis = [];
   if (!isRoot){
-    // List<String> specialLetters = ["ד","ט","ת"]; // אתמר במקום אתתמר, אטלפן, אדפק
     if (!specialRootLettersT.contains(verb[1]) || !startingletters.contains(verb[0])){
       return null;
     }
@@ -688,26 +417,22 @@ Pair<List<String>,String> checkSpecialVerbs2(String verb, bool isRoot){
     root = verb.substring(1);
     inftis.add( "ל" + root.substring(0,2) + "ו" + root.substring(2));//; // לדפוק)
   }
-
   String infti1 = "לה" + root; // להדפק
-  String infti2 = "להי" + root; // להדפק
+  String infti2 = "להי" + root; // להידפק
   inftis.add(infti1);
   inftis.add(infti2);
-
-  // if (root.length > 3){
-  //   infti += root[3];
-  // }
-  print("yoyo1234 $inftis}");
   return Pair(inftis, root);
 }
 
 Map<String, String> lalechet = {
   "הלך": "ללכת",
   "הלכה": "ללכת",
+  "הלכתי": "ללכת",
   "ילך": "ללכת",
   "תלך": "ללכת",
   "הולך": "ללכת",
   "הולכת": "ללכת",
+
 };
 
 List<String> startingletters = ["א","י","מ","נ","ת", "ה"]; // אזדקן, תזדקן, נזדקן, יזדקן, מזדקן, הזדקן

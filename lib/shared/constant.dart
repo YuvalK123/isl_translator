@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+/// input decoration of form in authenticates
 const textInputDecoration = InputDecoration(
   fillColor: Colors.white,
   filled: true,
@@ -9,6 +10,5 @@ const textInputDecoration = InputDecoration(
   focusedBorder: OutlineInputBorder(
       borderSide: BorderSide(color: Colors.pink, width: 2.0)
   ),
-  // focusedBorder: OutlineInputBorder(borderSide: BorderSide(color: Colors.pink[300], width: 2.0)),
 );
 
