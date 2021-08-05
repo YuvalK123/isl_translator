@@ -202,6 +202,7 @@ List<String> food = [
   "מופלטה"
 ];
 
+/// Subjects Name
 enum SubjectName{
   ANIMALS, FOOD, BODY, SHAPES, TIMES, GEOG, PRONOUNS, HOLIDAYS
 }
