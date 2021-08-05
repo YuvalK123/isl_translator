@@ -77,7 +77,7 @@ class AuthService {
   Future signOut() async {
     try{
       if (_auth.currentUser.isAnonymous){
-        deleteUser();
+        await DatabaseUserService(uid: _auth.currentUser.uid).deleteUser();
       }
       return await _auth.signOut();
     }
@@ -85,10 +85,6 @@ class AuthService {
       print(e.toString());
 
     }
-  }
-
-  void deleteUser() async{
-
   }
 
 }

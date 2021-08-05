@@ -1,8 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:dio/dio.dart';
 import 'package:disk_lru_cache/disk_lru_cache.dart';
-import 'package:isl_translator/main.dart';
 import 'package:isl_translator/models/pair.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:isl_translator/services/video_fetcher.dart';

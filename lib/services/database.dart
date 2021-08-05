@@ -1,7 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isl_translator/models/user.dart';
-import 'package:isl_translator/models/video.dart';
 
 class DatabaseUserService{
   final String uid;
@@ -60,5 +58,9 @@ class DatabaseUserService{
     print("uid is $uid");
     return usersCollection.doc(this.uid).snapshots()
         .map(_userModelFromSnapshot);
+  }
+
+  Future<void> deleteUser() async{
+    return this.usersCollection.doc(this.uid).delete();
   }
 }
