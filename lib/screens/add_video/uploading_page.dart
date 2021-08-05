@@ -34,10 +34,6 @@ class _UploadingVideos extends State<UploadingVideos>{
     super.initState();
     uid = _auth.currentUser.uid;
     loadToStorage();
-    if(widget.expression.split(' ').length > 1){
-      saveTerms.add(widget.expression);
-    }
-
   }
 
   Widget build(BuildContext context) {
