@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
@@ -50,7 +52,6 @@ class _SignInState extends State<SignIn> {
         reverse: true,
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-          // ignore: deprecated_member_use
           child: Form(
             key: _formKey,
             child: Column(

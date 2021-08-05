@@ -77,7 +77,7 @@ class _DictionaryState extends State<Dictionary> {
                           Container(alignment: Alignment.center,
                             child: Text(
                               product.text,
-                              style: theme.textTheme.title,
+                              style: theme.textTheme.headline6,
                               maxLines: 1,
                             ),
                           ),

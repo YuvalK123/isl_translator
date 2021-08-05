@@ -412,7 +412,7 @@ class _SubjectState extends State<Subject> {
                             alignment: Alignment.center,
                             child: Text(
                               product.text,
-                              style: theme.textTheme.title,
+                              style: theme.textTheme.headline6,
                               textDirection: TextDirection.rtl,
                               textAlign: TextAlign.center,
                               maxLines: 2,

@@ -28,16 +28,6 @@ class _WrapperState extends State<Wrapper> {
     final user = Provider.of<User>(context);
     print("user from wrapper $user");
     bool cond = (user != null && ((user.emailVerified || _auth.currentUser.isAnonymous)));
-    // if (user != null && ((user.emailVerified || _auth.currentUser.isAnonymous))){
-    //   print("user not null from wrapper $user");
-    //   // if (user.emailVerified || _auth.currentUser.isAnonymous){
-    //     print("from _auth ${_auth.currentUser}");
-    //     // print("good save terms!!!!");
-    //   setState(() {
-    //
-    //   });
-    //     return TranslationWrapper();
-    // }
     return cond ? TranslationWrapper() : Authenticate();
   }
 

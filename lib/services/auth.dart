@@ -63,7 +63,6 @@ class AuthService {
 
   // register with email & password
   Future registerUserWithEmailAndPassword(String email, String password) async{
-    // print("")
     try{
       UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email.replaceAll(' ', ''), password: password
@@ -72,7 +71,6 @@ class AuthService {
       // create a new document for the user with the uid
       await DatabaseUserService(uid: user.uid).updateUserData(
         username: "new user",
-        // age: 100,
         gender: 'f',
       );
       return _userFromFirebase(user);
