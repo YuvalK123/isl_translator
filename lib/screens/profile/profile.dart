@@ -42,7 +42,6 @@ class MapScreenState extends State<ProfilePage>
   bool isSave = false;
   final picker = ImagePicker();
   var imageUrl;
-  String _uploadedFileURL;
 
   /// Init state and load user
   @override
@@ -745,7 +744,7 @@ class MapScreenState extends State<ProfilePage>
     final newVidType = vidType == false ? VideoType.ANIMATION : VideoType.LIVE;
 
     /// Update data (name, gender and videoType) in firebase
-    await DatabaseUserService(uid: id).updateUserData2(
+    await DatabaseUserService(uid: id).updateUserData(
       username: newName,
       gender: newGender,
       videoType: newVidType,

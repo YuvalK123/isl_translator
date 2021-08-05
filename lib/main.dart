@@ -1,9 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:isl_translator/screens/authenticate/sign_in.dart';
 import 'package:isl_translator/services/auth.dart';
-import 'models/user.dart';
 import 'package:isl_translator/screens/wrapper.dart';
 import 'package:provider/provider.dart';
 import 'package:isl_translator/services/show_video.dart';

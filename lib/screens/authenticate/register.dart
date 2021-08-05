@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:isl_translator/models/user.dart';
 import 'package:isl_translator/screens/authenticate/Verify_screen.dart';
@@ -51,7 +53,6 @@ class _RegisterState extends State<Register> {
         reverse: true,
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 50.0),
-          // ignore: deprecated_member_use
           child: Form(
             key: _formKey,
             child: Column(
@@ -142,7 +143,7 @@ class _RegisterState extends State<Register> {
         } );
         return;
       }else{
-        DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid).updateUserData2(
+        DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid).updateUserData(
           username: userName,
           gender: "o",
           videoType: VideoType.ANIMATION,

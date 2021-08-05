@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:isl_translator/models/user.dart';
 
+
+/// DatabaseUserService class
+/// class receives [uid] of user, and manipulates it in firebase
 class DatabaseUserService{
   final String uid;
 
@@ -10,52 +13,40 @@ class DatabaseUserService{
   final CollectionReference usersCollection =
   FirebaseFirestore.instance.collection('users');
 
-  Future updateUserData({String username, String gender}) async {
-    return await usersCollection.doc(uid).set({
-      'username' : username,
-      // 'age' : age,
-      'gender' : gender
-
-    });
-  }
-
-  Future updateUserData2({String username, String gender,VideoType videoType}) async {
-    return await usersCollection.doc(uid).set({
+  /// function updates the user's collection of [username], [gender] and
+  /// [videoType] to play
+  Future updateUserData({String username, String gender, VideoType videoType}) async {
+    Map<String, String> map = {
       'username' : username,
       'gender' : gender,
-      'videoType': videoType.toString()
-    });
+    };
+    if (videoType != null){
+      map['videoType'] = videoType.toString();
+    }
+    return await usersCollection.doc(uid).set(map);
   }
 
 
-  Future getUserData() async{
+  /// returns user data
+  Future<DocumentSnapshot> getUserData() async{
     if (this.uid == null){
       return null;
     }
     return await usersCollection.doc(this.uid).get();
   }
 
-  List<UserModel> _userListFromSnapshot(QuerySnapshot snapshot){
-    return snapshot.docs.map((doc) =>
-        UserModel(username: doc.data()['username'] ?? 'Anon user',
-            age: doc.data()['age'] ?? 0,
-            gender: doc.data()['gender'] ?? "")
-    ).toList();
-  }
-
+  /// creates a UserModel from [documentSnapshot]
   UserModel _userModelFromSnapshot(DocumentSnapshot documentSnapshot){
     return UserModel(
       uid: this.uid,
       username: documentSnapshot.data()["username"] ?? "anon user",
       videoTypeStr: documentSnapshot.data()["videoType"] ?? VideoType.ANIMATION.toString(),
       gender: documentSnapshot.data()["gender"] ?? "",
-      // age: documentSnapshot.data()["age"] ?? ,
     );
   }
 
-  // get brews stream
+  /// userModel stream of user data from collection
   Stream<UserModel> get users {
-    print("uid is $uid");
     return usersCollection.doc(this.uid).snapshots()
         .map(_userModelFromSnapshot);
   }
