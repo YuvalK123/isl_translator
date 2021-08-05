@@ -35,6 +35,7 @@ List<String> searchTerm(String sentence, List<String> saveTerms) {
 /// Find all the terms in DB
 /// terms are phrases of 2+ words
 Future<void> findTermsDB() async{
+  saveTerms.clear();
   var futures = <Future>[];
   final uid = FirebaseAuth.instance.currentUser.uid;
   String personalDirName = "animation_openpose/$uid/";
@@ -44,7 +45,7 @@ Future<void> findTermsDB() async{
       futures.add(addSavedExp(items[i]));
     }
   });
-
+  // perosnal folder
   try{
     await FirebaseStorage.instance.ref().child(personalDirName).listAll().then((result) {
       var items = result.items;
