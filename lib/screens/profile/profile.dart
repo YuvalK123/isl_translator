@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_switch/flutter_switch.dart';
+import 'package:isl_translator/shared/internet_alert_dialouge.dart';
 import '../../models/profile_image.dart';
 import '../../shared/main_drawer.dart';
 import 'package:isl_translator/services/database.dart';
@@ -28,6 +29,7 @@ class MapScreenState extends State<ProfilePage>
   bool wrongOldPass = false;
   Gender _character = Gender.FEMALE;
   UserModel currUserModel;
+  bool showInternetAlert = false;
   final nameController = TextEditingController();
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
@@ -640,6 +642,11 @@ class MapScreenState extends State<ProfilePage>
                           )
                         ],
                       ),
+                      // Container(
+                      //showAlert(context);
+                      //Container(),
+                      //showInternetAlert ? InternetAlertDialogue() : Container()
+                      // ),
                     ],
                   ),
                 );
@@ -697,9 +704,9 @@ class MapScreenState extends State<ProfilePage>
   }
 
   /// Gets user
-  UserModel getUser(BuildContext context) {
+  User getUser(BuildContext context) {
     try {
-      return Provider.of<UserModel>(context);
+      return Provider.of<User>(context);
     } catch (e) {
       return null;
     }
