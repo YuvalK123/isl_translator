@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:dio/dio.dart';
 import 'package:isl_translator/models/pair.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:isl_translator/services/video_fetcher.dart';
 import 'package:path_provider/path_provider.dart';
 
 /// lru cache for videos
@@ -20,6 +19,8 @@ class LruCache{
   Map<String, int> saved = {}; // saved words in this run, and their sizes
   Map<String, DateTime> animModifiedDates = {};
   Map<String, DateTime> liveModifiedDates = {};
+  static final animSavedLetters = <String>[];
+  static final liveSavedLetters = <String>[];
   String cachePath = "";
   int maxSize;
   bool hasBeenAnimation = true;
@@ -28,11 +29,11 @@ class LruCache{
   /// constructor recieves maxsize in mb [mbSize]
   LruCache(int mbSize){
     this.maxSize = mbSize * 1024 * 1024; // 20M
-    initAsync();
+    _initAsync();
   }
 
   /// function to run async in constructor
-  void initAsync() async{
+  void _initAsync() async{
     this.liveDirectorySize = await sizeOfDirectory(cacheFolders["live"]);
     this.animDirectorySize = await sizeOfDirectory(cacheFolders["animation"]);
   }
@@ -169,7 +170,7 @@ class LruCache{
           await deleteLeastRecentFile(isAnimation);
         }
         List<String> savedLetters = isAnimation ?
-        VideoFetcher.animSavedLetters : VideoFetcher.liveSavedLetters;
+        animSavedLetters : liveSavedLetters;
         if (isLetter && !savedLetters.contains(title)){
           savedLetters.add(title);
         }

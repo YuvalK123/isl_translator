@@ -81,7 +81,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   void initAsync() async {
     await loadUser(); // load user for getting the dirName
     print("current dir name --> " + dirName);
-    await this._videoFetcher.getUrls(dirName, true);
+    await this._videoFetcher.getUrls(dirName);
     //await Future.delayed(Duration(seconds: 1));
     print("indexToUrl is ${_videoFetcher.indexToUrlNew}");
     if (_videoFetcher.indexToUrlNew.isNotEmpty) {
@@ -162,7 +162,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       return controller;
     }
     if (url == "&&" || url == "#"){
-      url = await VideoFetcher.getUrl(word, dirName);
+      url = await this._videoFetcher.getUrl(word, dirName);
     }
     print("failed loading from cache");
     controller = VideoPlayerController.network(url);
