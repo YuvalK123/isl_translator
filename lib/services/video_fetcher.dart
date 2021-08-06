@@ -209,7 +209,7 @@ class VideoFetcher {
     this.wordsToUrls = urlsWordsList;
     // save video to cache
     if (toSave) {
-      await lruCache.saveVideosFromUrls(dirName.toLowerCase().contains("animation"), wordsToUrlsNew);
+      await lruCache.saveVideosFromUrls(isAnimation, wordsToUrlsNew);
     }
     this.doneLoading = true;
     return urls;

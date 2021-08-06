@@ -573,7 +573,7 @@ class MapScreenState extends State<ProfilePage>
                                                                                 EdgeInsets.only(right: 10.0),
                                                                             child: Container(
                                                                                 child: new RaisedButton(
-                                                                              child: Text("ביטול"),
+                                                                              child: Text("ביטול", overflow: TextOverflow.ellipsis,),
                                                                               onPressed: () async {
                                                                                 if (_formKey.currentState.validate()) {
                                                                                   _formKey.currentState.save();

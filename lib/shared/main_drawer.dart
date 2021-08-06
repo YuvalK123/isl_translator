@@ -91,13 +91,15 @@ class MainDrawer extends StatelessWidget {
                               return Container(
                                 width: 100.0,
                                 height: 70.0,
-                                margin: EdgeInsets.only(top: 30.0, bottom: 10.0, left: 0.0),
+                                margin: EdgeInsets.only(
+                                    top: 30.0,
+                                    bottom: 10.0,
+                                    left: 0.0
+                                ),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   image: DecorationImage(
-                                    image: img,
-                                    // image: this._profileImage.img,
-                                      // image: NetworkImage(imgUrl),
+                                      image: img,
                                       fit: BoxFit.fitHeight
                                   ),
                                 ),
@@ -105,7 +107,7 @@ class MainDrawer extends StatelessWidget {
                             }
                           ),
                         ],
-                );
+                      );
                     }
                   ),
                 ),
@@ -116,7 +118,8 @@ class MainDrawer extends StatelessWidget {
                 icon: Icon(Icons.translate),
                 isCurrPage: this.currPage == pageButton.TRANSLATION,
               ),
-              FirebaseAuth.instance.currentUser.isAnonymous ? Container() : DrawerButton(
+              FirebaseAuth.instance.currentUser.isAnonymous ?
+              Container() : DrawerButton(
                   title: "הוסף וידיאו",
                   onTap: () => pushPage(context, AddVideoPage()),
                   icon: Icon(Icons.video_library),
