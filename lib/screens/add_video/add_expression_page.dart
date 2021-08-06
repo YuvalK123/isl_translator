@@ -41,6 +41,25 @@ class _AddExpression extends State<AddExpression> {
     indicator = Icons.play_arrow;
   }
 
+  /// pops up when the user try to enter more then one word
+  void wrongExpressionAlert(BuildContext context) {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('שגיאה', textDirection: TextDirection.rtl),
+            content: Text('הביטוי לא יכול להכיל רווחים\nנסה שנית', textDirection: TextDirection.rtl),
+            actions: <Widget>[
+              MaterialButton(
+                  child: Icon(Icons.check),
+                  onPressed: () => Navigator.of(context).pop()
+              ),
+            ],
+          );
+        }
+    );
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -94,12 +113,16 @@ class _AddExpression extends State<AddExpression> {
                 child: TextFormField(
                   onFieldSubmitted: (value) async {
                     expression = value;
-                    Navigator.pushReplacement(context, MaterialPageRoute(
-                      builder: (context) => UploadingVideos(
-                        videoFile: widget.videoFile,
-                        expression: expression,
-                      )
-                    ));
+                    if (expression.split(' ').length > 1){
+                      wrongExpressionAlert(context);
+                    } else {
+                      Navigator.pushReplacement(context, MaterialPageRoute(
+                          builder: (context) => UploadingVideos(
+                            videoFile: widget.videoFile,
+                            expression: expression,
+                          )
+                      ));
+                    }
                   },
                   textAlign: TextAlign.right,
                   style: TextStyle(
