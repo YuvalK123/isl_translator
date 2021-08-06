@@ -1,208 +1,7 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:isl_translator/services/video_player.dart';
-
-List<String> geography = [
-  "תל אביב יפו",
-  "רמת גן",
-  "ירושלים",
-  "אילת",
-  "חיפה",
-  "כפר סבא",
-  "פתח תקווה",
-  "ראשון לציון",
-  "חדרה",
-  "רעננה",
-  "אשדוד",
-  "גבעתיים",
-  "דימונה",
-  "זיכרון יעקב",
-  "ראש העין",
-  "מודיעין",
-  "קיבוץ",
-  "מושב"
-];
-
-List<String> holidays = [
-  "חג",
-  "מנהג",
-  "ראש השנה",
-  "סוכות",
-  "חנוכה",
-  "פורים",
-  "פסח",
-  "יום העצמאות",
-  "לג בעומר"
-];
-
-List<String> times = [
-  "דקה",
-  "שנייה",
-  "בוקר",
-  "לפני הצהריים",
-  "צהריים",
-  "אחרי הצהריים",
-  "ערב",
-  "לילה",
-  "יום",
-  "אתמול",
-  "שלשום",
-  "היום",
-  "מחר",
-  "מחרתיים",
-  "שבוע",
-  "שבועיים",
-  "חודש",
-  "שנה",
-  "ינואר",
-  "פבואר",
-  "מארס",
-  "אפריל",
-  "מאי",
-  "יוני",
-  "יולי",
-  "אוגוסט",
-  "ספטמבר",
-  "אוקטובר",
-  "נובמבר",
-  "דצמבר",
-  "יום ראשון",
-  "יום שני",
-  "יום שלישי",
-  "יום רביעי",
-  "יום חמישי",
-  "יום שישי",
-  "יום שבת",
-  "מוצאי שבת",
-  "עכשיו"
-];
-
-List<String> animals = [
-  "דולפין",
-  "נמלה",
-  "קיפוד",
-  "נחש",
-  "צפרדע",
-  "חמור",
-  "סוס",
-  "ארנב",
-  "פרפר",
-  "שפן",
-  "דוב",
-  "אריה",
-  "נמר",
-  "זאב",
-  "תנין",
-  "לווייתן",
-  "ציפור",
-  "דבורה",
-  "זבוב",
-  "יתוש",
-  "ינשוף",
-  "תוכי",
-  "אייל",
-  "צבי",
-  "עכביש",
-  "טווס",
-  "פיל"
-];
-
-List<String> pronouns = [
-  "אותנו",
-  "היא",
-  "הוא",
-  "אותך",
-  "אתה",
-  "את",
-  "אותי",
-  "אני",
-  "לנו",
-  "הם",
-  "הן",
-  "שלכן",
-  "שלכם",
-  "שלנו",
-  "בשבילה",
-  "בשבילו",
-  "שלה",
-  "שלו",
-  "בשבילך",
-  "שלך",
-  "בשבילי",
-  "שלי",
-  "אותן",
-  "אותם",
-  "לך",
-  "לי",
-  "לה",
-  "לכם",
-  "זה",
-  "זאת",
-  "אנחנו"
-];
-
-List<String> shapes = [
-  "עיגול",
-  "ריבוע",
-  "מלבן",
-  "משולש",
-  "טרפז",
-  "מעוין",
-  "משושה",
-  "מעגל",
-  "צורה"
-];
-
-List<String>  body = [
-  "פנים",
-  "עיניים",
-  "אוזניים",
-  "אף",
-  "יד",
-  "רגל",
-  "סנטר",
-  "עורף",
-  "מרפק",
-  "מצח",
-  "גרון",
-  "שיניים",
-  "דם",
-  "כבד",
-  "כליות",
-  "ריאות",
-  "לב",
-  "עצם"
-];
-
-List<String> food = [
-  "כריך",
-  "קציצה",
-  "בורקס",
-  "עוגייה",
-  "פיצה",
-  "מרק",
-  "אורז",
-  "גלידה",
-  "מלח",
-  "פלפל שחור",
-  "בטטה",
-  "תפוח אדמה",
-  "עגבנייה",
-  "מלפפון",
-  "בננה",
-  "תפוח",
-  "אגס",
-  "שזיף",
-  "תאנה",
-  "לימון",
-  "סופגנייה",
-  "רימון",
-  "אוזן המן",
-  "מופלטה"
-];
 
 /// Subjects Name
 enum SubjectName{
@@ -221,28 +20,31 @@ class Subject extends StatefulWidget {
 }
 
 class _SubjectState extends State<Subject> {
+  /// Variables
   List<String> myUrls;
   int ind = 1;
   SubjectName subjectName;
   String sentence;
-  String dictAssetsPath = "assets/dictionary/";
+  String dictAssetsPath = "assets/dictionary/"; // take the subjects list from a file
   VideoPlayer2 _videoFetcher = VideoPlayer2(
     key: UniqueKey(),
     sentence: null,
   );
 
+  /// Init
   @override
   void initState() {
     super.initState();
     subjectName = widget.subjectName;
   }
 
-  // Play videos function
+  /// Play videos function
   Future<void> playVideos() async {
-    //String sentence = myController.text;
+    /// if there is not sentence
     if (sentence == "") {
       sentence = null;
     }
+    /// call to videoFetcher for showing the video/animation
     if (mounted) {
       setState(() {
         this._videoFetcher = VideoPlayer2(
@@ -253,66 +55,30 @@ class _SubjectState extends State<Subject> {
     }
   }
 
-  List<String> get names{
-    switch(this.subjectName){
-      case SubjectName.ANIMALS:
-        return animals;
-        break;
-      case SubjectName.FOOD:
-        return food;
-        break;
-      case SubjectName.BODY:
-        return body;
-        break;
-      case SubjectName.SHAPES:
-        return shapes;
-        break;
-      case SubjectName.TIMES:
-        return times;
-        break;
-      case SubjectName.GEOG:
-        return geography;
-        break;
-      case SubjectName.PRONOUNS:
-        return pronouns;
-        break;
-      case SubjectName.HOLIDAYS:
-        return holidays;
-        break;
-    }
-    return null;
-  }
-
-  Future<List<String>> get namess async{
+  /// Gets the words from the according file
+  Future<List<String>> get names async{
     Function func = rootBundle.loadString;
-    // rootBundle.loadString('assets/dictionary/animals.txt')).split(",")
     switch(this.subjectName){
       case SubjectName.ANIMALS:
         return (await func(this.dictAssetsPath + "animals.txt")).split(",");
         break;
       case SubjectName.FOOD:
         return (await func(this.dictAssetsPath + "food.txt")).split(",");
-        // return food;
         break;
       case SubjectName.BODY:
         return (await func(this.dictAssetsPath + "body.txt")).split(",");
-        // return body;
         break;
       case SubjectName.SHAPES:
         return (await func(this.dictAssetsPath + "shapes.txt")).split(",");
-        // return shapes;
         break;
       case SubjectName.TIMES:
         return (await func(this.dictAssetsPath + "times.txt")).split(",");
-        // return times;
         break;
       case SubjectName.GEOG:
         return (await func(this.dictAssetsPath + "geography.txt")).split(",");
-        // return geography;
         break;
       case SubjectName.PRONOUNS:
         return (await func(this.dictAssetsPath + "pronouns.txt")).split(",");
-        // return pronouns;
         break;
       case SubjectName.HOLIDAYS:
         return (await func(this.dictAssetsPath + "holidays.txt")).split(",");
@@ -321,76 +87,32 @@ class _SubjectState extends State<Subject> {
     return null;
   }
 
-  void printBundle() async{
-    print("yoyo\n ${(await rootBundle.loadString('assets/dictionary/animals.txt')).split(",")}");
-  }
-
+  /// Build the cards (the subject dictionary view)
   Future<List<Card>> _buildGridCards(BuildContext context) async{
     List<ButtonImage> products = [];
+    /// Gets the words in this dictionary (for the specific subject)
     List<String> subjects;
     try{
-      subjects = await namess;
+      subjects = await names;
     } catch (e){
-      print("err in dict is $e");
-      subjects = names;
+      subjects = [];
     }
-    // print(subjects.join(","));
-    // printBundle();
+
+    /// Create ButtonImage to each word
     for (int i = 0; i < subjects.length; i++) {
       products.add(new ButtonImage("", subjects[i], subjects[i]));
     }
-    // if (subjectName == "holidays") {
-    //
-    //
-    // } else if (subjectName == "pronoun") {
-    //
-    //
-    //   for (int i = 0; i < names.length; i++) {
-    //     products.add(new ButtonImage("", names[i], names[i]));
-    //   }
-    // } else if (subjectName == "animals") {
-    //
-    //   for (int i = 0; i < names.length; i++) {
-    //     products.add(new ButtonImage("", names[i], names[i]));
-    //   }
-    // } else if (subjectName == "shapes") {
-    //
-    //   for (int i = 0; i < names.length; i++) {
-    //     products.add(new ButtonImage("", names[i], names[i]));
-    //   }
-    // } else if (subjectName == "body") {
-    //
-    //   for (int i = 0; i < names.length; i++) {
-    //     products.add(new ButtonImage("", names[i], names[i]));
-    //   }
-    // } else if (subjectName == "time") {
-    //
-    //   for (int i = 0; i < names.length; i++) {
-    //     products.add(new ButtonImage("", names[i], names[i]));
-    //   }
-    // } else if (subjectName == "geography") {
-    //
-    //   for (int i = 0; i < names.length; i++) {
-    //     products.add(new ButtonImage("", names[i], names[i]));
-    //   }
-    // } else if (subjectName == "food") {
-    //
-    //   for (int i = 0; i < names.length; i++) {
-    //     products.add(new ButtonImage("", names[i], names[i]));
-    //   }
-    // }
 
+    /// If there is not word to show, show an empty card
     if (products == null || products.isEmpty) {
       return const <Card>[];
     }
 
     final ThemeData theme = Theme.of(context);
-    /*final NumberFormat formatter = NumberFormat.simpleCurrency(
-        locale: Localizations.localeOf(context).toString());*/
 
+    /// Create Card for each word (card contain image, word name, and on tap function)
     return products.map((product) {
       return Card(
-        //color: Colors.cyan[800],
         shape: RoundedRectangleBorder(
             side: BorderSide(color: Colors.cyan[800], width: 2),
             borderRadius: const BorderRadius.all(Radius.circular(8.0))),
@@ -451,22 +173,24 @@ class _SubjectState extends State<Subject> {
     }).toList();
   }
 
+  /// Dialog to show the video
   Widget _buildPopupDialog(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.white,
       insetAnimationDuration: const Duration(milliseconds: 100),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
       child: Container(
-        // use container to change width and height
+        /// Use container to change width and height
         height: 400,
         width: 1000,
         child: Column(
           children: <Widget>[
+            /// Contain the videoFetcher that display the video/animation
             Container(
               child: AspectRatio(aspectRatio: 1.0, child: _videoFetcher
-                  // child: videoPlayerDemo.myUrls.length < 1 ? null : videoPlayerDemo
                   ),
             ),
+            // ignore: deprecated_member_use
             FlatButton(
               onPressed: () {
                 if (mounted) {}
@@ -480,6 +204,7 @@ class _SubjectState extends State<Subject> {
     );
   }
 
+  /// Build
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -494,6 +219,7 @@ class _SubjectState extends State<Subject> {
             )),
         backgroundColor: Colors.cyan[900],
       ),
+      /// List of cards
       body: FutureBuilder<List<Card>>(
         future: _buildGridCards(context),
         builder: (BuildContext context, AsyncSnapshot snapshot){
@@ -509,8 +235,6 @@ class _SubjectState extends State<Subject> {
             padding: EdgeInsets.all(16.0),
             childAspectRatio: 8.0 / 9.0,
             children: value,
-
-            // children: _buildGridCards(context) // Changed code
           );
         },
       ),
