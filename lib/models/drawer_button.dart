@@ -1,11 +1,18 @@
 import 'package:flutter/material.dart';
 
+
+/// class of the buttons in the main drawer
 class DrawerButton extends StatelessWidget {
+
   final String title;
   final Function onTap;
   final Icon icon;
   final bool isCurrPage;
 
+  /// [title] of button
+  /// [onTap] what happens when clicked
+  /// [icon] of button
+  /// if [isCurrPage] cant press it
   DrawerButton({this.title, this.onTap, this.icon, this.isCurrPage = false});
   @override
   Widget build(BuildContext context) {
@@ -28,6 +35,7 @@ class DrawerButton extends StatelessWidget {
       ),
       selected: this.isCurrPage,
       focusColor: Colors.white,
+      // if not current page, you can click it
       onTap: !this.isCurrPage ? this.onTap : (){},
       hoverColor: Colors.grey[300],
     );

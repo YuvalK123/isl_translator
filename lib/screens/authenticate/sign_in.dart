@@ -9,8 +9,10 @@ import 'package:isl_translator/shared/loading.dart';
 import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
 
+/// sign in window
 class SignIn extends StatefulWidget {
 
+  // what to do when toggled
   final Function toggleView;
   static final AuthService authService = AuthService();
   SignIn({ this.toggleView });
@@ -56,8 +58,6 @@ class _SignInState extends State<SignIn> {
             key: _formKey,
             child: Column(
               children: <Widget> [
-                //SizedBox(height: 20.0,),
-                //Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
                 SizedBox(height: 20.0,),
                 Container(
                   alignment: Alignment.topRight,
@@ -68,7 +68,17 @@ class _SignInState extends State<SignIn> {
                         Expanded(child: Image.asset("assets/images/sign_in_flag1.jpg", width: 200, height: 70,)),
                         Container(
                           alignment: Alignment.topRight,
-                            child: Text("ברוך הבא", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),textDirection: TextDirection.rtl,textAlign: TextAlign.right,)),
+                            child: Text(
+                              "ברוך הבא", style:
+                            TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 40,
+                                fontStyle: FontStyle.italic
+                            ),
+                              textDirection: TextDirection.rtl,
+                              textAlign: TextAlign.right,
+                            )
+                        ),
                       ],
                     ),
                   ),
@@ -76,14 +86,24 @@ class _SignInState extends State<SignIn> {
                 SizedBox(height: 40.0,),
                 Container(
                     alignment: Alignment.topRight,
-                    child: Text("התחבר/י למשתמש שלך", style: TextStyle(fontWeight: FontWeight.bold, fontSize:20,fontStyle: FontStyle.italic),)),
+                    child: Text(
+                      "התחבר/י למשתמש שלך",
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                          fontStyle: FontStyle.italic
+                      ),
+                    )
+                ),
                 SizedBox(height: 20.0,),
-                TextFormField(
+                TextFormField( // email text field
                   textDirection: TextDirection.rtl,
                   textAlign: TextAlign.right,
                   decoration: textInputDecoration.copyWith(hintText: 'אימייל'),
-                  validator: (val) => val.isEmpty ? 'Enter an email' : null,
-                  onChanged: (val) { // email
+                  //
+                  // validator: (val) => val.isEmpty ? 'Enter an email' : null,
+                  validator: (val) => emailValidation(val),
+                  onChanged: (val) { // update email string
                     setState(() => email = val);
                   },
                 ),
@@ -123,12 +143,20 @@ class _SignInState extends State<SignIn> {
                 ),
 
                 SizedBox(height: 12.0,),
-                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),),
-                //Image.asset("assets/images/sign_in_flag1.jpg", width: 1000, height: 150,),
-                //SizedBox(height: 150.0,),
+                Text(
+                  error,
+                  style: TextStyle(
+                      color: Colors.red,
+                      fontSize: 14.0
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(0,10,0,0),
-                  child: Image.asset("assets/images/sign_in1.png", width: 1000, height: 150,),
+                  child: Image.asset(
+                    "assets/images/sign_in1.png",
+                    width: 1000,
+                    height: 150,
+                  ),
                 ),
               ],
             ),
@@ -192,6 +220,16 @@ class _SignInState extends State<SignIn> {
         });
       }
     }
+  }
+
+  String emailValidation(String val){
+    if (val.isEmpty){
+      return "enter an email";
+    } else if (!val.contains("@")){
+      return "invalid email address";
+    }
+    return null;
+
   }
 
 }

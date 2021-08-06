@@ -1,9 +1,12 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/models/pair.dart';
+import 'package:isl_translator/services/video_fetcher.dart';
 
-
-List<String> prepositionalLetters = ["כש","וה","ב","כ","מ","ל", "ו", "ה", "ש"];
+List<String> prepositionalLetters = ["כש","ב","כ","מה","מ","ל", "וה","ו", "ה", "ש"];
+List<String> prepositional2Letters = ["כש""מה","וה"];
 List<String> prepositionalWords = ["של", "את"];
 
 
@@ -40,27 +43,51 @@ Map<String, String> hebrewChars = {
 
 /// check if [word] has a starting letter/s in [dirname]
 Future<String> getNonPrepositional(String word, String dirName) async{
-  if (!prepositionalLetters.contains(word[0])){ //||
-      // !prepositionalLetters.contains(word.substring(0,1))){
+  String subStr = word.substring(1);
+  if (!prepositionalLetters.contains(word[0]) || subStr.length < 2){
     return null;
   }
-  String subStr = word.substring(1);
-  if (subStr.length < 2){
+  print("substr1 == $subStr");
+  String url = await getUrl(subStr, dirName);
+  if (url == null){
+    url = await checkIfProcessedWord(subStr, dirName);
+    if (url != null){
+      return url;
+    }
+  }
+
+  String firstTwo = word.substring(0,2);
+  bool containsFirstTwo = !prepositional2Letters.contains(firstTwo);
+  if (containsFirstTwo || firstTwo.length < 2){
     return null;
   }
   // return await VideoFetcher.getUrl(word.substring(1), dirName);
-  return await getUrl(word.substring(1), dirName);
+  subStr = word.substring(2);
+  print("substr2 == $subStr");
+  url = await getUrl(subStr, dirName);
+  if (url == null){
+    url = await checkIfProcessedWord(subStr, dirName);
+    if (url != null){
+      return url;
+    }
+  }
+  return null;
 }
 
 
 
 /// to delete
 Future<String> getUrl(String word,String dirName) async{
-  String exec = dirName == "animation_openpose/" ? ".mp4" : ".mkv";
+  bool isAnimation = dirName.contains("animation");
+  String exec = isAnimation ? ".mp4" : ".mkv";
   Reference ref = FirebaseStorage.instance
       .ref()
       .child("$dirName" + word + "$exec");
   try {
+    File file = await VideoFetcher.lruCache.fetchVideoFile(word, isAnimation, null);
+    if (file != null){
+      return "&&";
+    }
     // gets the video's url
     var url = await ref.getDownloadURL();
     return url;
@@ -101,6 +128,7 @@ Future<String> parallelCheckForUrl(List<String> initiatives, String dirName) asy
 Future<String> checkIfVerb(String word, String dirName) async{
   // special verb
   if (lalechet.containsKey(word)){
+    print("lalechet contains word $word");
     return await getUrl(lalechet[word], dirName);
   }
   List<String> initiatives = await wordToInitiatives(word, patterns, infinitives);
@@ -129,14 +157,25 @@ Future<String> checkIfVerb(String word, String dirName) async{
      return url;
    }
   }
-  String url = await checkGenderCase(word, dirName);
-  if (url != null){
-    return url;
-  }
   // no url for this verb, or is not a verb
   return null;
 }
 
+
+/// checks if [word] is a verb by checking in [dirname] in firebase
+/// if it is, returns a url, o.w null
+Future<String> checkIfProcessedWord(String word, String dirName) async{
+  String url = await checkIfVerb(word, dirName);
+  if (url != null){
+    return url;
+  }
+  url = await checkGenderCase(word, dirName);
+  if (url != null){
+    return url;
+  }
+  // not a special word
+  return null;
+}
 
 /// if [root] is with h, fix it
 String handleRootH(String root){
@@ -226,29 +265,11 @@ List<String> handleVerbMatch(String pattern, String word, List<String> infinitiv
           infin += letter;
       }
     }
-    infin = handleFinalLetter(infin);
+    // infin = handleFinalLetter(infin);
     wordInitiatives.add(infin);
   }
   // handle final letters
   return wordInitiatives;
-}
-String handleFinalLetter(String infin){
-
-  String lastLetter = infin[infin.length - 1];
-  if (lastLetter == "כ"){
-
-  } else if (lastLetter == "מ"){
-
-  } else if (lastLetter == "נ"){
-
-  } else if (lastLetter == "צ"){
-
-  }else if (lastLetter == "פ"){
-
-  } else{
-    return infin;
-  }
-  return infin;
 }
 
 

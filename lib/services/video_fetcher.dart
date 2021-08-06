@@ -32,30 +32,33 @@ class VideoFetcher {
       }).toList());
 
 
-  Future<List<String>> processWord(String word,String dirName) async{
+  Future<List<String>> processWord(String word,String dirName) async {
     bool isAnimation = dirName.contains("animation");
     String exec = isAnimation ? "mp4" : "mkv";
     List<String> urls = [];
-    List<String> savedLetters = isAnimation ? animSavedLetters : liveSavedLetters;
-    var verb = await checkIfVerb(word, dirName);
-    if (verb != null){
+    List<String> savedLetters = isAnimation
+        ? animSavedLetters
+        : liveSavedLetters;
+    var verb = await checkIfProcessedWord(word, dirName);
+    if (verb != null) {
       urls.add(verb);
       return urls;
     }
     var nonPre = await getNonPrepositional(word, dirName);
-    if (nonPre != null){
+    if (nonPre != null) {
       urls.add(nonPre);
       return urls;
     }
+
     // Video doesn't exist - so split the work to letters
     var letters = splitToLetters(word);
-    for(int j=0; j < letters.length; j++){
+    for (int j = 0; j < letters.length; j++) {
       var letter = letters[j];
-      if (!hebrewChars.containsKey(letter)){
+      if (!hebrewChars.containsKey(letter)) {
         // if invalid hebrew char
         continue;
       }
-      if (savedLetters.contains(letter)){
+      if (savedLetters.contains(letter)) {
         // if saved letter
         urls.add("#");
         continue;

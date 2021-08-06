@@ -10,8 +10,10 @@ import 'package:flutter/material.dart';
 import 'package:isl_translator/shared/constant.dart';
 
 
+/// register page
 class Register extends StatefulWidget {
 
+  // what to do when toggled
   final Function toggleView;
 
   Register({ this.toggleView });
@@ -22,7 +24,7 @@ class Register extends StatefulWidget {
 
 class _RegisterState extends State<Register> {
 
-  final AuthService _authService = AuthService();
+  // final AuthService _authService = AuthService();
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
   bool loading = false;
@@ -37,7 +39,8 @@ class _RegisterState extends State<Register> {
     return loading ? Loading() : Scaffold(
       //backgroundColor: Colors.brown[100],
       appBar: AppBar(
-        backgroundColor: Colors.cyan[800],        elevation: 0.0,
+        backgroundColor: Colors.cyan[800],
+        elevation: 0.0,
         title: Container(
             alignment: Alignment.centerRight,
             child: Text('הרשמה')),
@@ -60,14 +63,25 @@ class _RegisterState extends State<Register> {
                 SizedBox(height: 20.0,),
                 Row(
                   children: [
-                    Image.asset("assets/images/register.png", width: 100, height: 100,),
+                    Image.asset("assets/images/register.png",
+                      width: 100,
+                      height: 100,
+                    ),
                     SizedBox(width: 10.0,),
                     Container(
                         alignment: Alignment.topRight,
-                        child: Text("הרשמה", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40,fontStyle: FontStyle.italic),)),
+                        child: Text(
+                          "הרשמה",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 40,fontStyle:
+                          FontStyle.italic),
+                        )
+                    ),
                   ],
                 ),
                 SizedBox(height: 40.0,),
+                // userName text field
                 TextFormField(
                   textDirection: TextDirection.rtl,
                   textAlign: TextAlign.right,
@@ -75,13 +89,12 @@ class _RegisterState extends State<Register> {
                   validator: (val) => val.isEmpty ? 'הכנס/י שם משתמש' : null,
                   onChanged: (val) { // email
                     setState(() {
-                    // TODO: save username
                       userName = val;
                     });
                   },
                 ),
                 SizedBox(height: 20.0,),
-                //Image.asset("assets/images/register.png", width: 100, height: 100,),
+                // email text field
                 TextFormField(
                   textDirection: TextDirection.rtl,
                   textAlign: TextAlign.right,
@@ -94,7 +107,8 @@ class _RegisterState extends State<Register> {
                   },
                 ),
                 SizedBox(height: 20.0,),
-                TextFormField( // password
+                // password text field
+                TextFormField(
                   textDirection: TextDirection.rtl,
                   textAlign: TextAlign.right,
                   decoration: textInputDecoration.copyWith(hintText: 'סיסמה'),
@@ -116,7 +130,11 @@ class _RegisterState extends State<Register> {
                   onPressed: register,
                 ),
                 SizedBox(height: 12.0,),
-                Text(error, style: TextStyle(color: Colors.red, fontSize: 14.0),),
+                // error text
+                Text(
+                  error,
+                  style: TextStyle(color: Colors.red, fontSize: 14.0),
+                ),
                 this.verify ? VerifyScreen() : Container(),
               ],
             ),
@@ -126,41 +144,39 @@ class _RegisterState extends State<Register> {
     );
   }
 
+  /// when click on register button, try to
   void register() async{
-    print("pressed");
+    /// if form is with valid values
     if (_formKey.currentState.validate()){
-      print("validated");
-
-      print("email $email , password $password");
-      dynamic result = await _authService.
+      // try to register
+      dynamic result = await AuthService().
       registerUserWithEmailAndPassword(email, password);
+      // if string then it's an error
       if (result.runtimeType == String){
         print("res == null");
         setState(() {
           loading = false;
-          // error = 'Please supply a valid email';
           error = 'Failed to register\n$result';
         } );
         return;
-      }else{
+      } else{ // not a string, so succeded to register
         DatabaseUserService(uid: FirebaseAuth.instance.currentUser.uid).updateUserData(
           username: userName,
           gender: "o",
           videoType: VideoType.ANIMATION,
         );
-        setState(() {
-          error = "";
-          this.verify = true;
-        });
-        setState(() {
-          if (_auth.currentUser.emailVerified){
+        // if user is with a verified mail
+        if (_auth.currentUser.emailVerified) {
+          setState(() {
             this.verify = false;
             loading = true;
-          }
-        });
-        print("registered");
-
-
+          });
+        } else{ // user's mail isnt verified
+          setState(() {
+            error = "";
+            this.verify = true;
+          });
+        }
       }
     }
   }

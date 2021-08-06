@@ -11,7 +11,6 @@ import 'package:isl_translator/screens/add_video/check_animation_page.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:isl_translator/screens/translation_page/translation_wrapper.dart';
-import 'package:isl_translator/services/handle_sentence.dart';
 
 
 class UploadingVideos extends StatefulWidget {

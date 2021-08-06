@@ -1,21 +1,7 @@
 
-// class UserModel {
-//
-//   final String uid;
-//   final String username;
-//   final int age;
-//   final String gender;
-//
-//   UserModel({ this.uid, this.username, this.age, this.gender });
-//
-//   @override
-//   String toString(){
-//     return "$uid, username: $username, age: ${age.toString()}, gender: $gender";
-//   }
-//
-// }
-
+/// user genders possibilities
 enum Gender {MALE, FEMALE, OTHER}
+/// the 2 types of video types
 enum VideoType {ANIMATION, LIVE}
 
 class UserModel {
@@ -23,19 +9,13 @@ class UserModel {
   final String uid;
   final String username;
   final int age;
-  final String gender;
   VideoType videoType;
-  String videoTypeStr;
   Gender genderModel;
   final bool emailVerified;
-  //
-  // Gender get genderModel{
-  //   return _gender;
-  // }
 
-  UserModel({ this.uid, this.username, this.age, this.gender,
-    this.videoType, this.videoTypeStr, this.emailVerified }){
-    this.videoType = this.videoTypeStr == VideoType.ANIMATION.toString() ? VideoType.ANIMATION : VideoType.LIVE;
+  UserModel({
+    this.uid, this.username, this.age, gender, videoTypeStr, this.emailVerified }){
+    this.videoType = (videoTypeStr == VideoType.ANIMATION.toString()) ? VideoType.ANIMATION : VideoType.LIVE;
     switch (gender){
       case 'f':
         this.genderModel = Gender.FEMALE;
@@ -51,7 +31,7 @@ class UserModel {
   @override
   String toString(){
     return "$uid, username: $username, age: ${age.toString()}, "
-        "gender: $gender $genderModel} type: ${this.videoType.toString()}, "
+        "gender: $genderModel} type: ${this.videoType.toString()}, "
         "emailVeified $emailVerified";
   }
 
