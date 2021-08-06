@@ -48,6 +48,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   String dirName = "animation_openpose/";
   UserModel currUserModel;
   bool isPause = false;
+  bool isValid = true;
 
   /// Init
   @override
@@ -81,7 +82,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
     /// Load user for getting the dirName
     await loadUser();
     /// Get the video's urls
-    await this._videoFetcher.getUrls(dirName);
+    bool isValid = await this._videoFetcher.getUrls(dirName);
+    if (!isValid){
+      setState(() {
+        this.isValid = false;
+      });
+    }
     /// If there is a video to show
     if (_videoFetcher.indexToUrlNew.isNotEmpty) {
       await _initController(0);
@@ -313,7 +319,7 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
   /// Build
   @override
   Widget build(BuildContext context) {
-    if (widget.sentence == null) {
+    if (widget.sentence == null || !(this.isValid)) {
       return Container();
     }
     return Scaffold(

@@ -135,12 +135,12 @@ class VideoFetcher {
   }
 
   /// get urls from either cache or
-  Future getUrls(String dirName) async {
+  Future<bool> getUrls(String dirName) async {
     List<String> splitSentenceList = splitSentence(
         sentence); // split the sentence
     // if not a valid sentence
     if (splitSentenceList == null) {
-      return null;
+      return false;
     }
     bool isAnimation = dirName.contains("animation");
     Map<String, List<String>> urlsWordsList = {};
@@ -158,6 +158,7 @@ class VideoFetcher {
     handleMapsAfterGet(urlsWordsList);
     // save videos to cache
     await lruCache.saveVideosFromUrls(isAnimation, wordsToUrlsNew);
+    return true;
   }
 
   /// after getUrls, update the maps on the outside
@@ -205,7 +206,6 @@ class VideoFetcher {
     }
   }
 
-  /* parallelGetUrls function */
   /// get urls in parallel for futures in getUrls
   /// private method for the getUrls API
   Future<void> _parallelGetUrls(String word, String dirName, bool isAnimation,

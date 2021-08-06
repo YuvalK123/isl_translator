@@ -62,7 +62,9 @@ List<String> splitSentence(String sentence) {
   var newSentence = sentence.replaceAll(
       new RegExp(r'[\u200f]'), ""); // replace to regular space
   var vals = hebrewLetters.toString().substring(1,hebrewLetters.toString().length - 1).replaceAll(",", "");
+  print("vals $vals");
   newSentence = newSentence.replaceAll(RegExp('[^$vals]'), "");
+  print("sent be4 is $sentence -> $newSentence");
   if (newSentence.isEmpty){
     return null;
   }
