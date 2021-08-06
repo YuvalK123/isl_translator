@@ -449,7 +449,7 @@ Pair<List<String>,String> checkSpecialVerbs2(String verb, bool isRoot){
 }
 
 List<String> lalechet = [
-  "ללכת", "הלך",
+  "ללכת", "הלך", "תלכו", "ילכו"
   "הלכה",  "הלכתי",  "ילך",  "תלך",  "הולך",  "הולכת",  "הולכים", "הולכות"
 ];
 
