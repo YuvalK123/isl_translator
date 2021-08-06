@@ -6,7 +6,7 @@ import 'package:isl_translator/models/pair.dart';
 import 'package:isl_translator/services/video_fetcher.dart';
 
 List<String> prepositionalLetters = ["כש","ב","כ","מה","מ","ל", "וה","ו", "ה", "ש"];
-List<String> prepositional2Letters = ["כש""מה","וה"];
+List<String> prepositional2Letters = ["כש","מה","וה"];
 List<String> prepositionalWords = ["של", "את"];
 
 
@@ -54,6 +54,8 @@ Future<String> getNonPrepositional(String word, String dirName) async{
     if (url != null){
       return url;
     }
+  } else{
+    return url;
   }
 
   String firstTwo = word.substring(0,2);
@@ -70,6 +72,8 @@ Future<String> getNonPrepositional(String word, String dirName) async{
     if (url != null){
       return url;
     }
+  } else{
+    return url;
   }
   return null;
 }
