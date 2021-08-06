@@ -11,7 +11,6 @@ class VideoFetcher {
   bool doneLoading = false;
   List<String> urls = [];
   final String sentence;
-  bool isValidSentence = false;
   static String lettersCachePath;
   static LruCache lruCache = LruCache(20);
   final _auth = FirebaseAuth.instance;
@@ -38,10 +37,7 @@ class VideoFetcher {
     String exec = isAnimation ? "mp4" : "mkv";
     List<String> urls = [];
     List<String> savedLetters = isAnimation ? animSavedLetters : liveSavedLetters;
-    print("check for verb...");
-    final stopWatch = Stopwatch()..start();
     var verb = await checkIfVerb(word, dirName);
-    print("elapsed: ${stopWatch.elapsed} is verb??? $verb");
     if (verb != null){
       urls.add(verb);
       return urls;
@@ -64,20 +60,16 @@ class VideoFetcher {
         urls.add("#");
         continue;
       }
-      print("working on ${letters[j]}.$exec");
       Reference ref = FirebaseStorage.instance
           .ref("$dirName").child("${letters[j]}.$exec");
       var url = await ref.getDownloadURL();
-      print("got url at $url for letter ${letters[j]}. adding to $urls");
       urls.add(url);
-      print("letter added ==> " + letters[j]);
     }
     return urls;
   }
 
   static Future<String> getUrl(String word, String firebaseDirName) async{
     String exec = firebaseDirName.contains("animation") ? ".mp4" : ".mkv";
-    print("fetching ${"$firebaseDirName" + word + "$exec"}");
     Reference ref = FirebaseStorage.instance
         .ref()
         .child("$firebaseDirName" + word + "$exec");
@@ -85,40 +77,36 @@ class VideoFetcher {
   }
 
   Future<void> _urlsTry(
-      String word, bool isAnimation, Map<String,List<String>> urlsWords, String dirName,
-      Map<String,int> indicesMap, List<String> urls, int index
+      String word, bool isAnimation, Map<String,List<String>> urlsWords,
+      String dirName, List<String> urls, int index
       ) async{
 
-    print("indices map in urlsTry for word $word: $indicesMap");
     // gets the video's url
     String url = await getUrl(word, dirName);
     bool isAnimation = dirName.toLowerCase().contains("animation");
-    await lruCache.saveFile(url, word, isAnimation, false, false);
+    await lruCache.saveFile(url, word, isAnimation, false);
     this.indexToWord[index] = word;
-    addToMapsIndex(word, [url],indicesMap, urlsWords, index);
+    addToMapsIndex(word, [url], urlsWords, index);
     urls.add(url);
   }
 
   Future<void> _urlsCatch(
       Exception err,
-      String word, bool isAnimation, Map<String,List<String>> urlsWords, String dirName,
-      Map<String,int> indicesMap, List<String> urls, int index
+      String word, bool isAnimation, Map<String,List<String>> urlsWords,
+      String dirName, List<String> urls, int index
       ) async{
-    print("indices map in _urlsCatch for word $word: $indicesMap");
     List<String> savedLetters = isAnimation ? animSavedLetters : liveSavedLetters;
     try {
       // check if word exist in the personal videos
       String url = await getUrl(word, dirName + _auth.currentUser.uid + "/");
-      addToMapsIndex(word, [url], indicesMap, urlsWords, index);
+      addToMapsIndex(word, [url], urlsWords, index);
       urls.add(url);
     } catch (err2) {
       var urlsList = await processWord(word, dirName);
-      print("urls list for $word is $urlsList}");
       List<String> letters = urlsList.length == 1 ? null : splitToLetters(word);
       if (letters == null){
-        print("none letters word $word");
         String url = urlsList[0];
-        addToMapsIndex(word, [url], indicesMap, urlsWords, index);
+        addToMapsIndex(word, [url], urlsWords, index);
         urls.add(url);
         return;
       }
@@ -128,18 +116,18 @@ class VideoFetcher {
         if (!isSaved){
           isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
           if (isSaved){
-            lettersList.add(letter);
+            savedLetters.add(letter);
           }
         }
 
         String url = urlsList[i];
-        addToMapsIndex(word, urlsList, indicesMap, urlsWords, index);
+        addToMapsIndex(word, urlsList, urlsWords, index);
         urls.add(url);
       }
     }
   }
 
-  void addToMapsIndex(String word, List<String> urls, Map<String,int> indicesMap,
+  void addToMapsIndex(String word, List<String> urls,
       Map<String,List<String>> urlsWords, int index){
     indexToUrlList[index] = urls; // add index to
     bool isLetters = urls.length != 1;
@@ -149,27 +137,21 @@ class VideoFetcher {
   }
 
   Future<List> getUrls(String dirName, bool toSave) async {
-    List<String> splitSentenceList = splitSentence(
-        sentence); // split the sentence
+    List<String> splitSentenceList = splitSentence(sentence); // split the sentence
     if (splitSentenceList == null) {
       return null;
     }
-    bool isAnimation = dirName == "animation_openpose/";
-    this.isValidSentence = true;
-    print("splitSentenceList $splitSentenceList");
+    bool isAnimation = dirName.contains("animation");
     List<String> urls = [];
-    int j = 0,
-        k = 0;
     Map<String, List<String>> urlsWordsList = {};
 
-    Map<String, int> indicesMap = {"indexToUrl": j, "indexToWord": k};
     List<Future<void>> futures = <Future>[];
     for (int i = 0; i < splitSentenceList.length; i++) {
       // split sentence
       String word = splitSentenceList[i];
       // load urls in parallel
       futures.add(parallelGetUrls(
-          word, dirName, isAnimation, indicesMap, urlsWordsList, i));
+          word, dirName, isAnimation, urlsWordsList, i));
     }
 
     // wait for loading all urls
@@ -232,21 +214,21 @@ class VideoFetcher {
 
   /* parallelGetUrls function */
   Future<void> parallelGetUrls(String word, String dirName, bool isAnimation,
-      Map<String,int> indicesMap, Map<String,List<String>> urlsWords, int index) async{
+      Map<String,List<String>> urlsWords, int index) async{
     try {
       bool isSaved = (await lruCache.fetchVideoFile(word, isAnimation, null) != null);
       if (isSaved){
         String strStart = word.length == 1 ? "#" : "&&";
         List<String> listurls = [strStart];
-        addToMapsIndex(word, listurls, indicesMap, urlsWords, index); // add index
+        addToMapsIndex(word, listurls, urlsWords, index); // add index
         return;
       }
-      await _urlsTry(word, isAnimation, urlsWords, dirName, indicesMap, urls, index);
+      await _urlsTry(word, isAnimation, urlsWords, dirName, urls, index);
     } on io.SocketException catch (err) {
       print(err);
       print("no internet connection");
     } catch (err) {
-      await _urlsCatch(err, word, isAnimation, urlsWords, dirName, indicesMap,
+      await _urlsCatch(err, word, isAnimation, urlsWords, dirName,
           urls, index);
     }
   }
