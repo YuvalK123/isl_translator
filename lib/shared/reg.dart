@@ -129,8 +129,8 @@ Future<String> parallelCheckForUrl(List<String> initiatives, String dirName) asy
 /// checks if [word] is a verb by checking in [dirname] in firebase
 Future<String> checkIfVerb(String word, String dirName) async{
   // lalechet is a special verb with common use
-  if (lalechet.containsKey(word)){
-    return await getUrl(lalechet[word], dirName);
+  if (lalechet.contains(word)){
+    return await getUrl("ללכת", dirName);
   }
   List<String> initiatives = await wordToInitiatives(word, patterns, infinitives);
   if (initiatives != null){
@@ -448,16 +448,10 @@ Pair<List<String>,String> checkSpecialVerbs2(String verb, bool isRoot){
   return Pair(inftis, root);
 }
 
-Map<String, String> lalechet = {
-  "הלך": "ללכת",
-  "הלכה": "ללכת",
-  "הלכתי": "ללכת",
-  "ילך": "ללכת",
-  "תלך": "ללכת",
-  "הולך": "ללכת",
-  "הולכת": "ללכת",
-
-};
+List<String> lalechet = [
+  "ללכת", "הלך",
+  "הלכה",  "הלכתי",  "ילך",  "תלך",  "הולך",  "הולכת",  "הולכים", "הולכות"
+];
 
 List<String> startingletters = ["א","י","מ","נ","ת", "ה"]; // אזדקן, תזדקן, נזדקן, יזדקן, מזדקן, הזדקן
 List<String> specialRootLettersT = ["ד","ט","ת"];
