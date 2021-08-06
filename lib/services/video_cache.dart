@@ -35,6 +35,9 @@ class LruCache{
   void initAsync() async{
     this.liveDirectorySize = await sizeOfDirectory(cacheFolders["live"]);
     this.animDirectorySize = await sizeOfDirectory(cacheFolders["animation"]);
+    print("liveDirectorySize $liveDirectorySize");
+    print("animDirectorySize $animDirectorySize");
+
   }
 
   /// get size of [folderName]
@@ -45,13 +48,17 @@ class LruCache{
     Directory directory = Directory(cacheFolderPath);
     int size = 0;
     if (!(await directory.exists())){
+      print("directory ${directory.path} null");
       return 0;
     }
     try{
       directory.list(recursive: true).forEach((FileSystemEntity file) async{
+        print("in dir file is $file");
         if (file is File){
+          print("file is File");
           // length is in bits. convert to bytes
-          size += ((await file.length())/8).ceil();
+          size += ((await file.length())/8).floor();
+
           final fileName = file.path.split('/').last;
           if (!modifiedDates.containsKey(fileName)){
             modifiedDates[fileName] = (await file.stat()).modified;
@@ -77,6 +84,7 @@ class LruCache{
       });
       await Future.wait(futures);
       if (toDelete(isAnimation, 0)){
+        print("needs to delete");
         await deleteLeastRecentFile(isAnimation);
       }
 
@@ -246,8 +254,10 @@ class LruCache{
   bool toDelete(bool isAnimation, int fileSize){
     int currSize = isAnimation ? this.animDirectorySize : this.liveDirectorySize;
     if (this.maxSize >= currSize + fileSize){
+      print("to delete? false");
       return false;
     }
+    print("to delete? true");
     return true;
   }
 
@@ -258,8 +268,10 @@ class LruCache{
       this.hasBeenAnimation = isAnimation; // update folder
       await _updateLeastRecentFile(isAnimation);
     }
+    print("deleteLeastRecentFile");
     await _deleteLeastRecent(isAnimation); // delete at least once
     while (toDelete(isAnimation, 0)){ // delete until its good
+      print("in while");
       await _deleteLeastRecent(isAnimation);
       
     }
