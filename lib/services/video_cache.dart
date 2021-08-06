@@ -5,9 +5,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:isl_translator/services/video_fetcher.dart';
 import 'package:path_provider/path_provider.dart';
 
-List<String> lettersList = ["א","ב","ג","ד","ה","ו","ז","ח","ט",
-                         "י","כ","ך","ל","מ","ם","נ","ן","ס",
-                          "ע","פ","ף","צ","ץ","ק","ר","ש","ת"];
+// List<String> lettersList = ["א","ב","ג","ד","ה","ו","ז","ח","ט",
+//                          "י","כ","ך","ל","מ","ם","נ","ן","ס",
+//                           "ע","פ","ף","צ","ץ","ק","ר","ש","ת"];
 
 class LruCache{
   String lettersCachePath = "";
@@ -25,17 +25,13 @@ class LruCache{
   Pair<String, File> leastRecentFile;
 
   LruCache(int mbSize){
-    this.maxSize = mbSize * 1024 * 1024; // 10M
+    this.maxSize = mbSize * 1024 * 1024; // 20M
     initAsync();
   }
 
   void initAsync() async{
     this.liveDirectorySize = await sizeOfDirectory(cacheFolders["live"]);
     this.animDirectorySize = await sizeOfDirectory(cacheFolders["animation"]);
-  }
-
-  static String getPath() {
-    return Directory.current.path;
   }
 
   Future<void> saveVideosFromUrls(bool isAnimation, Map<String,String> urls) async{
@@ -49,13 +45,7 @@ class LruCache{
         if (url == "&&" || url == "#"){
           return;
         }
-        // if (await isFileExist(word, isAnimation)) {
-          // print("on $firebaseDirName/$word.mp4");
-          // String url = await VideoFetcher.getUrl(word, firebaseDirName);
-          bool isLetter = word.length == 1;
-          // print("adding $word to save");
-          futures.add(saveFile(url, word, isAnimation, isLetter, false));
-        // }
+          futures.add(saveFile(url, word, isAnimation, false));
       });
       await Future.wait(futures);
       if (toDelete(isAnimation, 0)){
@@ -79,9 +69,7 @@ class LruCache{
     if (folderName.endsWith("/")){
       folderName.substring(0, folderName.length - 1);
     }
-    print("folderName is $folderName");
     Directory directory = await getExternalStorageDirectory();
-    print("path is ${directory.path}");
     String newPath = "";
     List<String> folders = directory.path.split("/");
     for (int i = 1; i < folders.length; i++){
@@ -138,10 +126,11 @@ class LruCache{
   }
 
   Future<bool> saveFile(
-      String url, String title, bool isAnimation, bool isLetter, bool toUpdate
+      String url, String title, bool isAnimation, bool toUpdate
       ) async{
     String fileName = "$title.mp4";
     String cacheKey = isAnimation ? "animation" : "live";
+    bool isLetter = title.length == 1;
     String folderName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
     Directory directory;
     try {
@@ -155,10 +144,9 @@ class LruCache{
           return false;
         }
       } else{
-        // apple
+        // apple - not supported
         return false;
       }
-      // String newPath = await getCachePathByFolder(folderName);
       if (!(await directory.exists())){
         // if directory exists - no need to create it. o.w - create.
         await directory.create(recursive: true);
@@ -173,6 +161,7 @@ class LruCache{
         // save file
         Dio dio = Dio();
         await dio.download(url, saveFile.path,
+        // await dio.download(url, directory.path + "/$fileName",
             onReceiveProgress: (int received, int total) {
           if (this.saved.containsKey(title) || title.length < 2){
             return;
@@ -224,7 +213,6 @@ class LruCache{
     String cacheKey = isAnimation ? "animation" : "live";
     String dirName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
     final modifiedDates = isAnimation ? animModifiedDates : liveModifiedDates;
-    // String url = title.replaceFirst("#", dirName);
     String cacheFolder = await getCachePathByFolder(dirName);
     String url = "$cacheFolder/$title.mp4";
     File file = File(url);
@@ -249,7 +237,6 @@ class LruCache{
   }
 
   Future<bool> isFileExists(String word, bool isAnimation) async{
-    // String cacheFolder = !isAnimation ? cacheFolders["live"] : cacheFolders["animation"];
     String cacheKey = isAnimation ? "animation" : "live";
     bool isLetter = word.length == 1;
     String dirName = isLetter ? cacheLettersFolders[cacheKey] : cacheFolders[cacheKey];
@@ -261,13 +248,9 @@ class LruCache{
 
   bool toDelete(bool isAnimation, int fileSize){
     int currSize = isAnimation ? this.animDirectorySize : this.liveDirectorySize;
-    print("todelete? $currSize, $isAnimation, $fileSize");
-    print("this.maxSize >= currSize + fileSize\n ${this.maxSize} >= $currSize + $fileSize");
     if (this.maxSize >= currSize + fileSize){
-      print("return false");
       return false;
     }
-    print("return true");
     return true;
   }
 
@@ -276,26 +259,20 @@ class LruCache{
       await _updateLeastRecentFile(isAnimation);
     }
     if (this.leastRecentFile != null){
-      print("deleting least recent ${this.leastRecentFile.a} ${this.leastRecentFile.b}");
     }
     await _deleteLeastRecent(isAnimation);
     // get leastRecentDate
     while (toDelete(isAnimation, 0)){
-      print("in while");
       await _deleteLeastRecent(isAnimation);
       
     }
     
-    // await deleteFile(title, isAnimation, title.length == 1);
   }
 
   Future<void> _updateLeastRecentFile(bool isAnimation) async{
-    print("_updateLeastRecentFile");
     Pair<String, DateTime> leastRecent;
     final modifiedDates = isAnimation ? animModifiedDates : liveModifiedDates;
-    print("modified $modifiedDates");
     modifiedDates.forEach((String title, DateTime dateTime) {
-      print("in modified, $title, $dateTime");
       if (leastRecent == null){
         leastRecent = Pair(title, dateTime);
       } else{
@@ -305,9 +282,7 @@ class LruCache{
         }
       }
     });
-    print("try to fetch and update");
     File file = await fetchVideoFile(leastRecent.a, isAnimation, null);
-    print("fetched and updated $file ${leastRecent.a}");
     this.leastRecentFile = Pair<String, File>(leastRecent.a, file);
   }
 
@@ -318,13 +293,7 @@ class LruCache{
         return;
       }
     }
-    try{
-      print("_deleteLeastRecent leastRecentFile $leastRecentFile ${leastRecentFile.a}, ${leastRecentFile.b}");
-    } catch (e){
-      print("e is $e");
-    }
 
-    // int size = await this.leastRecentFile.b.length();
     int size = this.saved[this.leastRecentFile.a];
     String title = this.leastRecentFile.a;
     this.leastRecentFile.b.delete(recursive: true);
@@ -340,7 +309,6 @@ class LruCache{
   }
 
   Future<int> sizeOfDirectory(String folderName) async{
-    print("in sizeOf for $folderName");
     String cacheFolderPath = await getCachePathByFolder(folderName);
     bool isAnimation = folderName.contains("animation");
     final modifiedDates = isAnimation ? animModifiedDates : liveModifiedDates;
@@ -351,9 +319,7 @@ class LruCache{
     }
     try{
       directory.list(recursive: true).forEach((FileSystemEntity file) async{
-        print("listing entities $file");
         if (file is File){
-          print("its a file!");
           // size += (await file.stat()).size;
           size += ((await file.length())/8).floor();
           final fileName = file.path.split('/').last;
@@ -361,9 +327,7 @@ class LruCache{
             modifiedDates[fileName] = (await file.stat()).modified;
           }
         }
-        print("modified == $modifiedDates}");
       });
-      print("size of directory is $size");
       return size;
     } catch (e){
       print("error of sizeOfDirectory $e");
