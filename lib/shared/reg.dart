@@ -5,10 +5,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:isl_translator/models/pair.dart';
 import 'package:isl_translator/services/video_fetcher.dart';
 
-List<String> prepositionalLetters = ["כש","ב","כ","מה","מ","ל", "וה","ו", "ה", "ש"];
-List<String> prepositional2Letters = ["כש","מה","וה"];
-List<String> prepositionalWords = ["של", "את"];
-
+List<String> prepositionalLetters = ["ב","כ","מ","ל","ו", "ה", "ש"];
+List<String> prepositional2Letters = ["כש","מה","וש","ומ","וה","ול","וב","וכ"];
 
 Map<String, String> hebrewChars = {
   "א" : "U+05D0",
