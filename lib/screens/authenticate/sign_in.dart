@@ -229,7 +229,5 @@ class _SignInState extends State<SignIn> {
       return "invalid email address";
     }
     return null;
-
   }
-
 }

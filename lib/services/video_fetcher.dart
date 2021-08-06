@@ -157,7 +157,7 @@ class VideoFetcher {
     await Future.wait(futures);
     handleMapsAfterGet(urlsWordsList);
     // save videos to cache
-    await lruCache.saveVideosFromUrls(isAnimation, wordsToUrlsNew);
+    lruCache.saveVideosFromUrls(isAnimation, wordsToUrlsNew);
     return true;
   }
 

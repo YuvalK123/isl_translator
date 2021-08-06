@@ -432,6 +432,9 @@ Pair<List<String>,String> checkSpecialVerbs2(String verb, bool isRoot){
   // אתמר במקום אתתמר, אטלפן, אדפק
   String root = verb;
   List<String> inftis = [];
+  if (verb.length < 2){
+    return null;
+  }
   if (!isRoot){
     if (!specialRootLettersT.contains(verb[1]) || !startingletters.contains(verb[0])){
       return null;
