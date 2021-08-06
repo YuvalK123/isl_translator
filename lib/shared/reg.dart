@@ -371,6 +371,25 @@ Future<String> parallelFindUrlInList(List<String> words, String dirName) async{
   return null;
 }
 
+/// if [word] ends with a letter of final letter needed, convert it
+String handleFinalLetter(String word){
+  String lastLetter = word[word.length - 1],
+      subStr = word.substring(0,word.length - 1);
+  if (lastLetter == "כ"){
+    word = subStr + "ך";
+  } else if (lastLetter == "מ"){
+    word = subStr + "ם";
+  } else if (lastLetter == "נ"){
+    word = subStr + "ן";
+  } else if (lastLetter == "צ"){
+    word = subStr + "ץ";
+  }else if (lastLetter == "פ"){
+    word = subStr + "ף";
+  }
+  return word;
+}
+
+
 ///  checks if its male/female [word], and sends versions of it with
 ///  the [dirname] to see if works
 Future<String> checkGenderCase(String word, String dirName) async{
@@ -394,6 +413,7 @@ Future<String> checkGenderCase(String word, String dirName) async{
   }
   if (singularVersions.isNotEmpty){
     if (singular.length > 1){
+      singular = handleFinalLetter(singular);
       singularVersions.add(singular);
     }
     var url = await parallelFindUrlInList(singularVersions, dirName);

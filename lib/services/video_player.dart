@@ -147,7 +147,12 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
       return controller;
     }
     if (url == "&&" || url == "#"){
-      url = await this._videoFetcher.getUrl(word, dirName);
+      try{
+        url = await this._videoFetcher.getUrl(word, dirName);
+      } catch (e){
+        return null;
+      }
+
     }
     controller = VideoPlayerController.network(url);
     return controller;
