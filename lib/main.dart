@@ -11,7 +11,7 @@ void main() async {
   await Firebase.initializeApp();
   final user = FirebaseAuth.instance.currentUser;
   runApp(MyApp());
-  if (user != null && user.uid != null && !user.emailVerified){
+  if (user != null && user.uid != null && user.emailVerified){
     await findTermsDB();
   }
 }
