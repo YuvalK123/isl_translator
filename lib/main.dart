@@ -7,11 +7,14 @@ import 'package:provider/provider.dart';
 import 'package:isl_translator/services/handle_sentence.dart';
 
 void main() async {
+  // init connection with firebase
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  // get user
+  runApp(MyApp()); // run app
   final user = FirebaseAuth.instance.currentUser;
-  runApp(MyApp());
-  if (user != null && user.uid != null && user.emailVerified){
+  if (user != null && user.uid != null && (user.emailVerified || user.isAnonymous)){
+    // if user exists, and its a valid entrence
     await findTermsDB();
   }
 }
