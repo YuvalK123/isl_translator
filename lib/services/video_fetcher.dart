@@ -71,7 +71,7 @@ class VideoFetcher {
     return urls;
   }
 
-  static Future<String> getUrl(String word, String firebaseDirName) async{
+   Future<String> getUrl(String word, String firebaseDirName) async{
     String exec = firebaseDirName.contains("animation") ? ".mp4" : ".mkv";
     Reference ref = FirebaseStorage.instance
         .ref()
@@ -113,20 +113,19 @@ class VideoFetcher {
         urls.add(url);
         return;
       }
-      for (int i = 0; i < urlsList.length; i++) {
-        String letter = letters[i];
-        bool isSaved = savedLetters.contains(letter);
-        if (!isSaved){
-          isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
-          if (isSaved){
-            savedLetters.add(letter);
-          }
-        }
-
-        String url = urlsList[i];
-        addToMapsIndex(word, urlsList, urlsWords, index);
-        urls.add(url);
-      }
+      // for (int i = 0; i < urlsList.length; i++) {
+      //   String letter = letters[i];
+      //   bool isSaved = savedLetters.contains(letter);
+      //   if (!isSaved){
+      //     isSaved = await lruCache.fetchVideoFile(letters[i], isAnimation, "#") != null;
+      //     if (isSaved){
+      //       savedLetters.add(letter);
+      //     }
+      //   }
+      //   String url = urlsList[i];
+      //   urls.add(url);
+      // }
+      addToMapsIndex(word, urlsList, urlsWords, index);
     }
   }
 
@@ -139,7 +138,7 @@ class VideoFetcher {
     urlsWords[word] = urls;
   }
 
-  Future<List> getUrls(String dirName, bool toSave) async {
+  Future<List> getUrls(String dirName) async {
     List<String> splitSentenceList = splitSentence(sentence); // split the sentence
     if (splitSentenceList == null) {
       return null;
@@ -203,14 +202,11 @@ class VideoFetcher {
     }
 
     this.urls = urls;
-    if (toSave) {
-
-    }
     this.wordsToUrls = urlsWordsList;
     // save video to cache
-    if (toSave) {
+    // if (toSave) {
       await lruCache.saveVideosFromUrls(isAnimation, wordsToUrlsNew);
-    }
+    // }
     this.doneLoading = true;
     return urls;
   }
