@@ -458,7 +458,8 @@ class _VideoPlayer2State extends State<VideoPlayer2> {
                               controller = snapshot.data;
                             }
                             // if (!controller.value.isInitialized){
-                            if (!isInit[this._videoFetcher.indexToUrlNew[index] + index.toString()]){
+                            String key = this._videoFetcher.indexToUrlNew[index] + index.toString();
+                            if (isInit.containsKey(key) && !isInit[key]){
                               return Loading();
                             }
                             return VideoPlayer(controller);

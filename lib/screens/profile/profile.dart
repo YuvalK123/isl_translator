@@ -573,7 +573,8 @@ class MapScreenState extends State<ProfilePage>
                                                                                 EdgeInsets.only(right: 10.0),
                                                                             child: Container(
                                                                                 child: new RaisedButton(
-                                                                              child: Text("ביטול", overflow: TextOverflow.ellipsis,),
+                                                                              child: Text("ביטול",
+                                                                              maxLines: 1,),
                                                                               onPressed: () async {
                                                                                 if (_formKey.currentState.validate()) {
                                                                                   _formKey.currentState.save();
@@ -582,7 +583,8 @@ class MapScreenState extends State<ProfilePage>
                                                                               },
                                                                               textColor: Colors.white,
                                                                               color: Colors.red,
-                                                                              shape: new RoundedRectangleBorder(borderRadius: new BorderRadius.circular(20.0)),
+                                                                              shape: new RoundedRectangleBorder(
+                                                                                  borderRadius: new BorderRadius.circular(20.0)),
                                                                             )),
                                                                           ),
                                                                           flex:

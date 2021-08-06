@@ -16,7 +16,8 @@ class LruCache{
   bool hasPermission = false;
   int animDirectorySize = 0;
   int liveDirectorySize = 0;
-  Map<String, int> saved = {}; // saved words in this run, and their sizes
+  Map<String, int> animSaved = {}; // saved words in this run, and their sizes
+  Map<String, int> liveSaved = {}; // saved words in this run, and their sizes
   Map<String, DateTime> animModifiedDates = {};
   Map<String, DateTime> liveModifiedDates = {};
   static final animSavedLetters = <String>[];
@@ -28,6 +29,7 @@ class LruCache{
 
   /// constructor recieves maxsize in mb [mbSize]
   LruCache(int mbSize){
+    // this.maxSize = mbSize * 8388608; // 20M
     this.maxSize = mbSize * 1024 * 1024; // 20M
     _initAsync();
   }
@@ -49,21 +51,37 @@ class LruCache{
       return 0;
     }
     try{
-      directory.list(recursive: true).forEach((FileSystemEntity file) async{
-        if (file is File){
-          // length is in bits. convert to bytes
-          size += ((await file.length())/8).ceil();
-          final fileName = file.path.split('/').last;
-          if (!modifiedDates.containsKey(fileName)){
-            modifiedDates[fileName] = (await file.stat()).modified;
-          }
-        }
-      });
+      List<FileSystemEntity> files = directory.listSync(recursive: true);
+      for (var file in files){
+        size += await check(file, modifiedDates, isAnimation);
+      }
       return size;
     } catch (e){
       print("error of sizeOfDirectory $e");
     }
     return 0;
+  }
+
+  Future<int> check(FileSystemEntity file, Map<String, DateTime> modifiedDates,
+      bool isAnimation) async{
+    int size = 0;
+    if (file is File){
+      final fileName = file.path.split('/').last;
+      final title = fileName.split(".")[0];
+      if (title.length < 2){
+        return 0;
+      }
+      // length is in bits.
+      size += (await file.length());
+
+
+      final saved = isAnimation ? this.animSaved : this.liveSaved;
+      if (!modifiedDates.containsKey(fileName) && title.length > 1){
+        modifiedDates[title] = (await file.stat()).modified;
+        saved[title] = size;
+      }
+    }
+    return size;
   }
 
   /// save videos from [urls] list in respective directory if [isAnimation]
@@ -80,7 +98,6 @@ class LruCache{
       if (toDelete(isAnimation, 0)){
         await deleteLeastRecentFile(isAnimation);
       }
-
     } catch(e){
       print("e for words $urls is $e\n failed to save from list");
     }
@@ -166,7 +183,8 @@ class LruCache{
         if (saveFile != null){ // add file modifiedDate
           modifiedDates[title] = (await saveFile.stat()).modified;
         }
-        if (toUpdate && toDelete(isAnimation, this.saved[title])){
+        final saved = isAnimation ? this.animSaved : this.liveSaved;
+        if (toUpdate && toDelete(isAnimation, saved[title]) && !isLetter){
           await deleteLeastRecentFile(isAnimation);
         }
         List<String> savedLetters = isAnimation ?
@@ -188,10 +206,11 @@ class LruCache{
   /// so we update it while running. size in bits is [total]
   void onReceiveProgress(int received, int total, String title, bool isAnimation){
     // no need to save current file size if already saved
-    if (this.saved.containsKey(title) || title.length < 2){
+    final saved = isAnimation ? this.animSaved : this.liveSaved;
+    if (saved.containsKey(title) || title.length < 2){
       return;
     }
-    this.saved[title] = total;
+    saved[title] = total;
     if (isAnimation){
       this.animDirectorySize += total;
     } else{
@@ -245,6 +264,7 @@ class LruCache{
 
   /// checks if needs to delete a file in folder
   bool toDelete(bool isAnimation, int fileSize){
+
     int currSize = isAnimation ? this.animDirectorySize : this.liveDirectorySize;
     if (this.maxSize >= currSize + fileSize){
       return false;
@@ -262,7 +282,6 @@ class LruCache{
     await _deleteLeastRecent(isAnimation); // delete at least once
     while (toDelete(isAnimation, 0)){ // delete until its good
       await _deleteLeastRecent(isAnimation);
-      
     }
     
   }
@@ -270,8 +289,11 @@ class LruCache{
   /// update the least recent file from the [isAnimation] folder
   Future<void> _updateLeastRecentFile(bool isAnimation) async{
     Pair<String, DateTime> leastRecent;
-    final modifiedDates = isAnimation ? animModifiedDates : liveModifiedDates;
+    var modifiedDates = isAnimation ? animModifiedDates : liveModifiedDates;
     modifiedDates.forEach((String title, DateTime dateTime) {
+      if (title.length < 2){
+        return;
+      }
       if (leastRecent == null){
         leastRecent = Pair(title, dateTime);
       } else{
@@ -281,32 +303,45 @@ class LruCache{
         }
       }
     });
+    if (leastRecent == null){
+      this.leastRecentFile = null;
+      return;
+    }
     File file = await fetchVideoFile(leastRecent.a, isAnimation, null);
+    if (file == null){
+      this.leastRecentFile = null;
+      return;
+    }
     this.leastRecentFile = Pair<String, File>(leastRecent.a, file);
   }
 
   /// delete least recent file
   Future<void> _deleteLeastRecent(bool isAnimation) async{
     // if no least recent file
-    if (this.leastRecentFile == null){
+    if (this.leastRecentFile == null || this.leastRecentFile.b == null ){
       await _updateLeastRecentFile(isAnimation);
       // no file to delete
-      if (this.leastRecentFile == null){
+      if (this.leastRecentFile == null  || this.leastRecentFile.b == null){
         return;
       }
     }
-
-    int size = this.saved[this.leastRecentFile.a];
+    final saved = isAnimation ? this.animSaved : this.liveSaved;
     String title = this.leastRecentFile.a;
-    this.leastRecentFile.b.delete(recursive: true);
-    if (isAnimation){
-      this.animModifiedDates.remove(title);
-      this.animDirectorySize -= size;
-    } else{
-      this.liveModifiedDates.remove(title);
-      this.liveDirectorySize -= size;
+    int size = saved[title];
+    try{
+      size = await this.leastRecentFile.b.length();
+      await this.leastRecentFile.b.delete(recursive: true);
+    } catch (e){
+      print("in deletion err is $e");
     }
-    this.saved.remove(this.leastRecentFile.a);
+    if (isAnimation && this.animModifiedDates.containsKey(title) && size != null){
+      this.animModifiedDates.remove(title);
+      this.animDirectorySize = this.animDirectorySize - size;
+    } else if (this.liveModifiedDates.containsKey(title) && size != null){
+      this.liveModifiedDates.remove(title);
+      this.liveDirectorySize = this.liveDirectorySize - size;
+    }
+    saved.remove(title);
     await _updateLeastRecentFile(isAnimation);
   }
 
