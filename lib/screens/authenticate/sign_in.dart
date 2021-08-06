@@ -69,10 +69,10 @@ class _SignInState extends State<SignIn> {
                         Container(
                           alignment: Alignment.topRight,
                             child: Text(
-                              "ברוך הבא", style:
+                              "ברוכים הבאים", style:
                             TextStyle(
                                 fontWeight: FontWeight.bold,
-                                fontSize: 40,
+                                fontSize: 30,
                                 fontStyle: FontStyle.italic
                             ),
                               textDirection: TextDirection.rtl,
